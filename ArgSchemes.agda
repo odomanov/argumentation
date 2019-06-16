@@ -124,10 +124,11 @@ ThString (Neg (Th s)) = "NOT DEFINED"
 
 StString : String → Statement → String
 StString pre (st nothing th wt) = "\n"
-  +++ pre +++ "THESIS: " +++ ThString th +++ " (" +++ primShowFloat wt +++ ") " 
+  +++ pre +++ ThString th +++ " (" +++ primShowFloat wt +++ ") " 
 StString pre (st (just t) th wt) = "\n"
-  +++ pre +++ "TEXT:   " +++ t +++ "\n"
-  +++ pre +++ "THESIS: " +++ ThString th +++ " (" +++ primShowFloat wt +++ ") " 
+  +++ pre +++ ThString th +++ " (" +++ primShowFloat wt +++ ")" +++ "\n" 
+  +++ pre +++ "(TEXT: " +++ t +++ ")" 
+
 
 -- Печать цели / вывода
 
