@@ -34,25 +34,25 @@ record A-от-эксперта : Set where
     эксперт : Statement
     говорит : Statement
     область : Statement 
-    цель    : Statement
+    вывод   : Statement
     Q1      : Maybe Statement
 
 record A-от-примера : Set where
   field
     пример : Statement
-    цель   : Statement
+    вывод  : Statement
 
 record A-от-причины-к-следствию : Set where
   field
     причинная-связь : Statement
     причина         : Statement
-    цель            : Statement
+    следствие       : Statement
     
 record A-от-следствия-к-причине : Set where
   field
     причинная-связь : Statement
     следствие       : Statement
-    цель            : Statement
+    причина         : Statement
 
 record A-от-знака : Set where
   field
@@ -64,26 +64,25 @@ record A-абдукция : Set where
   field
     факт       : Statement
     объяснение : Statement
-    цель       : Statement
+    вывод      : Statement
     
 record A-ad-hominem : Set where
   field
     плохой-человек : Statement
     говорит        : Statement
-    цель           : Statement
+    вывод          : Statement
 
 record A-ad-hominem-arg : Set where
   inductive
   field
     плохой-человек : Statement
     аргумент       : Argument
-    цель           : Argument
 
 record A-от-альтернативы : Set where
   field
     альтернатива : Statement
     неверно      : Statement
-    цель         : Statement
+    верно        : Statement
     
 data Argument where
   `dummy : Argument
@@ -130,6 +129,20 @@ StString pre (st (just t) th wt) = "\n"
   +++ pre +++ "TEXT:   " +++ t +++ "\n"
   +++ pre +++ "THESIS: " +++ ThString th +++ " (" +++ primShowFloat wt +++ ") " 
 
+-- Печать цели / вывода
+
+ЦельString : String → Argument → String 
+ЦельString _ `dummy = ""
+ЦельString pre (`от-эксперта a) = StString pre (A-от-эксперта.вывод a)
+ЦельString pre (`от-примера a) =  StString pre (A-от-примера.вывод a)
+ЦельString pre (`от-причины-к-следствию a) =  StString pre (A-от-причины-к-следствию.следствие a)
+ЦельString pre (`от-следствия-к-причине a) =  StString pre (A-от-следствия-к-причине.причина a)
+ЦельString pre (`от-знака a) =  StString pre (A-от-знака.цель a)
+ЦельString pre (`абдукция a) =  StString pre (A-абдукция.вывод a)
+ЦельString pre (`ad-hominem a) =  StString pre (A-ad-hominem.вывод a)
+ЦельString pre (`ad-hominem-arg a) =  "Аргумент сомнителен"
+ЦельString pre (`от-альтернативы a) =  StString pre (A-от-альтернативы.верно a)
+
 
 concl-line = "----------"
 dpre : String → String
@@ -144,38 +157,38 @@ AString pre (`от-эксперта a) =
   +++ npre pre +++ "говорит: " +++ StString (dpre pre) (A-от-эксперта.говорит a)
   +++ npre pre +++ "область: " +++ StString (dpre pre) (A-от-эксперта.область a)
   +++ npre pre +++ concl-line
-  +++ pre +++ StString pre (A-от-эксперта.цель  a)
+  +++ pre +++ ЦельString pre (`от-эксперта a)
 AString pre (`от-примера a) =
   npre pre +++ "пример: " +++ StString (dpre pre) (A-от-примера.пример a)
   +++ npre pre +++ concl-line
-  +++ pre +++ StString pre (A-от-примера.цель  a)
+  +++ pre +++ ЦельString pre (`от-примера a)
 AString pre (`от-причины-к-следствию a) =
   npre pre
   +++ "причинная связь: " +++ StString (dpre pre) (A-от-причины-к-следствию.причинная-связь a)
   +++ npre pre +++ "причина: " +++ StString (dpre pre) (A-от-причины-к-следствию.причина a)
   +++ npre pre +++ concl-line
-  +++ pre +++ StString pre (A-от-причины-к-следствию.цель  a)
+  +++ pre +++ ЦельString pre (`от-причины-к-следствию a)
 AString pre (`от-следствия-к-причине a) =
   npre pre
   +++ "причинная связь: " +++ StString (dpre pre) (A-от-следствия-к-причине.причинная-связь a)
   +++ npre pre +++ "следствие: " +++ StString (dpre pre) (A-от-следствия-к-причине.следствие a)
   +++ npre pre +++ concl-line
-  +++ pre +++ StString pre (A-от-следствия-к-причине.цель  a)
+  +++ pre +++ ЦельString pre (`от-следствия-к-причине a)
 AString pre (`от-знака a) =
   npre pre +++ "знак: " +++ StString (dpre pre) (A-от-знака.знак a)
   +++ npre pre +++ "связь-со-знаком: " +++ StString (dpre pre) (A-от-знака.связь-со-знаком a)
   +++ npre pre +++ concl-line
-  +++ pre +++ StString pre (A-от-знака.цель  a)
+  +++ pre +++ ЦельString pre (`от-знака a)
 AString pre (`абдукция a) =
   npre pre +++ "факт: " +++ StString (dpre pre) (A-абдукция.факт a)
   +++ npre pre +++ "объяснение: " +++ StString (dpre pre) (A-абдукция.объяснение a)
   +++ npre pre +++ concl-line
-  +++ pre +++ StString pre (A-абдукция.цель  a)
+  +++ pre +++ ЦельString pre (`абдукция a)
 AString pre (`ad-hominem a) =
   npre pre +++ "плохой человек: " +++ StString (dpre pre) (A-ad-hominem.плохой-человек a)
   +++ npre pre +++ "говорит: " +++ StString (dpre pre) (A-ad-hominem.говорит a)
   +++ npre pre +++ concl-line
-  +++ pre +++ StString pre (A-ad-hominem.цель  a)
+  +++ pre +++ ЦельString pre (`ad-hominem a)
 AString pre (`ad-hominem-arg a) =
   npre pre +++ "плохой человек: " +++ StString (dpre pre) (A-ad-hominem-arg.плохой-человек a)
   +++ npre pre +++ "аргумент: " +++ AString (dpre pre) (A-ad-hominem-arg.аргумент a)
@@ -185,5 +198,5 @@ AString pre (`от-альтернативы a) =
   npre pre +++ "альтернатива: " +++ StString (dpre pre) (A-от-альтернативы.альтернатива a)
   +++ npre pre +++ "неверно: " +++ StString (dpre pre) (A-от-альтернативы.неверно a)
   +++ npre pre +++ concl-line
-  +++ pre +++ StString pre (A-от-альтернативы.цель  a)
+  +++ pre +++ ЦельString pre (`от-альтернативы a)
 
