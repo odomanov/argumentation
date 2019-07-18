@@ -1,12 +1,17 @@
 module ArgSchemes where
 
-open import Data.Unit
--- open import Relation.Binary.PropositionalEquality using (_≡_; _≢_; refl)
-open import Data.List
-open import Data.String renaming (_++_ to _+++_)
-open import Data.Maybe
+open import Data.Bool
 open import Data.Float
+open import Data.List
+open import Data.Maybe
+open import Data.String renaming (_++_ to _+++_)
+open import Data.Unit
+open import Relation.Binary
+open import Relation.Binary.PropositionalEquality using (_≡_; _≢_; refl)
+open import Relation.Nullary
+open import Relation.Nullary.Decidable
 
+open import ArgPrelude
 
 record Thesis' : Set where
   field
@@ -18,12 +23,30 @@ data Thesis : Set where
   Neg : Thesis → Thesis  -- отрицание тезиса
   Th  : String → Thesis  -- если  отрицание не определено / не требуется
 
+-- bool equality
+_=T_ : Thesis → Thesis → Bool
+(Pos x) =T (Pos y) with (Thesis'.pos x) Data.String.≟ (Thesis'.pos y)
+... | yes _ = true
+... | no _  = false
+(Neg x) =T (Neg y) = x =T y
+(Th x) =T (Th y) with x Data.String.≟ y
+... | yes _ = true
+... | no _  = false
+_ =T _ = false
+
 record Statement : Set where
   constructor st
   field
     text   : Maybe String  -- сам текст
     thesis : Thesis        -- его смысл / расшифровка (пропозиция)
     weight : Float
+
+-- bool equality
+_=S_ : Statement → Statement → Bool
+(st _ x _) =S (st _ y _) = x =T y
+
+
+
 
 ------------  Определение схем аргументов  ----------
 
