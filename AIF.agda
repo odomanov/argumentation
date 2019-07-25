@@ -36,111 +36,66 @@
 
 module AIF where
 
-open import Agda.Builtin.Equality.Erase
+-- open import Agda.Builtin.Equality.Erase
 open import Data.Bool
+open import Data.Empty using (⊥)
 open import Data.Float
 open import Data.List
+open import Data.List.Membership.Propositional
 open import Data.Maybe
 open import Data.Product
 open import Data.String renaming (_++_ to _+++_)
-open import Data.Unit
+open import Data.Unit using (⊤)
+open import Function.Equivalence using (_⇔_)
 open import Level renaming (zero to lzero; suc to lsuc)
-open import Relation.Binary using (Decidable)
 open import Relation.Binary.PropositionalEquality using (_≡_; _≢_; refl)
 open import Relation.Nullary
-open import Relation.Nullary.Decidable
 
 open import ArgPrelude
-open import ArgSchemes
-open import LabelAlgebra  -- nodes are labeled
+open import LabelAlgebra renaming (⊤ to LA⊤; ⊥ to LA⊥)  -- nodes are labeled
 
 
 -- Roles ----------------------------------------------------------
 
 
 data Role    : Set where
-  эксперт    : Role
-  говорит    : Role
-  область    : Role
-  факт       : Role
-  объяснение : Role
-  вывод      : Role
-  -- Q1      : Maybe 
-  пример     : Role
-  аргумент   : Role
+  role : String → Role
+  
+эксперт      = role "эксперт"
+говорит      = role "говорит"
+область      = role "область"
+факт         = role "факт"
+объяснение   = role "объяснение"
+вывод        = role "вывод"
+пример       = role "пример"
+все-признают = role "все-признают"
+поддержка    = role "поддержка"
+атака        = role "атака"
 
--- ugly definition, yes
-_=R?_ : Decidable {A = Role} _≡_
-эксперт =R? эксперт       = yes refl    
-говорит =R? говорит       = yes refl 
-область =R? область       = yes refl 
-факт =R? факт             = yes refl 
-объяснение =R? объяснение = yes refl 
-вывод =R? вывод           = yes refl 
-пример =R? пример         = yes refl
-аргумент =R? аргумент     = yes refl
-эксперт =R? говорит       = no λ()
-эксперт =R? область       = no λ()       
-эксперт =R? факт          = no λ() 
-эксперт =R? объяснение    = no λ() 
-эксперт =R? вывод         = no λ() 
-эксперт =R? пример        = no λ() 
-эксперт =R? аргумент      = no λ() 
-говорит =R? эксперт       = no λ() 
-говорит =R? область       = no λ() 
-говорит =R? факт          = no λ() 
-говорит =R? объяснение    = no λ() 
-говорит =R? вывод         = no λ() 
-говорит =R? пример        = no λ() 
-говорит =R? аргумент      = no λ() 
-область =R? эксперт       = no λ() 
-область =R? говорит       = no λ() 
-область =R? факт          = no λ() 
-область =R? объяснение    = no λ() 
-область =R? вывод         = no λ() 
-область =R? пример        = no λ() 
-область =R? аргумент      = no λ() 
-факт =R? эксперт          = no λ() 
-факт =R? говорит          = no λ() 
-факт =R? область          = no λ() 
-факт =R? объяснение       = no λ() 
-факт =R? вывод            = no λ() 
-факт =R? пример           = no λ() 
-факт =R? аргумент         = no λ() 
-объяснение =R? эксперт    = no λ() 
-объяснение =R? говорит    = no λ() 
-объяснение =R? область    = no λ() 
-объяснение =R? факт       = no λ() 
-объяснение =R? вывод      = no λ() 
-объяснение =R? пример     = no λ() 
-объяснение =R? аргумент   = no λ() 
-вывод =R? эксперт         = no λ() 
-вывод =R? говорит         = no λ() 
-вывод =R? область         = no λ() 
-вывод =R? факт            = no λ() 
-вывод =R? объяснение      = no λ() 
-вывод =R? пример          = no λ() 
-вывод =R? аргумент        = no λ() 
-пример =R? эксперт        = no λ() 
-пример =R? говорит        = no λ() 
-пример =R? область        = no λ() 
-пример =R? факт           = no λ() 
-пример =R? объяснение     = no λ() 
-пример =R? вывод          = no λ() 
-пример =R? аргумент       = no λ() 
-аргумент =R? эксперт      = no λ() 
-аргумент =R? говорит      = no λ() 
-аргумент =R? область      = no λ() 
-аргумент =R? факт         = no λ() 
-аргумент =R? объяснение   = no λ() 
-аргумент =R? вывод        = no λ() 
-аргумент =R? пример       = no λ() 
+Roles : List Role
+Roles = 
+  эксперт    ∷   
+  говорит    ∷
+  область    ∷
+  факт       ∷
+  объяснение ∷
+  вывод      ∷
+  пример     ∷
+  все-признают ∷
+  поддержка  ∷
+  атака      ∷
+  []
 
 _=R_ : Role → Role → Bool
-r =R r' with r =R? r'
+role r =R role r' with r Data.String.≟ r'
 ... | yes _ = true
 ... | no _ = false
 
+
+instance
+  REq : BEq Role
+  _===_ {{REq}} x y = x =R y
+  
 -- TODO: get rid of dependence on order
 _=LR_ : List Role → List Role → Bool
 [] =LR [] = true
@@ -148,20 +103,21 @@ _=LR_ : List Role → List Role → Bool
 _  =LR [] = false
 (x ∷ xs) =LR (y ∷ ys) = (x =R y) ∧ xs =LR ys
 
+_≡LR_ : List Role → List Role → Set
+[] ≡LR [] = ⊤
+(_ ∷ _)  ≡LR [] = ⊥
+[] ≡LR (_ ∷ _)  = ⊥
+-- x ≡LR y = ∀ z → (z ∈ x ⇔ z ∈ y)
+x ≡LR y = (∀ z → (z ∈ x → z ∈ y)) × (∀ z → (z ∈ y → z ∈ x))
+-- x ≡LR y = (All (λ z → z ∈ y) x) × (All (λ z → z ∈ x) y)
+
+
+
+
 
 -- Nodes -------------------------------------------------------
 
-record I-node : Set where
-  constructor mkI
-  field
-    Body : Statement
-
-record CA-Scheme : Set where
-  inductive
-  constructor mkCA
-  field
-    Conflicting : Role
-    Conflicted  : Role
+-- first, let's define schemes
 
 record RA-Scheme : Set where
   inductive
@@ -172,6 +128,13 @@ record RA-Scheme : Set where
     -- Presumptions : List Role -- critical questions / условия применимости
     -- Exceptions   : List Role -- critical questions / исключения
 
+record CA-Scheme : Set where
+  inductive
+  constructor mkCA
+  field
+    Conflicting : Role
+    Conflicted  : Role
+
 record PA-Scheme : Set where
   inductive
   constructor mkPA
@@ -179,53 +142,92 @@ record PA-Scheme : Set where
     Preferred    : Role 
     Dispreferred : Role
 
+-- two types of nodes:
+
+record I-node : Set where
+  constructor mkI
+  field
+    Body : Statement
+
 data S-node : Set where
   SR : RA-Scheme → S-node
   SC : CA-Scheme → S-node
   SP : PA-Scheme → S-node
 
+open RA-Scheme {{...}} public
+
 
 -- various equalities
 
 _=RA_ : RA-Scheme → RA-Scheme → Bool
-(mkRA p c) =RA (mkRA p' c') = p =LR p' ∧ c =R c'
+(mkRA p c) =RA (mkRA p' c') = p =LR p' ∧ c === c'
 
 _=CA_ : CA-Scheme → CA-Scheme → Bool
-(mkCA x y) =CA (mkCA x' y') = x =R x' ∧ y =R y'
+(mkCA x y) =CA (mkCA x' y') = x === x' ∧ y === y'
 
 _=PA_ : PA-Scheme → PA-Scheme → Bool
-(mkPA x y) =PA (mkPA x' y') = x =R x' ∧ y =R y'
+(mkPA x y) =PA (mkPA x' y') = x === x' ∧ y === y'
 
+instance
+  RAEq : BEq RA-Scheme
+  _===_ {{RAEq}} x y = x =RA y
+  
+instance
+  CAEq : BEq CA-Scheme
+  _===_ {{CAEq}} x y = x =CA y
+  
+instance
+  PAEq : BEq PA-Scheme
+  _===_ {{PAEq}} x y = x =PA y
+  
 
 
 module _ {c ℓ₁ ℓ₂} {la : LabelAlgebra c ℓ₁ ℓ₂} where
 
   mutual
    
-    -- nodes are labeled
+    -- Nodes are labeled. The node's value may be 'nothing'.
     data Node' : Set (c ⊔ ℓ₁ ⊔ ℓ₂) where
       In : I-node → Node'
       Sn : S-node → Node'
    
     data Node : Set (c ⊔ ℓ₁ ⊔ ℓ₂) where
       Ln : Node' → Maybe (Carrier la) → Node
-   
+
+    -- Node equality, boolean.
+    -- Label value is not checked.
     _=N_ : Node → Node → Bool
-    Ln (In (mkI x1)) v1 =N Ln (In (mkI x2)) v2 = x1 =S x2 -- ∧ (v1 =L v2)
-    Ln (Sn (SR ra1)) _  =N Ln (Sn (SR ra2)) _  = ra1 =RA ra2
-    Ln (Sn (SC ca1)) _  =N Ln (Sn (SC ca2)) _  = ca1 =CA ca2
-    Ln (Sn (SP pa1)) _  =N Ln (Sn (SP pa2)) _  = pa1 =PA pa2
+    Ln (In (mkI x1)) v1 =N Ln (In (mkI x2)) v2 = x1 === x2 -- ∧ (v1 =L v2)
+    Ln (Sn (SR ra1)) _  =N Ln (Sn (SR ra2)) _  = ra1 === ra2
+    Ln (Sn (SC ca1)) _  =N Ln (Sn (SC ca2)) _  = ca1 === ca2
+    Ln (Sn (SP pa1)) _  =N Ln (Sn (SP pa2)) _  = pa1 === pa2
     _ =N _ = false
 
+    instance 
+      NEq : BEq Node
+      _===_ {{NEq}} x y = x =N y
+  
     _=RN_ : (Role × Node) → (Role × Node) → Bool
-    (r1 , nd1) =RN (r2 , nd2) = r1 =R r2 ∧ nd1 =N nd2
+    (r1 , nd1) =RN (r2 , nd2) = r1 === r2 ∧ nd1 === nd2
     
+    instance 
+      RNEq : BEq (Role × Node)
+      _===_ {{RNEq}} x y = x =RN y
+
+    -- TODO: get rid of the order
     _=LRN_ : List (Role × Node) → List (Role × Node) → Bool
     [] =LRN [] = true
     [] =LRN _ = false
     _ =LRN [] = false
-    (x ∷ xs) =LRN (y ∷ ys) = x =RN y ∧ xs =LRN ys
+    (x ∷ xs) =LRN (y ∷ ys) = x === y ∧ xs =LRN ys
   
+    instance 
+      LRNEq : BEq (List (Role × Node))
+      _===_ {{LRNEq}} x y = x =LRN y
+  
+
+
+
 
 
 
@@ -234,12 +236,7 @@ module _ {c ℓ₁ ℓ₂} {la : LabelAlgebra c ℓ₁ ℓ₂} where
 
 -- printing functions
 
-showRole : Role → String
-showRole  эксперт     = "эксперт"   
-showRole  говорит     = "говорит"   
-showRole  область     = "область"   
-showRole  факт        = "факт"      
-showRole  объяснение  = "объяснение"
-showRole  вывод       = "вывод"     
-showRole  пример      = "пример"    
-showRole  аргумент    = "аргумент"    
+instance
+  shRole : ShowClass Role
+  sh {{shRole}} pre (role r) = pre +++ r 
+

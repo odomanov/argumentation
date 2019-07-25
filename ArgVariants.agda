@@ -7,19 +7,20 @@ open import Data.String renaming (_++_ to _+++_)
 open import Data.Maybe
 open import Data.Float
 
+open import ArgPrelude
 open import ArgSchemes
 
 ------------  Варианты аргументов  ----------
 
 T-P-говорит-что-A-истинно = Th "P говорит, что A истинно (ложно)"
 T-A-истинно = Th "A истинно (ложно)"
-T-A-имеет-место = Pos record {
+T-A-имеет-место = record {
     pos = "A имеет место";
     neg = "A не имеет места" }
-T-B-имеет-место = Pos record {
+T-B-имеет-место = record {
     pos = "B имеет место";
     neg = "B не имеет места" }
-T-B-будет-иметь-место = Pos record {
+T-B-будет-иметь-место = record {
     pos = "B будет иметь место / должно случиться";
     neg = "B не будет иметь места / не должно случиться" }
 T-в-частном-случае-A-истинно = Th "A истинно (ложно) в частном случае"
@@ -31,20 +32,16 @@ V-от-эксперта =
        aa = record {
          эксперт = record {
            text = nothing;
-           thesis = Th "P является экспертом в области D";
-           weight = 0.5 };
+           thesis = Th "P является экспертом в области D" };
          говорит = record {
            text = nothing;
-           thesis = T-P-говорит-что-A-истинно;
-           weight = 0.5 };  
+           thesis = T-P-говорит-что-A-истинно };  
          область = record {
            text = nothing;
-           thesis = Th "A относится к области D";
-           weight = 0.5 };
+           thesis = Th "A относится к области D" };
          вывод = record {
            text = nothing;
-           thesis = T-A-истинно;
-           weight = 0.5 };
+           thesis = T-A-истинно };
          Q1 = nothing }
   in `от-эксперта aa
 
@@ -77,12 +74,10 @@ V-от-примера =
        aa = record {
          пример = record {
            text = nothing;
-           thesis = T-в-частном-случае-A-истинно;
-           weight = 0.5 };
+           thesis = T-в-частном-случае-A-истинно };
          вывод = record {
            text = nothing;
-           thesis = T-A-истинно-в-общем-случае;
-           weight = 0.5 } }
+           thesis = T-A-истинно-в-общем-случае } }
  in `от-примера aa
 
 -- V-от-примера-neg =
@@ -105,16 +100,13 @@ V-от-причины-к-следствию =
        aa = record {
          причинная-связь = record {
            text = nothing;
-           thesis = Th "A вызывает B";
-           weight = 0.5 };
+           thesis = Th "A вызывает B" };
          причина = record {
            text = nothing;
-           thesis = T-A-имеет-место;
-           weight = 0.5 };
+           thesis = Pos T-A-имеет-место };
          следствие = record {
            text = nothing;
-           thesis = T-B-будет-иметь-место;
-           weight = 0.5 } }
+           thesis = Pos T-B-будет-иметь-место } }
   in `от-причины-к-следствию aa
 
 V-от-следствия-к-причине =
@@ -123,16 +115,13 @@ V-от-следствия-к-причине =
        aa = record {
          причинная-связь = record {
            text = nothing;
-           thesis = Th "A вызывает B";
-           weight = 0.5 };
+           thesis = Th "A вызывает B" };
          следствие = record {
            text = nothing;
-           thesis = T-B-имеет-место;
-           weight = 0.5 };
+           thesis = Pos T-B-имеет-место };
          причина = record {
            text = nothing;
-           thesis = T-A-имеет-место;
-           weight = 0.5 } }
+           thesis = Pos T-A-имеет-место } }
   in `от-следствия-к-причине aa
 
 V-от-следствия-к-причине-neg =
@@ -141,16 +130,13 @@ V-от-следствия-к-причине-neg =
        aa = record {
          причинная-связь = record {
            text = nothing;
-           thesis = Th "A вызывает B";
-           weight = 0.5 };
+           thesis = Th "A вызывает B" };
          следствие = record {
            text = nothing;
-           thesis = Neg T-B-имеет-место;
-           weight = 0.5 };
+           thesis = Neg T-B-имеет-место };
          причина = record {
            text = nothing;
-           thesis = Neg T-A-имеет-место;
-           weight = 0.5 } }
+           thesis = Neg T-A-имеет-место } }
   in `от-следствия-к-причине aa
 
 V-от-знака =
@@ -159,16 +145,13 @@ V-от-знака =
        aa = record {
          знак = record {
            text = nothing;
-           thesis = Th "A имеет место";
-           weight = 0.5 };
+           thesis = Th "A имеет место" };
          связь-со-знаком = record {
            text = nothing;
-           thesis = Th "A является индикатором B";
-           weight = 0.5 };
+           thesis = Th "A является индикатором B" };
          цель = record {
            text = nothing;
-           thesis = Th "B имеет место";
-           weight = 0.5 } }
+           thesis = Th "B имеет место" } }
   in `от-знака aa
 
 V-абдукция =
@@ -177,16 +160,13 @@ V-абдукция =
        aa = record {
          факт = record {
            text = nothing;
-           thesis = Th "A имеет место";
-           weight = 0.5 };
+           thesis = Th "A имеет место" };
          объяснение = record {
            text = nothing;
-           thesis = Th "B лучше всего объясняет A";
-           weight = 0.5 };
+           thesis = Th "B лучше всего объясняет A" };
          вывод = record {
            text = nothing;
-           thesis = Th "Имеет место B";
-           weight = 0.5 } }
+           thesis = Th "Имеет место B" } }
   in `абдукция aa
 
 V-ad-hominem =
@@ -195,16 +175,13 @@ V-ad-hominem =
        aa = record {
          плохой-человек = record {
            text = nothing;
-           thesis = Th "P плохой человек";
-           weight = 0.5 };
+           thesis = Th "P плохой человек" };
          говорит = record {
            text = nothing;
-           thesis = Th "P говорит, что A истинно";
-           weight = 0.5 };
+           thesis = Th "P говорит, что A истинно" };
          вывод = record {
            text = nothing;
-           thesis = Th "A ложно";
-           weight = 0.5 } }
+           thesis = Th "A ложно" } }
   in `ad-hominem aa
 
 V-ad-hominem-arg =
@@ -213,8 +190,7 @@ V-ad-hominem-arg =
        aa = record {
          плохой-человек = record {
            text = nothing;
-           thesis = Th "P плохой человек";
-           weight = 0.5 };
+           thesis = Th "P плохой человек" };
          аргумент = `dummy }
   in `ad-hominem-arg aa
 
@@ -224,16 +200,13 @@ V-от-альтернативы =
        aa = record {
          альтернатива = record {
            text = nothing;
-           thesis = Th "Может иметь место либо X, либо Y";
-           weight = 0.5 };
+           thesis = Th "Может иметь место либо X, либо Y" };
          неверно = record {
            text = nothing;
-           thesis = Th "X явно не имеет места";
-           weight = 0.5 };
+           thesis = Th "X явно не имеет места" };
          верно = record {
            text = nothing;
-           thesis = Th "Имеет место Y";
-           weight = 0.5 } }
+           thesis = Th "Имеет место Y" } }
   in `от-альтернативы aa
 
 VList = V-от-эксперта ∷ -- V-от-эксперта-neg ∷

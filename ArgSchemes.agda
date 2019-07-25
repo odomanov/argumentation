@@ -1,171 +1,82 @@
 module ArgSchemes where
 
 open import Data.Bool
+open import Data.Empty
 open import Data.Float
 open import Data.List
 open import Data.Maybe
 open import Data.String renaming (_++_ to _+++_)
 open import Data.Unit
+open import Function using (id)
 open import Relation.Binary
 open import Relation.Binary.PropositionalEquality using (_≡_; _≢_; refl)
 open import Relation.Nullary
 open import Relation.Nullary.Decidable
 
 open import ArgPrelude
-
-record Thesis' : Set where
-  field
-    pos : String  -- positive form
-    neg : String  -- negative form
-
-data Thesis : Set where
-  Pos : Thesis' → Thesis -- тезис
-  Neg : Thesis → Thesis  -- отрицание тезиса
-  Th  : String → Thesis  -- если  отрицание не определено / не требуется
-
--- bool equality
-_=T_ : Thesis → Thesis → Bool
-(Pos x) =T (Pos y) with (Thesis'.pos x) Data.String.≟ (Thesis'.pos y)
-... | yes _ = true
-... | no _  = false
-(Neg x) =T (Neg y) = x =T y
-(Th x) =T (Th y) with x Data.String.≟ y
-... | yes _ = true
-... | no _  = false
-_ =T _ = false
-
-record Statement : Set where
-  constructor st
-  field
-    text   : Maybe String  -- сам текст
-    thesis : Thesis        -- его смысл / расшифровка (пропозиция)
-    weight : Float
-
--- bool equality
-_=S_ : Statement → Statement → Bool
-(st _ x _) =S (st _ y _) = x =T y
-
-
+open import AIF
 
 
 ------------  Определение схем аргументов  ----------
 
-data Argument : Set 
+-- data Argument : Set 
 
-record A-от-эксперта : Set where
-  field
-    эксперт : Statement
-    говорит : Statement
-    область : Statement 
-    вывод   : Statement
-    Q1      : Maybe Statement
+instance
+  A-от-эксперта : RA-Scheme
+  Premises {{A-от-эксперта}} = (эксперт) ∷ (говорит) ∷ (область) ∷ []
+  Conclusion {{A-от-эксперта}} = вывод
 
-record A-от-примера : Set where
-  field
-    пример : Statement
-    вывод  : Statement
+  A-от-примера : RA-Scheme
+  Premises {{A-от-примера}} = (пример) ∷ []
+  Conclusion {{A-от-примера}} = вывод
 
-record A-от-причины-к-следствию : Set where
-  field
-    причинная-связь : Statement
-    причина         : Statement
-    следствие       : Statement
+  A-абдукция : RA-Scheme
+  Premises {{A-абдукция}} = (факт) ∷ (объяснение) ∷ []
+  Conclusion {{A-абдукция}} = вывод
+
+  A-ad-populum : RA-Scheme
+  Premises {{A-ad-populum}} = (все-признают) ∷ []
+  Conclusion {{A-ad-populum}} = вывод
+  
+
+
     
-record A-от-следствия-к-причине : Set where
-  field
-    причинная-связь : Statement
-    следствие       : Statement
-    причина         : Statement
 
-record A-от-знака : Set where
-  field
-    знак            : Statement
-    связь-со-знаком : Statement
-    цель            : Statement
 
-record A-абдукция : Set where
-  field
-    факт       : Statement
-    объяснение : Statement
-    вывод      : Statement
     
-record A-ad-hominem : Set where
-  field
-    плохой-человек : Statement
-    говорит        : Statement
-    вывод          : Statement
 
-record A-ad-hominem-arg : Set where
-  inductive
-  field
-    плохой-человек : Statement
-    аргумент       : Argument
 
-record A-от-альтернативы : Set where
-  field
-    альтернатива : Statement
-    неверно      : Statement
-    верно        : Statement
     
-data Argument where
-  `dummy : Argument
-  `от-эксперта : A-от-эксперта → Argument
-  `от-примера : A-от-примера → Argument
-  `от-причины-к-следствию : A-от-причины-к-следствию → Argument
-  `от-следствия-к-причине : A-от-следствия-к-причине → Argument
-  `от-знака : A-от-знака → Argument
-  `абдукция : A-абдукция → Argument
-  `ad-hominem : A-ad-hominem → Argument
-  `ad-hominem-arg : A-ad-hominem-arg → Argument
-  `от-альтернативы : A-от-альтернативы → Argument
 
--- Имена схем
 
-AName : Argument → String
-AName `dummy = "DUMMY ARGUMENT"
-AName (`от-эксперта a) = "От эксперта"
-AName (`от-примера a) = "От примера"
-AName (`от-причины-к-следствию a) = "От причины к следствию"
-AName (`от-следствия-к-причине a) = "От следствия к причине"
-AName (`от-знака a) = "От знака"
-AName (`абдукция a) = "Абдукция"
-AName (`ad-hominem a) = "Ad hominem (против тезиса)"
-AName (`ad-hominem-arg a) = "Ad hominem (против аргумента)"
-AName (`от-альтернативы a) = "От альтернативы"
+
 
 
 
 --  подготовка строк для печати
 
-ThString : Thesis → String
-ThString (Pos t) = Thesis'.pos t
-ThString (Neg (Pos t)) = Thesis'.neg t
-ThString (Neg (Neg t)) = ThString t
-ThString (Th s) = s
-ThString (Neg (Th s)) = "NOT DEFINED"
+instance
+  shThesis : ShowClass Thesis
+  sh {{shThesis}} pre t = showThesis pre t
+    where
+    showThesis : String → Thesis → String
+    showThesis pre (Pos t) = pre +++ "POS: " +++ Thesis'.pos t
+    showThesis pre (Neg t) = pre +++ "NEG: " +++ Thesis'.neg t
+    showThesis pre (Th s) = pre +++ s
 
-
-StString : String → Statement → String
-StString pre (st nothing th wt) = "\n"
-  +++ pre +++ ThString th +++ " (" +++ primShowFloat wt +++ ") " 
-StString pre (st (just t) th wt) = "\n"
-  +++ pre +++ ThString th +++ " (" +++ primShowFloat wt +++ ")" +++ "\n" 
-  +++ pre +++ "(TEXT: " +++ t +++ ")" 
+  shStatement : ShowClass Statement
+  sh {{shStatement}} pre s = showStatement pre s
+    where 
+    showStatement : String → Statement → String
+    showStatement pre (st nothing th) = "\n"
+      +++ pre +++ sh "" th 
+    showStatement pre (st (just t) th) = "\n"
+      +++ pre +++ sh "" th +++ "\n" 
+      +++ pre +++ "(TEXT: " +++ t +++ ")" 
 
 
 -- Печать цели / вывода
 
-ЦельString : String → Argument → String 
-ЦельString _ `dummy = ""
-ЦельString pre (`от-эксперта a) = StString pre (A-от-эксперта.вывод a)
-ЦельString pre (`от-примера a) =  StString pre (A-от-примера.вывод a)
-ЦельString pre (`от-причины-к-следствию a) =  StString pre (A-от-причины-к-следствию.следствие a)
-ЦельString pre (`от-следствия-к-причине a) =  StString pre (A-от-следствия-к-причине.причина a)
-ЦельString pre (`от-знака a) =  StString pre (A-от-знака.цель a)
-ЦельString pre (`абдукция a) =  StString pre (A-абдукция.вывод a)
-ЦельString pre (`ad-hominem a) =  StString pre (A-ad-hominem.вывод a)
-ЦельString pre (`ad-hominem-arg a) =  "Аргумент сомнителен"
-ЦельString pre (`от-альтернативы a) =  StString pre (A-от-альтернативы.верно a)
 
 
 concl-line = "----------"
@@ -174,53 +85,4 @@ dpre pre = pre +++ pre
 npre : String → String
 npre pre = "\n" +++ pre
 
-AString : String → Argument → String
-AString _ `dummy = "DUMMY"
-AString pre (`от-эксперта a) =
-  npre pre +++ "эксперт: " +++ StString (dpre pre) (A-от-эксперта.эксперт a)
-  +++ npre pre +++ "говорит: " +++ StString (dpre pre) (A-от-эксперта.говорит a)
-  +++ npre pre +++ "область: " +++ StString (dpre pre) (A-от-эксперта.область a)
-  +++ npre pre +++ concl-line
-  +++ pre +++ ЦельString pre (`от-эксперта a)
-AString pre (`от-примера a) =
-  npre pre +++ "пример: " +++ StString (dpre pre) (A-от-примера.пример a)
-  +++ npre pre +++ concl-line
-  +++ pre +++ ЦельString pre (`от-примера a)
-AString pre (`от-причины-к-следствию a) =
-  npre pre
-  +++ "причинная связь: " +++ StString (dpre pre) (A-от-причины-к-следствию.причинная-связь a)
-  +++ npre pre +++ "причина: " +++ StString (dpre pre) (A-от-причины-к-следствию.причина a)
-  +++ npre pre +++ concl-line
-  +++ pre +++ ЦельString pre (`от-причины-к-следствию a)
-AString pre (`от-следствия-к-причине a) =
-  npre pre
-  +++ "причинная связь: " +++ StString (dpre pre) (A-от-следствия-к-причине.причинная-связь a)
-  +++ npre pre +++ "следствие: " +++ StString (dpre pre) (A-от-следствия-к-причине.следствие a)
-  +++ npre pre +++ concl-line
-  +++ pre +++ ЦельString pre (`от-следствия-к-причине a)
-AString pre (`от-знака a) =
-  npre pre +++ "знак: " +++ StString (dpre pre) (A-от-знака.знак a)
-  +++ npre pre +++ "связь-со-знаком: " +++ StString (dpre pre) (A-от-знака.связь-со-знаком a)
-  +++ npre pre +++ concl-line
-  +++ pre +++ ЦельString pre (`от-знака a)
-AString pre (`абдукция a) =
-  npre pre +++ "факт: " +++ StString (dpre pre) (A-абдукция.факт a)
-  +++ npre pre +++ "объяснение: " +++ StString (dpre pre) (A-абдукция.объяснение a)
-  +++ npre pre +++ concl-line
-  +++ pre +++ ЦельString pre (`абдукция a)
-AString pre (`ad-hominem a) =
-  npre pre +++ "плохой человек: " +++ StString (dpre pre) (A-ad-hominem.плохой-человек a)
-  +++ npre pre +++ "говорит: " +++ StString (dpre pre) (A-ad-hominem.говорит a)
-  +++ npre pre +++ concl-line
-  +++ pre +++ ЦельString pre (`ad-hominem a)
-AString pre (`ad-hominem-arg a) =
-  npre pre +++ "плохой человек: " +++ StString (dpre pre) (A-ad-hominem-arg.плохой-человек a)
-  +++ npre pre +++ "аргумент: " +++ AString (dpre pre) (A-ad-hominem-arg.аргумент a)
-  +++ npre pre +++ concl-line
-  +++ npre pre +++ "Аргумент сомнителен"
-AString pre (`от-альтернативы a) =
-  npre pre +++ "альтернатива: " +++ StString (dpre pre) (A-от-альтернативы.альтернатива a)
-  +++ npre pre +++ "неверно: " +++ StString (dpre pre) (A-от-альтернативы.неверно a)
-  +++ npre pre +++ concl-line
-  +++ pre +++ ЦельString pre (`от-альтернативы a)
 
