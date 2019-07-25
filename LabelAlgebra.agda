@@ -14,6 +14,7 @@ record IsLabelAlgebra {c ℓ₁ ℓ₂} {A : Set c}
                          (_⊙_ : Op₂ A)
                          (_⊕_ : Op₂ A)
                          (_⊖_ : Op₂ A)
+                         (⊘ : Op₁ A)
                          (⊤ : A)
                          (⊥ : A)
                          : Set (suc (c ⊔ ℓ₁ ⊔ ℓ₂)) where
@@ -51,9 +52,10 @@ record LabelAlgebra c ℓ₁ ℓ₂ : Set (suc (c ⊔ ℓ₁ ⊔ ℓ₂)) where
     _⊙_       : Op₂ Carrier     -- The support operation.
     _⊕_       : Op₂ Carrier     -- The aggregation operation.
     _⊖_       : Op₂ Carrier     -- The conflict operation.
+    ⊘         : Op₁ Carrier     -- The negation operation.
     ⊤         : Carrier         -- The maximum.
     ⊥         : Carrier         -- The minimum.
-    isLabelAlgebra : IsLabelAlgebra _≈_ _≤_ _⊙_ _⊕_ _⊖_ ⊤ ⊥ 
+    isLabelAlgebra : IsLabelAlgebra _≈_ _≤_ _⊙_ _⊕_ _⊖_ ⊘ ⊤ ⊥ 
     
   open IsLabelAlgebra isLabelAlgebra public
 

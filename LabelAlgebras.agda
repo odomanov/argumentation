@@ -89,7 +89,18 @@ Trust⊖ a b = record
   }
 
 postulate
-  Trust-isLabelAlgebra : IsLabelAlgebra FUEquality FULessEq Trust⊙ Trust⊕ Trust⊖ FU1 FU0
+  0≤v⊘ : ∀ x → 0.0 LessEq (primFloatMinus (value FU1) x) ≡ true
+  v≤1⊘ : ∀ x → (primFloatMinus (value FU1) x) LessEq 1.0 ≡ true
+
+Trust⊘ : FUnit → FUnit
+Trust⊘ a = record
+  { value = primFloatMinus (value FU1) (value a)
+  ; 0≤v = 0≤v⊘ (value a) 
+  ; v≤1 = v≤1⊘ (value a) 
+  }
+
+postulate
+  Trust-isLabelAlgebra : IsLabelAlgebra FUEquality FULessEq Trust⊙ Trust⊕ Trust⊖ Trust⊘ FU1 FU0
 
 Trust : LabelAlgebra _ _ _
 Trust = record
@@ -99,6 +110,7 @@ Trust = record
   ; _⊙_ = Trust⊙
   ; _⊕_ = Trust⊕
   ; _⊖_ = Trust⊖
+  ; ⊘ = Trust⊘
   ; ⊤ = FU1
   ; ⊥ = FU0
   ; isLabelAlgebra = Trust-isLabelAlgebra
@@ -155,8 +167,19 @@ Pref⊖ a b = record
   ; v≤1 = prefv≤1⊖ a b 
   }
 
+-- postulate
+--   0≤v⊘ : ∀ x → 0.0 LessEq (primFloatMinus (value FU1) x) ≡ true
+--   v≤1⊘ : ∀ x → (primFloatMinus (value FU1) x) LessEq 1.0 ≡ true
+
+Pref⊘ : FUnit → FUnit
+Pref⊘ a = record
+  { value = primFloatMinus (value FU1) (value a)
+  ; 0≤v = 0≤v⊘ (value a) 
+  ; v≤1 = v≤1⊘ (value a) 
+  }
+
 postulate
-  Pref-isLabelAlgebra : IsLabelAlgebra FUEquality FULessEq Pref⊙ Pref⊕ Pref⊖ FU1 FU0
+  Pref-isLabelAlgebra : IsLabelAlgebra FUEquality FULessEq Pref⊙ Pref⊕ Pref⊖ Pref⊘ FU1 FU0
 
 Pref : LabelAlgebra _ _ _
 Pref = record
@@ -166,6 +189,7 @@ Pref = record
   ; _⊙_ = Pref⊙
   ; _⊕_ = Pref⊕
   ; _⊖_ = Pref⊖
+  ; ⊘ = Pref⊘
   ; ⊤ = FU1
   ; ⊥ = FU0
   ; isLabelAlgebra = Pref-isLabelAlgebra
