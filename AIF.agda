@@ -48,6 +48,7 @@ open import Data.String renaming (_++_ to _+++_)
 open import Data.Unit using (⊤)
 open import Function.Equivalence using (_⇔_)
 open import Level renaming (zero to lzero; suc to lsuc)
+open import Relation.Binary using (Decidable)
 open import Relation.Binary.PropositionalEquality using (_≡_; _≢_; refl)
 open import Relation.Nullary
 
@@ -91,6 +92,11 @@ role r =R role r' with r Data.String.≟ r'
 ... | yes _ = true
 ... | no _ = false
 
+_≡R_ : Role → Role → Set
+role r ≡R role r' = r ≡ r'
+
+_≟R_ : Decidable _≡R_
+role r ≟R role r' = r Data.String.≟ r'
 
 instance
   REq : BEq Role
