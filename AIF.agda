@@ -36,7 +36,6 @@
 
 module AIF where
 
--- open import Agda.Builtin.Equality.Erase
 open import Data.Bool
 open import Data.Empty using (⊥)
 open import Data.Float
@@ -46,14 +45,14 @@ open import Data.Maybe
 open import Data.Product
 open import Data.String renaming (_++_ to _+++_)
 open import Data.Unit using (⊤)
-open import Function.Equivalence using (_⇔_)
 open import Level renaming (zero to lzero; suc to lsuc)
 open import Relation.Binary using (Decidable)
 open import Relation.Binary.PropositionalEquality using (_≡_; _≢_; refl)
 open import Relation.Nullary
 
 open import ArgPrelude
-open import LabelAlgebra renaming (⊤ to LA⊤; ⊥ to LA⊥)  -- nodes are labeled
+open import LabelAlgebra   -- nodes are labeled
+  renaming (⊤ to LA⊤; ⊥ to LA⊥; _∧_ to _LA∧_; _∨_ to _LA∨_)
 
 
 -- Roles ----------------------------------------------------------
@@ -108,7 +107,7 @@ instance
   REq : BEq Role
   _===_ {{REq}} x y = x =R y
   
--- TODO: get rid of dependence on order
+-- TODO: get rid of the dependence on order
 _=LR_ : List Role → List Role → Bool
 [] =LR [] = true
 [] =LR _  = false
@@ -126,8 +125,8 @@ x ≡LR y = (∀ z → (z ∈ x → z ∈ y)) × (∀ z → (z ∈ y → z ∈ x
 
 
 
-
 -- Nodes -------------------------------------------------------
+
 
 -- first, let's define schemes
 
@@ -209,7 +208,7 @@ module _ {c ℓ₁ ℓ₂} {la : LabelAlgebra c ℓ₁ ℓ₂} where
     -- Node equality, boolean.
     -- Label value is not checked.
     _=N_ : Node → Node → Bool
-    Ln (In (mkI x1)) v1 =N Ln (In (mkI x2)) v2 = x1 === x2 -- ∧ (v1 =L v2)
+    Ln (In (mkI x1)) v1 =N Ln (In (mkI x2)) v2 = x1  === x2 -- ∧ (v1 =L v2)
     Ln (Sn (SR ra1)) _  =N Ln (Sn (SR ra2)) _  = ra1 === ra2
     Ln (Sn (SC ca1)) _  =N Ln (Sn (SC ca2)) _  = ca1 === ca2
     Ln (Sn (SP pa1)) _  =N Ln (Sn (SP pa2)) _  = pa1 === pa2
@@ -229,8 +228,8 @@ module _ {c ℓ₁ ℓ₂} {la : LabelAlgebra c ℓ₁ ℓ₂} where
     -- TODO: get rid of the order
     _=LRN_ : List (Role × Node) → List (Role × Node) → Bool
     [] =LRN [] = true
-    [] =LRN _ = false
-    _ =LRN [] = false
+    [] =LRN _  = false
+    _  =LRN [] = false
     (x ∷ xs) =LRN (y ∷ ys) = x === y ∧ xs =LRN ys
   
     instance 
@@ -244,6 +243,9 @@ module _ {c ℓ₁ ℓ₂} {la : LabelAlgebra c ℓ₁ ℓ₂} where
 
 
 
+
+--   выводarg : Node
+--   выводarg = In record { Body = A-от-эксперта.вывод arg }
 
 
 -- printing functions
