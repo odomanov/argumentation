@@ -13,7 +13,8 @@ open import Data.Unit
 open import Level
 open import Relation.Binary.PropositionalEquality using (_≡_; _≢_; refl)
 
-open import LabelAlgebra public renaming (⊤ to LA⊤; ⊥ to LA⊥)
+open import LabelAlgebra public
+  renaming (⊤ to LA⊤; ⊥ to LA⊥; _∧_ to _LA∧_; _∨_ to _LA∨_)
 
 _LessEq_ : Float → Float → Bool
 x LessEq y = (primFloatLess x y ∨ primFloatEquality x y)
@@ -42,6 +43,26 @@ FULess a b = if (primFloatLess (value a) (value b)) then ⊤ else ⊥
 
 FULessEq : FUnit → FUnit → Set
 FULessEq a b = if (value a) LessEq (value b) then ⊤ else ⊥ 
+
+
+fmin : Float → Float → Float
+fmin x y with primFloatLess x y 
+... | true  = x
+... | false = y
+
+fmax : Float → Float → Float
+fmax x y with primFloatLess x y 
+... | true  = y
+... | false = x
+
+postulate
+  min0≤v : ∀ x y → (0.0 LessEq (fmin (value x) (value y)) ≡ true)
+  minv≤1 : ∀ x y → (fmin (value x) (value y)) LessEq 1.0 ≡ true
+  max0≤v : ∀ x y → (0.0 LessEq (fmax (value x) (value y)) ≡ true)
+  maxv≤1 : ∀ x y → (fmax (value x) (value y)) LessEq 1.0 ≡ true
+  ½0≤v : ∀ x → (0.0 LessEq primFloatTimes 0.5 (value x)) ≡ true  
+  ½v≤1 : ∀ x → (primFloatTimes 0.5 (value x) LessEq 1.0) ≡ true   
+
 
 
 -------------------------------------------------------
@@ -100,8 +121,26 @@ Trust⊘ a = record
   ; v≤1 = v≤1⊘ (value a) 
   }
 
+Trust∧ : FUnit → FUnit → FUnit
+Trust∧ a b = record
+  { value = fmin (value a) (value b)
+  ; 0≤v = min0≤v a b
+  ; v≤1 = minv≤1 a b
+  }
+
+Trust∨ : FUnit → FUnit → FUnit
+Trust∨ a b = record
+  { value = fmax (value a) (value b)
+  ; 0≤v = max0≤v a b
+  ; v≤1 = maxv≤1 a b
+  }
+
+Trust½ : FUnit → FUnit
+Trust½ x = x                       -- dummy definition !!
+
 postulate
-  Trust-isLabelAlgebra : IsLabelAlgebra FUEquality FULessEq Trust⊙ Trust⊕ Trust⊖ Trust⊘ FU1 FU0
+  Trust-isLabelAlgebra : IsLabelAlgebra
+    FUEquality FULessEq Trust⊙ Trust⊕ Trust⊖ Trust⊘ Trust∧ Trust∨ Trust½ FU1 FU0
 
 Trust : LabelAlgebra _ _ _
 Trust = record
@@ -111,7 +150,10 @@ Trust = record
   ; _⊙_ = Trust⊙
   ; _⊕_ = Trust⊕
   ; _⊖_ = Trust⊖
-  ; ⊘ = Trust⊘
+  ; ⊘   = Trust⊘
+  ; _∧_ = Trust∧
+  ; _∨_ = Trust∨
+  ; ½   = Trust½
   ; ⊤ = FU1
   ; ⊥ = FU0
   ; isLabelAlgebra = Trust-isLabelAlgebra
@@ -122,28 +164,16 @@ TV : (x : Float) → {p1 : 0.0 LessEq x ≡ true} → {p2 : x LessEq 1.0 ≡ tru
 TV x {p1} {p2} = record { value = x; 0≤v = p1; v≤1 = p2 }
 
 
+
+
 -------------------------------------------------------
 -- Preference Algebra
-
-fmin : Float → Float → Float
-fmin x y with primFloatLess x y 
-... | true  = x
-... | false = y
-
-fmax : Float → Float → Float
-fmax x y with primFloatLess x y 
-... | true  = y
-... | false = x
-
-postulate
-  pref0≤v⊙ : ∀ x y → (0.0 LessEq (fmin (value x) (value y)) ≡ true)
-  prefv≤1⊙ : ∀ x y → (fmin (value x) (value y)) LessEq 1.0 ≡ true
 
 Pref⊙ : FUnit → FUnit → FUnit
 Pref⊙ a b = record
   { value = fmin (value a) (value b)
-  ; 0≤v = pref0≤v⊙ a b 
-  ; v≤1 = prefv≤1⊙ a b 
+  ; 0≤v = min0≤v a b 
+  ; v≤1 = minv≤1 a b 
   }
 
 postulate
@@ -168,10 +198,6 @@ Pref⊖ a b = record
   ; v≤1 = prefv≤1⊖ a b 
   }
 
--- postulate
---   0≤v⊘ : ∀ x → 0.0 LessEq (primFloatMinus (value FU1) x) ≡ true
---   v≤1⊘ : ∀ x → (primFloatMinus (value FU1) x) LessEq 1.0 ≡ true
-
 Pref⊘ : FUnit → FUnit
 Pref⊘ a = record
   { value = primFloatMinus (value FU1) (value a)
@@ -179,8 +205,23 @@ Pref⊘ a = record
   ; v≤1 = v≤1⊘ (value a) 
   }
 
+Pref∨ : FUnit → FUnit → FUnit
+Pref∨ a b = record
+  { value = fmax (value a) (value b)
+  ; 0≤v = max0≤v a b
+  ; v≤1 = maxv≤1 a b
+  }
+
+Pref½ : FUnit → FUnit
+Pref½ x = record
+  { value = primFloatTimes 0.5 (value x)
+  ; 0≤v = ½0≤v x
+  ; v≤1 = ½v≤1 x
+  }
+
 postulate
-  Pref-isLabelAlgebra : IsLabelAlgebra FUEquality FULessEq Pref⊙ Pref⊕ Pref⊖ Pref⊘ FU1 FU0
+  Pref-isLabelAlgebra : IsLabelAlgebra
+    FUEquality FULessEq Pref⊙ Pref⊕ Pref⊖ Pref⊘ Pref⊙ Pref∨ Pref½ FU1 FU0
 
 Pref : LabelAlgebra _ _ _
 Pref = record
@@ -190,7 +231,10 @@ Pref = record
   ; _⊙_ = Pref⊙
   ; _⊕_ = Pref⊕
   ; _⊖_ = Pref⊖
-  ; ⊘ = Pref⊘
+  ; ⊘   = Pref⊘
+  ; _∧_ = Pref⊙
+  ; _∨_ = Pref∨
+  ; ½   = Pref½
   ; ⊤ = FU1
   ; ⊥ = FU0
   ; isLabelAlgebra = Pref-isLabelAlgebra

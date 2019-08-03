@@ -1,10 +1,11 @@
--- Label Algebra (Budan et al.)
+-- Label Algebra (Budan et al.) -- with conflicts
 
 module LabelAlgebra where
 
 open import Algebra.FunctionProperties
 open import Level
 open import Relation.Binary
+open import Relation.Binary.Lattice using (Supremum; Infimum)
 open import Relation.Binary.PropositionalEquality using (_≡_; _≢_; refl)
 open import Relation.Nullary
 
@@ -14,7 +15,10 @@ record IsLabelAlgebra {c ℓ₁ ℓ₂} {A : Set c}
                          (_⊙_ : Op₂ A)
                          (_⊕_ : Op₂ A)
                          (_⊖_ : Op₂ A)
-                         (⊘ : Op₁ A)
+                         (⊘   : Op₁ A)
+                         (_∧_ : Op₂ A)
+                         (_∨_ : Op₂ A)
+                         (½   : Op₁ A)
                          (⊤ : A)
                          (⊥ : A)
                          : Set (suc (c ⊔ ℓ₁ ⊔ ℓ₂)) where
@@ -39,6 +43,10 @@ record IsLabelAlgebra {c ℓ₁ ℓ₂} {A : Set c}
     ⊖-neut    : ∀ (a) → (a ⊖ ⊥) ≈ a
     ⊖-3       : ∀ (a b) → (a ⊖ b) ≈ ⊥ → (b ⊖ a) ≈ ⊥ → a ≈ b
     ⊖-4       : ∀ (a b) → (a ⊕ b) ≤ ⊤ → ¬ ((a ⊕ b) ≈ ⊤) → ((a ⊕ b) ⊖ b) ≈ a
+    -- min, max
+    sup       : Supremum _≤_ _∨_
+    inf       : Infimum  _≤_ _∧_
+
 
 record LabelAlgebra c ℓ₁ ℓ₂ : Set (suc (c ⊔ ℓ₁ ⊔ ℓ₂)) where
   infix  4 _≈_ _≤_
@@ -46,16 +54,19 @@ record LabelAlgebra c ℓ₁ ℓ₂ : Set (suc (c ⊔ ℓ₁ ⊔ ℓ₂)) where
   infixr 7 _⊖_
   infixr 7 _⊙_
   field
-    Carrier   : Set c
-    _≈_       : Rel Carrier ℓ₁  -- The underlying equality.
-    _≤_       : Rel Carrier ℓ₂  -- The partial order.
-    _⊙_       : Op₂ Carrier     -- The support operation.
-    _⊕_       : Op₂ Carrier     -- The aggregation operation.
-    _⊖_       : Op₂ Carrier     -- The conflict operation.
-    ⊘         : Op₁ Carrier     -- The negation operation.
-    ⊤         : Carrier         -- The maximum.
-    ⊥         : Carrier         -- The minimum.
-    isLabelAlgebra : IsLabelAlgebra _≈_ _≤_ _⊙_ _⊕_ _⊖_ ⊘ ⊤ ⊥ 
+    Carrier : Set c
+    _≈_     : Rel Carrier ℓ₁  -- The underlying equality.
+    _≤_     : Rel Carrier ℓ₂  -- The partial order.
+    _⊙_     : Op₂ Carrier     -- The support operation.
+    _⊕_     : Op₂ Carrier     -- The aggregation operation.
+    _⊖_     : Op₂ Carrier     -- The conflict operation.
+    ⊘       : Op₁ Carrier     -- The negation operation.
+    _∧_     : Op₂ Carrier     -- The minimum operation.
+    _∨_     : Op₂ Carrier     -- The maximum operation.
+    ½       : Op₁ Carrier     -- The half operation.
+    ⊤       : Carrier         -- The maximum.
+    ⊥       : Carrier         -- The minimum.
+    isLabelAlgebra : IsLabelAlgebra _≈_ _≤_ _⊙_ _⊕_ _⊖_ ⊘ _∧_ _∨_ ½ ⊤ ⊥ 
     
   open IsLabelAlgebra isLabelAlgebra public
 
