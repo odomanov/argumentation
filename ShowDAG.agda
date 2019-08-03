@@ -8,6 +8,7 @@ open import Data.Float
 open import Data.List as List using (List; []; _∷_)
 open import Data.Maybe
 open import Data.Nat as Nat using (suc; ℕ)
+open import Data.Nat.Show renaming (show to ℕshow)
 open import Data.Product using (_×_; _,_; proj₁; proj₂)
 open import Data.String renaming (_++_ to _+++_)
 open import Data.Vec as Vec using (Vec; []; _∷_)
@@ -68,3 +69,23 @@ instance
     showAGraph {suc n} pre (ctx & g) = sh ":: " n 
       +++ sh pre ctx +++ "\n" +++ showAGraph {n} pre g
 
+  shFin : ∀ {n} → ShowClass (Fin n)
+  sh {{shFin}} pre i = showFin pre i
+    where
+    showFin : ∀ {n} → String → Fin n → String
+    showFin pre i = pre +++ ℕshow (toℕ i)
+
+  shFinList : ∀ {n} → ShowClass (List (Fin n))
+  sh {{shFinList}} pre l = showFinList pre l
+    where
+    showFinList : ∀ {n} → String → List (Fin n) → String
+    showFinList pre [] = pre
+    showFinList pre (x ∷ xs) = pre +++ (ℕshow (toℕ x)) +++ showFinList pre xs
+
+  shFinNodeList : ∀ {n} → ShowClass (List (Fin n × LNode))
+  sh {{shFinNodeList}} pre l = showFinNodeList pre l
+    where
+    showFinNodeList : ∀ {n} → String → List (Fin n × LNode) → String
+    showFinNodeList pre [] = pre
+    showFinNodeList pre (x ∷ xs) = pre +++ (ℕshow (toℕ (proj₁ x)))
+      +++ " : " +++ sh "" (proj₂ x) +++ showFinNodeList pre xs
