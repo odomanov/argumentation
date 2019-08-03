@@ -61,7 +61,8 @@ open import LabelAlgebra renaming (⊤ to LA⊤; ⊥ to LA⊥)  -- nodes are lab
 
 data Role    : Set where
   role : String → Role
-  
+
+-- RA-nodes
 эксперт      = role "эксперт"
 говорит      = role "говорит"
 область      = role "область"
@@ -72,6 +73,9 @@ data Role    : Set where
 все-признают = role "все-признают"
 поддержка    = role "поддержка"
 атака        = role "атака"
+-- CA-nodes
+conflicting  = role "conflicting"
+conflicted   = role "conflicted"
 
 Roles : List Role
 Roles = 
@@ -85,6 +89,8 @@ Roles =
   все-признают ∷
   поддержка  ∷
   атака      ∷
+  conflicting ∷
+  conflicted  ∷
   []
 
 _=R_ : Role → Role → Bool
