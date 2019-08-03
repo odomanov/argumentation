@@ -1,5 +1,5 @@
 -- Using Labels for reasoning. Definitions of Label algebras
--- TODO Prove 0≤v⊙ etc.
+-- TODO: Prove 0≤v⊙ etc.
 
 module LabelAlgebras where
 
@@ -18,6 +18,7 @@ open import LabelAlgebra public renaming (⊤ to LA⊤; ⊥ to LA⊥)
 _LessEq_ : Float → Float → Bool
 x LessEq y = (primFloatLess x y ∨ primFloatEquality x y)
 
+-- Float interval [0..1]
 record FUnit : Set where
   constructor mkFUnit
   field
@@ -25,7 +26,7 @@ record FUnit : Set where
     0≤v   : (0.0 LessEq value) ≡ true
     v≤1   : (value LessEq 1.0) ≡ true
 
-open FUnit
+open FUnit public
 
 FU0 : FUnit
 FU0 = record { value = 0.0; 0≤v = refl; v≤1 = refl }
@@ -199,28 +200,3 @@ PV : (x : Float) → {p1 : 0.0 LessEq x ≡ true} → {p2 : x LessEq 1.0 ≡ tru
      → LabelAlgebra.Carrier Pref
 PV x {p1} {p2} = record { value = x; 0≤v = p1; v≤1 = p2 }
 
-P≡FU : Carrier Pref ≡ FUnit
-P≡FU = refl
-
-_ : Maybe FUnit ≡ Maybe (Carrier Pref)
-_ = refl
-
-
-
--- for printing
-
-showFUnit : Maybe FUnit → String
-showFUnit nothing = "NOTHING"
-showFUnit (just (mkFUnit x _ _)) = Data.Float.show x
-
-showLabelPref : Maybe (LabelAlgebra.Carrier Pref) → String
-showLabelPref v = showFUnit v
-
-showLabelTrust : Maybe (LabelAlgebra.Carrier Trust) → String
-showLabelTrust v = showFUnit v
-
--- showLabel : ∀ {c ℓ₁ ℓ₂} (la : LabelAlgebra c ℓ₁ ℓ₂) → Maybe (LabelAlgebra.Carrier la) → String
--- showLabel {c = lzero} Pref v = showLabelPref v 
--- showLabel Trust v = showLabelTrust v 
--- showLabel Pref v rewrite P≡FU = (showLabelPref v) 
--- showLabel Pref (just (mkFUnit v _ _)) = Data.Float.show v 
