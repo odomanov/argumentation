@@ -3,16 +3,17 @@ module BarinovaDAG where
 open import Data.Fin
 open import Data.Float using (show)
 open import Data.List 
+open import Data.Maybe
 open import Data.Nat
 open import Data.Nat.Show using (show)
-open import Data.Product -- using (_×_; proj₁; proj₂) -- renaming (_,_ to ⟨_,_⟩)
-open import Data.Unit -- using (⊤; tt)
-open import Relation.Binary.PropositionalEquality using (_≡_; _≢_; refl)
+open import Data.Product 
 open import Data.String renaming (_++_ to _+++_)
-open import Data.Maybe
+open import Data.Unit using (⊤; tt)
+open import Relation.Binary.PropositionalEquality using (_≡_; _≢_; refl)
 
 open import ArgPrelude
 open import ArgSchemes
+-- open import ArgVariants
 open import LabelAlgebras
 open import AIF
 open import DAG Pref
