@@ -11,11 +11,10 @@ open import Data.Nat.Show
 open import Data.String as String using (String) renaming (_++_ to _+++_)
 open import Data.Unit
 open import Function using (id)
+open import Level renaming (zero to lzero; suc to lsuc)
 open import Relation.Binary
 open import Relation.Binary.PropositionalEquality using (_≡_; _≢_; refl)
 open import Relation.Nullary
-open import Relation.Nullary.Decidable
-open import Level renaming (zero to lzero; suc to lsuc)
 
 -- boolean equality
 
@@ -58,22 +57,53 @@ _=T_ : Thesis → Thesis → Bool
 (Th x) =T (Th y) = x String.== y
 _ =T _ = false
 
+infix 4 _≟T_
+
+private
+  _≡T_ : Thesis → Thesis → Set
+  (Pos x) ≡T (Pos y) = (Thesis'.pos x) ≡ (Thesis'.pos y)
+  (Neg x) ≡T (Neg y) = (Thesis'.neg x) ≡ (Thesis'.neg y)
+  (Th x)  ≡T (Th y)  = x ≡ y
+  _ ≡T _ = ⊥
+  
+
+-- decidable equality
+_≟T_ : Decidable _≡T_
+x' ≟T y' with x' | y'
+... | Pos x | Pos y = (Thesis'.pos x) String.≟ (Thesis'.pos y)
+... | Neg x | Neg y = (Thesis'.neg x) String.≟ (Thesis'.neg y)
+... | Th x  | Th y  = x String.≟ y
+... | Pos x | Neg y = no id 
+... | Pos x | Th y  = no id
+... | Neg x | Pos y = no id
+... | Neg x | Th y  = no id
+... | Th x  | Pos y = no id
+... | Th x  | Neg y = no id
 
 
 instance
   TEq : BEq Thesis
   _===_ {{TEq}} x y = x =T y
 
--- Statement consists of Thesis and a particular text this thesis is stated.
+-- Statement consists of Thesis and a particular text this thesis is stated in.
 record Statement : Set where
   constructor st
   field
-    text   : Maybe String  -- сам текст
-    thesis : Thesis        -- его смысл / расшифровка (пропозиция)
+    text   : Maybe String  -- the text
+    thesis : Thesis        -- it's meaning (proposition)
 
 -- bool equality
 _=S_ : Statement → Statement → Bool
 (st _ x) =S (st _ y) = x =T y
+
+infix 4 _≟S_
+
+private
+  _≡S_ : Statement → Statement → Set
+  x ≡S y = (Statement.thesis x) ≡T (Statement.thesis y)
+
+_≟S_ : Decidable _≡S_
+x ≟S y = (Statement.thesis x) ≟T (Statement.thesis y)
 
 
 instance
@@ -101,3 +131,21 @@ instance
 
   shNat : ShowClass Nat
   sh {{shNat}} pre n = pre +++ (Data.Nat.Show.show n)
+
+  shThesis : ShowClass Thesis
+  sh {{shThesis}} pre t = showThesis pre t
+    where
+    showThesis : String → Thesis → String
+    showThesis pre (Pos t) = pre +++ "POS: " +++ Thesis'.pos t
+    showThesis pre (Neg t) = pre +++ "NEG: " +++ Thesis'.neg t
+    showThesis pre (Th s) = pre +++ s
+
+  shStatement : ShowClass Statement
+  sh {{shStatement}} pre s = showStatement pre s
+    where 
+    showStatement : String → Statement → String
+    showStatement pre (st nothing th) = "\n"
+      +++ pre +++ sh "" th 
+    showStatement pre (st (just t) th) = "\n"
+      +++ pre +++ sh "" th +++ "\n" 
+      +++ pre +++ "(TEXT: " +++ t +++ ")" 

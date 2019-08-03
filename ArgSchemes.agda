@@ -40,41 +40,6 @@ instance
   
 
 
-    
-
-
-    
-
-
-    
-
-
-
-
-
-
---  подготовка строк для печати
-
-instance
-  shThesis : ShowClass Thesis
-  sh {{shThesis}} pre t = showThesis pre t
-    where
-    showThesis : String → Thesis → String
-    showThesis pre (Pos t) = pre +++ "POS: " +++ Thesis'.pos t
-    showThesis pre (Neg t) = pre +++ "NEG: " +++ Thesis'.neg t
-    showThesis pre (Th s) = pre +++ s
-
-  shStatement : ShowClass Statement
-  sh {{shStatement}} pre s = showStatement pre s
-    where 
-    showStatement : String → Statement → String
-    showStatement pre (st nothing th) = "\n"
-      +++ pre +++ sh "" th 
-    showStatement pre (st (just t) th) = "\n"
-      +++ pre +++ sh "" th +++ "\n" 
-      +++ pre +++ "(TEXT: " +++ t +++ ")" 
-
-
 -- Печать цели / вывода
 
 
