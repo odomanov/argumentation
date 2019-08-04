@@ -368,9 +368,6 @@ replaceVal (context (Ln nd _) sucs) v = context (Ln nd v) sucs
 --   ... | yes _ = (replaceVal c v) & g
 --   ... | no _  = c & g
 
-
-
-
 -- the cumulative value of all conflicts of the i-th context
 foldConflicts : ∀ {n} → AGraph n → Fin n → MC
 foldConflicts {n} g i = List.foldr f (just (LA⊥ la)) (NConflicts g i)
@@ -378,27 +375,36 @@ foldConflicts {n} g i = List.foldr f (just (LA⊥ la)) (NConflicts g i)
   f : Fin n → MC → MC
   f i v = v ⟪ _LA∨_ la ⟫ (val g i)
 
+-- negation of foldConflicts
+¬foldConflicts : ∀ {n} → AGraph n → Fin n → MC
+¬foldConflicts {n} g i = ⟪ ⊘ la ⟫ foldConflicts g i
 
--- iteration step
+-- value corrected by conflicts
+val+conflicts : ∀ {n} → AGraph n → AGraph n → Fin n → MC
+val+conflicts {n} g0 g i = (val g0 i) ⟪ _⊙_ la ⟫ ¬foldConflicts g i
 
-infixr 4 step_ 
+-- iteration steps
 
-step_ : ∀ {n}
-       → AGraph n  -- current iteration
-       → AGraph n  -- next iteration
-step_ {n} gin = foldr (λ k → AGraph k) (f) ∅ gin
-  where
-  -- the value of the next iteration
-  iterationVal : Fin n → MC
-  -- iterationVal i = (val←Idx gin i)
-  iterationVal i = (⟪ ½ la ⟫ (val←Idx gin i))
-                   ⟪ _⊕_ la ⟫
-                   (⟪ ½ la ⟫ ((val gin i)
-                              ⟪ _LA∧_ la ⟫
-                              ((just (LA⊤ la)) ⟪ _⊖_ la ⟫ (foldConflicts gin i))
-                             )
-                   )
+-- the value of the next iteration
+iterationVal : ∀ {n} → AGraph n → AGraph n → Fin n → MC
+-- iterationVal i = (val←Idx gin i)
+iterationVal g0 gin i = (⟪ ½ la ⟫ (val←Idx gin i))
+                        ⟪ _⊕_ la ⟫
+                        (⟪ ½ la ⟫ val+conflicts g0 gin i)
 
-  f : ∀ {k} → AContext k → AGraph k → AGraph (ℕ.suc k)
-  f {k} c g = (replaceVal c (iterationVal (Fin.inject≤ (Fin.fromℕ (n ∸ (ℕ.suc k))) p7))) & g
+private
+  step' : ∀ {n}
+         → AGraph n  -- initial graph
+         → AGraph n  -- current iteration
+         → AGraph n  -- next iteration
+  step' {n} g0 gin = foldr (λ k → AGraph k) f ∅ gin
+    where
+    f : ∀ {k} → AContext k → AGraph k → AGraph (ℕ.suc k)
+    f {k} c g = (replaceVal c (iterationVal g0 gin (Fin.inject≤ (Fin.fromℕ (n ∸ (ℕ.suc k))) p7))) & g
 
+steps : ∀ {n}
+        → ℕ         -- number of iterations 
+        → AGraph n  -- initial graph
+        → AGraph n  -- final iteration
+steps  ℕ.zero   g = compute g
+steps (ℕ.suc i) g = step' g (steps i g)
