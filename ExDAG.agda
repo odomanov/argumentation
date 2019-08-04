@@ -2,6 +2,7 @@
 
 module ExDAG where
 
+open import Agda.Builtin.Float
 open import Data.Bool
 open import Data.Empty
 open import Data.Fin as Fin
@@ -367,16 +368,106 @@ module Example1 where
 
   G50 = compute G5
 
-  G51 = step G50
+  G51 = steps 1 G5
 
-  G52 = step G51
+  G52 = steps 2 G5
 
-  G53 = step G52
+  G53 = steps 3 G5
 
-  G54 = step step step step step step step step step step step step step step step (compute G5)
+  G54 = steps 20 G5
 
 
-open Example1 
+
+-- From Pereira et al. Changing One's Mind...
+
+module Example2 where
+
+  St1  = let t = "St1"
+         in record { text = just t; thesis = Th t}
+  St2  = let t = "St2"
+         in record { text = just t; thesis = Th t}
+  St3  = let t = "St3"
+         in record { text = just t; thesis = Th t}
+  
+  A : LNode
+  A = Ln (In record { Body = St1 }) (just (PV 1.0 {refl} {refl}))
+
+  B : LNode
+  B = Ln (In record { Body = St2 }) (just (PV 0.4 {refl} {refl}))
+
+  C : LNode
+  C = Ln (In record { Body = St3 }) (just (PV 0.2 {refl} {refl}))
+
+  CA→B : LNode
+  CA→B = Ln (Sn (SC record {Conflicting = conflicting; Conflicted = conflicted}))
+             (just (PV 1.0 {refl} {refl}))
+  
+  CB→C : LNode
+  CB→C = Ln (Sn (SC record {Conflicting = conflicting; Conflicted = conflicted}))
+             (just (PV 1.0 {refl} {refl}))
+  
+  CC→A : LNode
+  CC→A = Ln (Sn (SC record {Conflicting = conflicting; Conflicted = conflicted}))
+             (just (PV 1.0 {refl} {refl}))
+  
+
+
+  G5 : AGraph _
+  G5 =
+       context CC→A ((conflicted , # 2) ∷ (conflicting , # 4) ∷ []) &
+       context CB→C ((conflicted , # 2) ∷ (conflicting , # 1) ∷ []) &
+       context CA→B ((conflicted , # 2) ∷ (conflicting , # 1) ∷ []) &
+       context C [] &
+       context B [] &
+       context A [] &
+       ∅
+  
+
+  _ : nodes G5 ≡ (# 0 , CC→A) ∷ (# 1 , CB→C) ∷ (# 2 , CA→B)
+               ∷ (# 3 , C)    ∷ (# 4 , B)    ∷ (# 5 , A)    ∷ []
+  _ = refl
+
+  _ : roots G5 ≡ (# 0 , CC→A) ∷ (# 1 , CB→C) ∷ (# 2 , CA→B) ∷ [] 
+  _ = refl
+  
+  _ : roots¬CA G5 ≡ (# 3 , C) ∷ (# 4 , B)  ∷ (# 5 , A)  ∷ []
+  _ = refl
+  
+  _ : NConflicts G5 (# 3) ≡ (# 4) ∷ []
+  _ = refl
+
+  _ : NConflicts G5 (# 4) ≡ (# 5) ∷ []
+  _ = refl
+
+  _ : NConflicts G5 (# 5) ≡ (# 3) ∷ []
+  _ = refl
+
+
+  G50 = compute G5
+
+  _ : G50 ≡ steps 0 G5
+  _ = refl
+  
+  G51 = steps 1 G5
+
+  G52 = steps 2 G5
+
+  G53 = steps 3 G5
+
+  G54 = steps 4 G5
+
+  G55 = steps 5 G5
+
+  G56 = steps 6 G5
+
+  G57 = steps 7 G5
+
+  G5lim = steps 200 G5
+
+
+
+
+
 
 ------------------------------------------------------------------------
 
@@ -386,145 +477,255 @@ open import IO
 
 main = run (putStrLn stringToPrint)
   where
+  ----- From Example1 --------------------------------------------
+  -- open Example1 
+  -- stringToPrint = "--------------------------------------------"
+  --   -- +++ sh "\nN1 = " (val G2 (# 5))
+  --   -- +++ sh "\nN2 = " (val G2 (# 4))
+  --   -- +++ sh "\nN3 = " (val G2 (# 0))
+  --   -- +++ sh "\nN4 = " (val G2 (# 3))
+  --   -- +++ sh "\nN5 = " (val G2 (# 2))
+  --   -- +++ sh "\nN6 = " (val G2 (# 1))
+  --   -- +++ sh "\nN1+N2 = " (val←Ctx G2 (# 5) ⟪ _⊕_ Pref ⟫ val←Ctx G2 (# 4))
+  --   -- +++ sh "\nN4+N6 = " (val←Ctx G2 (# 3) ⟪ _⊕_ Pref ⟫ val←Ctx G2 (# 1))
+  --   -- +++ sh "\nN1+N5 = " (val←Ctx G2 (# 5) ⟪ _⊕_ Pref ⟫ val←Ctx G2 (# 2))
+  --   -- +++ sh "\nN1.N2 = " (val←Ctx G2 (# 5) ⟪ _⊙_ Pref ⟫ val←Ctx G2 (# 4))
+  --   -- +++ sh "\nN4.N6 = " (val←Ctx G2 (# 3) ⟪ _⊙_ Pref ⟫ val←Ctx G2 (# 1))
+  --   -- +++ sh "\nN1.N5 = " (val←Ctx G2 (# 5) ⟪ _⊙_ Pref ⟫ val←Ctx G2 (# 2))
+  --   -- +++ "\nG4  ======================="
+  --   -- +++ sh "\nN1 = " (val G4 (# 7))
+  --   -- +++ sh "\nN2 = " (val G4 (# 6))
+  --   -- +++ sh "\nN3 = " (val G4 (# 0))
+  --   -- +++ sh "\nN4 = " (val G4 (# 5))
+  --   -- +++ sh "\nN5 = " (val G4 (# 4))
+  --   -- +++ sh "\nN6 = " (val G4 (# 3))
+  --   -- +++ sh "\nN7 = " (val G4 (# 2))
+  --   -- +++ sh "\nN8 = " (val G4 (# 1))
+  --   +++ "\nG5 orig ======================="
+  --   +++ sh "\nN1  = " (val←Idx G5 (# 9))
+  --   +++ sh "\nN2  = " (val←Idx G5 (# 8))
+  --   +++ sh "\nN3  = " (val←Idx G5 (# 4))
+  --   +++ sh "\nN4  = " (val←Idx G5 (# 7))
+  --   +++ sh "\nN5  = " (val←Idx G5 (# 6))
+  --   +++ sh "\nN6  = " (val←Idx G5 (# 5))
+  --   +++ sh "\nN7  = " (val←Idx G5 (# 3))
+  --   +++ sh "\nN8  = " (val←Idx G5 (# 2))
+  --   +++ sh "\n-N3 = " (val←Idx G5 (# 1))
+  --   +++ sh "\nCN1 = " (val←Idx G5 (# 0))
+  --   +++ "\nG5 computed  ======================="
+  --   +++ sh "\nN1  = " (val G5 (# 9))
+  --   +++ sh "\nN2  = " (val G5 (# 8))
+  --   +++ sh "\nN3  = " (val G5 (# 4))
+  --   +++ sh "\nN4  = " (val G5 (# 7))
+  --   +++ sh "\nN5  = " (val G5 (# 6))
+  --   +++ sh "\nN6  = " (val G5 (# 5))
+  --   +++ sh "\nN7  = " (val G5 (# 3))
+  --   +++ sh "\nN8  = " (val G5 (# 2))
+  --   +++ sh "\n-N3 = " (val G5 (# 1))
+  --   +++ sh "\nCN1 = " (val G5 (# 0))
+  --   -- +++ "\n============================\n"
+  --   -- +++ sh "  " G2
+  --   -- +++ "\nNConflicts 0: " +++ sh "" (NConflicts G5 (# 0))
+  --   -- +++ "\nNConflicts 1: " +++ sh "" (NConflicts G5 (# 1))
+  --   -- +++ "\nNConflicts 2: " +++ sh "" (NConflicts G5 (# 2))
+  --   -- +++ "\nNConflicts 3: " +++ sh "" (NConflicts G5 (# 3))
+  --   -- +++ "\nNConflicts 4: " +++ sh "" (NConflicts G5 (# 4))
+  --   +++ "\nG50  ======================="
+  --   +++ sh "\nN1  = " (val←Idx G50 (# 9))
+  --   +++ sh "\nN2  = " (val←Idx G50 (# 8))
+  --   +++ sh "\nN3  = " (val←Idx G50 (# 4))
+  --   +++ sh "\nN4  = " (val←Idx G50 (# 7))
+  --   +++ sh "\nN5  = " (val←Idx G50 (# 6))
+  --   +++ sh "\nN6  = " (val←Idx G50 (# 5))
+  --   +++ sh "\nN7  = " (val←Idx G50 (# 3))
+  --   +++ sh "\nN8  = " (val←Idx G50 (# 2))
+  --   +++ sh "\n-N3 = " (val←Idx G50 (# 1))
+  --   +++ sh "\nCN1 = " (val←Idx G50 (# 0))
+  --   +++ "\nG51  ======================="
+  --   +++ sh "\nN1  = " (val←Idx G51 (# 9))
+  --   +++ sh "\nN2  = " (val←Idx G51 (# 8))
+  --   +++ sh "\nN3  = " (val←Idx G51 (# 4))
+  --   +++ sh "\nN4  = " (val←Idx G51 (# 7))
+  --   +++ sh "\nN5  = " (val←Idx G51 (# 6))
+  --   +++ sh "\nN6  = " (val←Idx G51 (# 5))
+  --   +++ sh "\nN7  = " (val←Idx G51 (# 3))
+  --   +++ sh "\nN8  = " (val←Idx G51 (# 2))
+  --   +++ sh "\n-N3 = " (val←Idx G51 (# 1))
+  --   +++ sh "\nCN1 = " (val←Idx G51 (# 0))
+  --   +++ "\nG52  ======================="
+  --   +++ sh "\nN1  = " (val←Idx G52 (# 9))
+  --   +++ sh "\nN2  = " (val←Idx G52 (# 8))
+  --   +++ sh "\nN3  = " (val←Idx G52 (# 4))
+  --   +++ sh "\nN4  = " (val←Idx G52 (# 7))
+  --   +++ sh "\nN5  = " (val←Idx G52 (# 6))
+  --   +++ sh "\nN6  = " (val←Idx G52 (# 5))
+  --   +++ sh "\nN7  = " (val←Idx G52 (# 3))
+  --   +++ sh "\nN8  = " (val←Idx G52 (# 2))
+  --   +++ sh "\n-N3 = " (val←Idx G52 (# 1))
+  --   +++ sh "\nCN1 = " (val←Idx G52 (# 0))
+  --   +++ "\nG53  ======================="
+  --   +++ sh "\nN1  = " (val←Idx G53 (# 9))
+  --   +++ sh "\nN2  = " (val←Idx G53 (# 8))
+  --   +++ sh "\nN3  = " (val←Idx G53 (# 4))
+  --   +++ sh "\nN4  = " (val←Idx G53 (# 7))
+  --   +++ sh "\nN5  = " (val←Idx G53 (# 6))
+  --   +++ sh "\nN6  = " (val←Idx G53 (# 5))
+  --   +++ sh "\nN7  = " (val←Idx G53 (# 3))
+  --   +++ sh "\nN8  = " (val←Idx G53 (# 2))
+  --   +++ sh "\n-N3 = " (val←Idx G53 (# 1))
+  --   +++ sh "\nCN1 = " (val←Idx G53 (# 0))
+  --   +++ "\nG54  ======================="
+  --   +++ sh "\nN1  = " (val←Idx G54 (# 9))
+  --   +++ sh "\nN2  = " (val←Idx G54 (# 8))
+  --   +++ sh "\nN3  = " (val←Idx G54 (# 4))
+  --   +++ sh "\nN4  = " (val←Idx G54 (# 7))
+  --   +++ sh "\nN5  = " (val←Idx G54 (# 6))
+  --   +++ sh "\nN6  = " (val←Idx G54 (# 5))
+  --   +++ sh "\nN7  = " (val←Idx G54 (# 3))
+  --   +++ sh "\nN8  = " (val←Idx G54 (# 2))
+  --   +++ sh "\n-N3 = " (val←Idx G54 (# 1))
+  --   +++ sh "\nCN1 = " (val←Idx G54 (# 0))
+  --   -- +++ "\nG5repl0  ======================="
+  --   -- +++ sh "\nN1 = " (val←Idx (replaceInGraph G5 (# 0) (just (LA⊤ Pref))) (# 7))
+  --   -- +++ sh "\nN2 = " (val←Idx (replaceInGraph G5 (# 0) (just (LA⊤ Pref))) (# 6))
+  --   -- +++ sh "\nN3 = " (val←Idx (replaceInGraph G5 (# 0) (just (LA⊤ Pref))) (# 0))
+  --   -- +++ sh "\nN4 = " (val←Idx (replaceInGraph G5 (# 0) (just (LA⊤ Pref))) (# 5))
+  --   -- +++ sh "\nN5 = " (val←Idx (replaceInGraph G5 (# 0) (just (LA⊤ Pref))) (# 4))
+  --   -- +++ sh "\nN6 = " (val←Idx (replaceInGraph G5 (# 0) (just (LA⊤ Pref))) (# 3))
+  --   -- +++ sh "\nN7 = " (val←Idx (replaceInGraph G5 (# 0) (just (LA⊤ Pref))) (# 2))
+  --   -- +++ sh "\nN8 = " (val←Idx (replaceInGraph G5 (# 0) (just (LA⊤ Pref))) (# 1))
+  --   -- +++ "\nG5repl2  ======================="
+  --   -- +++ sh "\nN1 = " (val←Idx (replaceInGraph G5 (# 2) (just (LA⊤ Pref))) (# 7))
+  --   -- +++ sh "\nN2 = " (val←Idx (replaceInGraph G5 (# 2) (just (LA⊤ Pref))) (# 6))
+  --   -- +++ sh "\nN3 = " (val←Idx (replaceInGraph G5 (# 2) (just (LA⊤ Pref))) (# 0))
+  --   -- +++ sh "\nN4 = " (val←Idx (replaceInGraph G5 (# 2) (just (LA⊤ Pref))) (# 5))
+  --   -- +++ sh "\nN5 = " (val←Idx (replaceInGraph G5 (# 2) (just (LA⊤ Pref))) (# 4))
+  --   -- +++ sh "\nN6 = " (val←Idx (replaceInGraph G5 (# 2) (just (LA⊤ Pref))) (# 3))
+  --   -- +++ sh "\nN7 = " (val←Idx (replaceInGraph G5 (# 2) (just (LA⊤ Pref))) (# 2))
+  --   -- +++ sh "\nN8 = " (val←Idx (replaceInGraph G5 (# 2) (just (LA⊤ Pref))) (# 1))
+  --   -- +++ "\nG5repl7  ======================="
+  --   -- +++ sh "\nN1 = " (val←Idx (replaceInGraph G5 (# 7) (just (LA⊤ Pref))) (# 7))
+  --   -- +++ sh "\nN2 = " (val←Idx (replaceInGraph G5 (# 7) (just (LA⊤ Pref))) (# 6))
+  --   -- +++ sh "\nN3 = " (val←Idx (replaceInGraph G5 (# 7) (just (LA⊤ Pref))) (# 0))
+  --   -- +++ sh "\nN4 = " (val←Idx (replaceInGraph G5 (# 7) (just (LA⊤ Pref))) (# 5))
+  --   -- +++ sh "\nN5 = " (val←Idx (replaceInGraph G5 (# 7) (just (LA⊤ Pref))) (# 4))
+  --   -- +++ sh "\nN6 = " (val←Idx (replaceInGraph G5 (# 7) (just (LA⊤ Pref))) (# 3))
+  --   -- +++ sh "\nN7 = " (val←Idx (replaceInGraph G5 (# 7) (just (LA⊤ Pref))) (# 2))
+  --   -- +++ sh "\nN8 = " (val←Idx (replaceInGraph G5 (# 7) (just (LA⊤ Pref))) (# 1))
+  --   +++ sh "\nfoldConflicts0: " (foldConflicts G5 (# 0))
+  --   +++ sh "\nfoldConflicts1: " (foldConflicts G5 (# 1))
+  --   +++ sh "\nfoldConflicts2: " (foldConflicts G5 (# 2))
+  --   +++ sh "\nfoldConflicts3: " (foldConflicts G5 (# 3))
+  --   +++ sh "\nfoldConflicts4: " (foldConflicts G5 (# 4))
+  --   -- +++ "\nroots: " +++ sh "" (roots¬CA G5)
+  --   -- +++ "\nNArgs0: " +++ sh "  " (NArgs G5 (# 0))
+  --   -- +++ "\nNArgs1: " +++ sh "  " (NArgs G5 (# 1))
+  --   -- +++ "\nNArgs4: " +++ sh "  " (NArgs G5 (# 4))
+
+  ----- From Example2 --------------------------------------------
+  open Example2
   stringToPrint = "--------------------------------------------"
-    -- +++ sh "\nN1 = " (val G2 (# 5))
-    -- +++ sh "\nN2 = " (val G2 (# 4))
-    -- +++ sh "\nN3 = " (val G2 (# 0))
-    -- +++ sh "\nN4 = " (val G2 (# 3))
-    -- +++ sh "\nN5 = " (val G2 (# 2))
-    -- +++ sh "\nN6 = " (val G2 (# 1))
-    -- +++ sh "\nN1+N2 = " (val←Ctx G2 (# 5) ⟪ _⊕_ Pref ⟫ val←Ctx G2 (# 4))
-    -- +++ sh "\nN4+N6 = " (val←Ctx G2 (# 3) ⟪ _⊕_ Pref ⟫ val←Ctx G2 (# 1))
-    -- +++ sh "\nN1+N5 = " (val←Ctx G2 (# 5) ⟪ _⊕_ Pref ⟫ val←Ctx G2 (# 2))
-    -- +++ sh "\nN1.N2 = " (val←Ctx G2 (# 5) ⟪ _⊙_ Pref ⟫ val←Ctx G2 (# 4))
-    -- +++ sh "\nN4.N6 = " (val←Ctx G2 (# 3) ⟪ _⊙_ Pref ⟫ val←Ctx G2 (# 1))
-    -- +++ sh "\nN1.N5 = " (val←Ctx G2 (# 5) ⟪ _⊙_ Pref ⟫ val←Ctx G2 (# 2))
-    -- +++ "\nG4  ======================="
-    -- +++ sh "\nN1 = " (val G4 (# 7))
-    -- +++ sh "\nN2 = " (val G4 (# 6))
-    -- +++ sh "\nN3 = " (val G4 (# 0))
-    -- +++ sh "\nN4 = " (val G4 (# 5))
-    -- +++ sh "\nN5 = " (val G4 (# 4))
-    -- +++ sh "\nN6 = " (val G4 (# 3))
-    -- +++ sh "\nN7 = " (val G4 (# 2))
-    -- +++ sh "\nN8 = " (val G4 (# 1))
     +++ "\nG5 orig ======================="
-    +++ sh "\nN1  = " (val←Idx G5 (# 9))
-    +++ sh "\nN2  = " (val←Idx G5 (# 8))
-    +++ sh "\nN3  = " (val←Idx G5 (# 4))
-    +++ sh "\nN4  = " (val←Idx G5 (# 7))
-    +++ sh "\nN5  = " (val←Idx G5 (# 6))
-    +++ sh "\nN6  = " (val←Idx G5 (# 5))
-    +++ sh "\nN7  = " (val←Idx G5 (# 3))
-    +++ sh "\nN8  = " (val←Idx G5 (# 2))
-    +++ sh "\n-N3 = " (val←Idx G5 (# 1))
-    +++ sh "\nCN1 = " (val←Idx G5 (# 0))
+    +++ sh "\nA   = " (val←Idx G5 (# 5))
+    +++ sh "\nB   = " (val←Idx G5 (# 4))
+    +++ sh "\nC   = " (val←Idx G5 (# 3))
+    -- +++ sh "\nCN1  = " (val←Idx G5 (# 0))
+    -- +++ sh "\nCN2  = " (val←Idx G5 (# 1))
+    -- +++ sh "\nCN3  = " (val←Idx G5 (# 2))
     +++ "\nG5 computed  ======================="
-    +++ sh "\nN1  = " (val G5 (# 9))
-    +++ sh "\nN2  = " (val G5 (# 8))
-    +++ sh "\nN3  = " (val G5 (# 4))
-    +++ sh "\nN4  = " (val G5 (# 7))
-    +++ sh "\nN5  = " (val G5 (# 6))
-    +++ sh "\nN6  = " (val G5 (# 5))
-    +++ sh "\nN7  = " (val G5 (# 3))
-    +++ sh "\nN8  = " (val G5 (# 2))
-    +++ sh "\n-N3 = " (val G5 (# 1))
-    +++ sh "\nCN1 = " (val G5 (# 0))
-    -- +++ "\n============================\n"
-    -- +++ sh "  " G2
-    -- +++ "\nNConflicts 0: " +++ sh "" (NConflicts G5 (# 0))
-    -- +++ "\nNConflicts 1: " +++ sh "" (NConflicts G5 (# 1))
-    -- +++ "\nNConflicts 2: " +++ sh "" (NConflicts G5 (# 2))
-    -- +++ "\nNConflicts 3: " +++ sh "" (NConflicts G5 (# 3))
-    -- +++ "\nNConflicts 4: " +++ sh "" (NConflicts G5 (# 4))
-    +++ "\nG50  ======================="
-    +++ sh "\nN1  = " (val←Idx G50 (# 9))
-    +++ sh "\nN2  = " (val←Idx G50 (# 8))
-    +++ sh "\nN3  = " (val←Idx G50 (# 4))
-    +++ sh "\nN4  = " (val←Idx G50 (# 7))
-    +++ sh "\nN5  = " (val←Idx G50 (# 6))
-    +++ sh "\nN6  = " (val←Idx G50 (# 5))
-    +++ sh "\nN7  = " (val←Idx G50 (# 3))
-    +++ sh "\nN8  = " (val←Idx G50 (# 2))
-    +++ sh "\n-N3 = " (val←Idx G50 (# 1))
-    +++ sh "\nCN1 = " (val←Idx G50 (# 0))
-    +++ "\nG51  ======================="
-    +++ sh "\nN1  = " (val←Idx G51 (# 9))
-    +++ sh "\nN2  = " (val←Idx G51 (# 8))
-    +++ sh "\nN3  = " (val←Idx G51 (# 4))
-    +++ sh "\nN4  = " (val←Idx G51 (# 7))
-    +++ sh "\nN5  = " (val←Idx G51 (# 6))
-    +++ sh "\nN6  = " (val←Idx G51 (# 5))
-    +++ sh "\nN7  = " (val←Idx G51 (# 3))
-    +++ sh "\nN8  = " (val←Idx G51 (# 2))
-    +++ sh "\n-N3 = " (val←Idx G51 (# 1))
-    +++ sh "\nCN1 = " (val←Idx G51 (# 0))
-    +++ "\nG52  ======================="
-    +++ sh "\nN1  = " (val←Idx G52 (# 9))
-    +++ sh "\nN2  = " (val←Idx G52 (# 8))
-    +++ sh "\nN3  = " (val←Idx G52 (# 4))
-    +++ sh "\nN4  = " (val←Idx G52 (# 7))
-    +++ sh "\nN5  = " (val←Idx G52 (# 6))
-    +++ sh "\nN6  = " (val←Idx G52 (# 5))
-    +++ sh "\nN7  = " (val←Idx G52 (# 3))
-    +++ sh "\nN8  = " (val←Idx G52 (# 2))
-    +++ sh "\n-N3 = " (val←Idx G52 (# 1))
-    +++ sh "\nCN1 = " (val←Idx G52 (# 0))
-    +++ "\nG53  ======================="
-    +++ sh "\nN1  = " (val←Idx G53 (# 9))
-    +++ sh "\nN2  = " (val←Idx G53 (# 8))
-    +++ sh "\nN3  = " (val←Idx G53 (# 4))
-    +++ sh "\nN4  = " (val←Idx G53 (# 7))
-    +++ sh "\nN5  = " (val←Idx G53 (# 6))
-    +++ sh "\nN6  = " (val←Idx G53 (# 5))
-    +++ sh "\nN7  = " (val←Idx G53 (# 3))
-    +++ sh "\nN8  = " (val←Idx G53 (# 2))
-    +++ sh "\n-N3 = " (val←Idx G53 (# 1))
-    +++ sh "\nCN1 = " (val←Idx G53 (# 0))
-    +++ "\nG54  ======================="
-    +++ sh "\nN1  = " (val←Idx G54 (# 9))
-    +++ sh "\nN2  = " (val←Idx G54 (# 8))
-    +++ sh "\nN3  = " (val←Idx G54 (# 4))
-    +++ sh "\nN4  = " (val←Idx G54 (# 7))
-    +++ sh "\nN5  = " (val←Idx G54 (# 6))
-    +++ sh "\nN6  = " (val←Idx G54 (# 5))
-    +++ sh "\nN7  = " (val←Idx G54 (# 3))
-    +++ sh "\nN8  = " (val←Idx G54 (# 2))
-    +++ sh "\n-N3 = " (val←Idx G54 (# 1))
-    +++ sh "\nCN1 = " (val←Idx G54 (# 0))
-    -- +++ "\nG5repl0  ======================="
-    -- +++ sh "\nN1 = " (val←Idx (replaceInGraph G5 (# 0) (just (LA⊤ Pref))) (# 7))
-    -- +++ sh "\nN2 = " (val←Idx (replaceInGraph G5 (# 0) (just (LA⊤ Pref))) (# 6))
-    -- +++ sh "\nN3 = " (val←Idx (replaceInGraph G5 (# 0) (just (LA⊤ Pref))) (# 0))
-    -- +++ sh "\nN4 = " (val←Idx (replaceInGraph G5 (# 0) (just (LA⊤ Pref))) (# 5))
-    -- +++ sh "\nN5 = " (val←Idx (replaceInGraph G5 (# 0) (just (LA⊤ Pref))) (# 4))
-    -- +++ sh "\nN6 = " (val←Idx (replaceInGraph G5 (# 0) (just (LA⊤ Pref))) (# 3))
-    -- +++ sh "\nN7 = " (val←Idx (replaceInGraph G5 (# 0) (just (LA⊤ Pref))) (# 2))
-    -- +++ sh "\nN8 = " (val←Idx (replaceInGraph G5 (# 0) (just (LA⊤ Pref))) (# 1))
-    -- +++ "\nG5repl2  ======================="
-    -- +++ sh "\nN1 = " (val←Idx (replaceInGraph G5 (# 2) (just (LA⊤ Pref))) (# 7))
-    -- +++ sh "\nN2 = " (val←Idx (replaceInGraph G5 (# 2) (just (LA⊤ Pref))) (# 6))
-    -- +++ sh "\nN3 = " (val←Idx (replaceInGraph G5 (# 2) (just (LA⊤ Pref))) (# 0))
-    -- +++ sh "\nN4 = " (val←Idx (replaceInGraph G5 (# 2) (just (LA⊤ Pref))) (# 5))
-    -- +++ sh "\nN5 = " (val←Idx (replaceInGraph G5 (# 2) (just (LA⊤ Pref))) (# 4))
-    -- +++ sh "\nN6 = " (val←Idx (replaceInGraph G5 (# 2) (just (LA⊤ Pref))) (# 3))
-    -- +++ sh "\nN7 = " (val←Idx (replaceInGraph G5 (# 2) (just (LA⊤ Pref))) (# 2))
-    -- +++ sh "\nN8 = " (val←Idx (replaceInGraph G5 (# 2) (just (LA⊤ Pref))) (# 1))
-    -- +++ "\nG5repl7  ======================="
-    -- +++ sh "\nN1 = " (val←Idx (replaceInGraph G5 (# 7) (just (LA⊤ Pref))) (# 7))
-    -- +++ sh "\nN2 = " (val←Idx (replaceInGraph G5 (# 7) (just (LA⊤ Pref))) (# 6))
-    -- +++ sh "\nN3 = " (val←Idx (replaceInGraph G5 (# 7) (just (LA⊤ Pref))) (# 0))
-    -- +++ sh "\nN4 = " (val←Idx (replaceInGraph G5 (# 7) (just (LA⊤ Pref))) (# 5))
-    -- +++ sh "\nN5 = " (val←Idx (replaceInGraph G5 (# 7) (just (LA⊤ Pref))) (# 4))
-    -- +++ sh "\nN6 = " (val←Idx (replaceInGraph G5 (# 7) (just (LA⊤ Pref))) (# 3))
-    -- +++ sh "\nN7 = " (val←Idx (replaceInGraph G5 (# 7) (just (LA⊤ Pref))) (# 2))
-    -- +++ sh "\nN8 = " (val←Idx (replaceInGraph G5 (# 7) (just (LA⊤ Pref))) (# 1))
-    +++ sh "\nfoldConflicts0: " (foldConflicts G5 (# 0))
-    +++ sh "\nfoldConflicts1: " (foldConflicts G5 (# 1))
-    +++ sh "\nfoldConflicts2: " (foldConflicts G5 (# 2))
-    +++ sh "\nfoldConflicts3: " (foldConflicts G5 (# 3))
-    +++ sh "\nfoldConflicts4: " (foldConflicts G5 (# 4))
-    -- +++ "\nroots: " +++ sh "" (roots¬CA G5)
-    -- +++ "\nNArgs0: " +++ sh "  " (NArgs G5 (# 0))
-    -- +++ "\nNArgs1: " +++ sh "  " (NArgs G5 (# 1))
-    -- +++ "\nNArgs4: " +++ sh "  " (NArgs G5 (# 4))
+    +++ sh "\nA   = " (val G5 (# 5))
+    +++ sh "\nB   = " (val G5 (# 4))
+    +++ sh "\nC   = " (val G5 (# 3))
+    -- +++ sh "\nCN1  = " (val G5 (# 0))
+    -- +++ sh "\nCN2  = " (val G5 (# 1))
+    -- +++ sh "\nCN3  = " (val G5 (# 2))
+    +++ "\nG50 ======================="
+    +++ sh "\nA   = " (val←Idx G50 (# 5))
+    +++ sh "\nB   = " (val←Idx G50 (# 4))
+    +++ sh "\nC   = " (val←Idx G50 (# 3))
+    -- +++ sh "\nCN1  = " (val←Idx G50 (# 0))
+    -- +++ sh "\nCN2  = " (val←Idx G50 (# 1))
+    -- +++ sh "\nCN3  = " (val←Idx G50 (# 2))
+    +++ "\nG51 ======================="
+    +++ sh "\nA   = " (val←Idx G51 (# 5))
+    +++ sh "\nB   = " (val←Idx G51 (# 4))
+    +++ sh "\nC   = " (val←Idx G51 (# 3))
+    -- +++ sh "\nCN1  = " (val←Idx G51 (# 0))
+    -- +++ sh "\nCN2  = " (val←Idx G51 (# 1))
+    -- +++ sh "\nCN3  = " (val←Idx G51 (# 2))
+    +++ "\nG52 ======================="
+    +++ sh "\nA   = " (val←Idx G52 (# 5))
+    +++ sh "\nB   = " (val←Idx G52 (# 4))
+    +++ sh "\nC   = " (val←Idx G52 (# 3))
+    -- +++ sh "\nCN1  = " (val←Idx G52 (# 0))
+    -- +++ sh "\nCN2  = " (val←Idx G52 (# 1))
+    -- +++ sh "\nCN3  = " (val←Idx G52 (# 2))
+    +++ "\nG53 ======================="
+    +++ sh "\nA   = " (val←Idx G53 (# 5))
+    +++ sh "\nB   = " (val←Idx G53 (# 4))
+    +++ sh "\nC   = " (val←Idx G53 (# 3))
+    -- +++ sh "\nCN1  = " (val←Idx G53 (# 0))
+    -- +++ sh "\nCN2  = " (val←Idx G53 (# 1))
+    -- +++ sh "\nCN3  = " (val←Idx G53 (# 2))
+    +++ "\nG54 ======================="
+    +++ sh "\nA   = " (val←Idx G54 (# 5))
+    +++ sh "\nB   = " (val←Idx G54 (# 4))
+    +++ sh "\nC   = " (val←Idx G54 (# 3))
+    -- +++ sh "\nCN1  = " (val←Idx G54 (# 0))
+    -- +++ sh "\nCN2  = " (val←Idx G54 (# 1))
+    -- +++ sh "\nCN3  = " (val←Idx G54 (# 2))
+    +++ "\nG55 ======================="
+    +++ sh "\nA   = " (val←Idx G55 (# 5))
+    +++ sh "\nB   = " (val←Idx G55 (# 4))
+    +++ sh "\nC   = " (val←Idx G55 (# 3))
+    -- -- +++ sh "\nCN1  = " (val←Idx G55 (# 0))
+    -- -- +++ sh "\nCN2  = " (val←Idx G55 (# 1))
+    -- -- +++ sh "\nCN3  = " (val←Idx G55 (# 2))
+    +++ "\nG56 ======================="
+    +++ sh "\nA   = " (val←Idx G56 (# 5))
+    +++ sh "\nB   = " (val←Idx G56 (# 4))
+    +++ sh "\nC   = " (val←Idx G56 (# 3))
+    -- -- +++ sh "\nCN1  = " (val←Idx G56 (# 0))
+    -- -- +++ sh "\nCN2  = " (val←Idx G56 (# 1))
+    -- -- +++ sh "\nCN3  = " (val←Idx G56 (# 2))
+    +++ "\nG57 ======================="
+    +++ sh "\nA   = " (val←Idx G57 (# 5))
+    +++ sh "\nB   = " (val←Idx G57 (# 4))
+    +++ sh "\nC   = " (val←Idx G57 (# 3))
+    -- -- +++ sh "\nCN1  = " (val←Idx G57 (# 0))
+    -- -- +++ sh "\nCN2  = " (val←Idx G57 (# 1))
+    -- -- +++ sh "\nCN3  = " (val←Idx G57 (# 2))
+    +++ "\nG5lim ======================="
+    +++ sh "\nA   = " (val←Idx G5lim (# 5))
+    +++ sh "\nB   = " (val←Idx G5lim (# 4))
+    +++ sh "\nC   = " (val←Idx G5lim (# 3))
+    -- +++ sh "\nCN1  = " (val←Idx G5lim (# 0))
+    -- +++ sh "\nCN2  = " (val←Idx G5lim (# 1))
+    -- +++ sh "\nCN3  = " (val←Idx G5lim (# 2))
+    -- +++ sh "\nfoldConflicts:G5:0: " (foldConflicts G5 (# 0))
+    -- +++ sh "\nfoldConflicts:G5:1: " (foldConflicts G5 (# 1))
+    -- +++ sh "\nfoldConflicts:G5:2: " (foldConflicts G5 (# 2))
+    -- +++ sh "\nfoldConflicts:G5:A: " (foldConflicts G5 (# 5))
+    -- +++ sh "\nfoldConflicts:G5:B: " (foldConflicts G5 (# 4))
+    -- +++ sh "\nfoldConflicts:G5:C: " (foldConflicts G5 (# 3))
+    -- +++ sh "\nfoldConflicts:G53:0: " (foldConflicts G53 (# 0)) 
+    -- +++ sh "\nfoldConflicts:G53:1: " (foldConflicts G53 (# 1)) 
+    -- +++ sh "\nfoldConflicts:G53:2: " (foldConflicts G53 (# 2)) 
+    +++ sh "\nfoldConflicts:G55:A: " (foldConflicts G55 (# 5)) 
+    +++ sh "\nfoldConflicts:G55:B: " (foldConflicts G55 (# 4)) 
+    +++ sh "\nfoldConflicts:G55:C: " (foldConflicts G55 (# 3)) 
+    -- +++ sh "\nfoldConflicts-:G53:0: " (foldConflicts- G53 (# 0)) 
+    -- +++ sh "\nfoldConflicts-:G53:1: " (foldConflicts- G53 (# 1)) 
+    -- +++ sh "\nfoldConflicts-:G53:2: " (foldConflicts- G53 (# 2)) 
+    +++ sh "\n-foldConflicts:G55:A: " (¬foldConflicts G55 (# 5)) 
+    +++ sh "\n-foldConflicts:G55:B: " (¬foldConflicts G55 (# 4)) 
+    +++ sh "\n-foldConflicts:G55:C: " (¬foldConflicts G55 (# 3)) 
+    +++ sh "\nval+conflicts:G55:A: " (val+conflicts G50 G55 (# 5)) 
+    +++ sh "\nval+conflicts:G55:B: " (val+conflicts G50 G55 (# 4)) 
+    +++ sh "\nval+conflicts:G55:C: " (val+conflicts G50 G55 (# 3)) 
+    +++ sh "\niterationVal:G55:A: " (iterationVal G50 G55 (# 5)) 
+    +++ sh "\niterationVal:G55:B: " (iterationVal G50 G55 (# 4)) 
+    +++ sh "\niterationVal:G55:C: " (iterationVal G50 G55 (# 3)) 
+
+
+                              
