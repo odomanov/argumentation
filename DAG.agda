@@ -64,9 +64,33 @@ _![_>_] : ∀ {n} → AGraph (ℕsuc n) → (i : Fin (ℕsuc n)) → (δi : Fin 
 _![_>_] g i δi = Ac.head (Ac.tail (g [ i ]) [ δi ])
 
 
+-- Auxiliary statements
+
 -- TODO: prove these
 postulate
   p3 : ∀ {n} {i : Fin n} → ℕsuc (ℕsuc (ℕsuc (toℕ i + (n - suc i)))) ℕ.≤ ℕsuc (ℕsuc n)
+  -- p7 : ∀ {n k} → ℕsuc (n ∸ ℕsuc k) ℕ.≤ n
+
+p1 : ∀ (n i) → (n - suc i) ℕ.≤ n
+p1 (ℕsuc n) Fin.0F = ≤-step ≤-refl
+p1 (ℕsuc n) (suc i) = ≤-step (p1 n i)
+
+p2 : ∀ n i → ℕsuc ((toℕ i) + (ℕsuc n - i)) ℕ.≤ ℕsuc (ℕsuc n)
+p2 Fin.0F Fin.0F = s≤s (s≤s z≤n)
+p2 Fin.0F Fin.1F = ≤-reflexive refl
+p2 (ℕsuc n) Fin.0F = s≤s (s≤s (s≤s ≤-refl))
+p2 (ℕsuc n) (suc i) = s≤s (s≤s (≤-reflexive (pppp n i)))
+  where
+  pppp : ∀ n i → toℕ i + (ℕsuc n - i) ≡ ℕsuc n
+  pppp Fin.0F Fin.0F = refl
+  pppp Fin.0F Fin.1F = refl
+  pppp (ℕsuc n) Fin.0F = refl
+  pppp (ℕsuc n) (suc i) = cong ℕsuc (pppp n i)
+
+p6 : ∀ {n k} → (_ : ℕsuc k ℕ.≤ n) → k ℕ.≤ n
+p6 {n} {Fin.0F} = λ _ → z≤n
+p6 {n} {ℕsuc k} = λ x → ≤⇒pred≤ x 
+
 
 -- i, δi → i
 realIdx : ∀ {n} → (i : Fin n) → Fin (n - suc i) → Fin n
@@ -221,9 +245,6 @@ fold↓ {n = ℕsuc n} f init = fold' f init (Fin.fromℕ n)
   fold' f init zero    = init
   fold' f init (suc i) = f (suc i) (fold' f init (Fin.inject₁ i))
 
--- TODO: prove
-postulate
-  p5 : ∀ {n} {i : Fin n} → ℕsuc (toℕ {n} i) ≥ Fin.1F
 
 {-# TERMINATING #-}    -- the termination check fails
 -- fold up on the whole Fin n
@@ -243,7 +264,7 @@ fold↑ {n = ℕsuc n} f init = fold' f init (zero)
           → Ty
   fold' {n = n} f init i with n - suc i ≥? ℕzero
   ... | yes _ = init
-  ... | no  _ = f i (fold' f init (Fin.reduce≥ (suc i) p5))
+  ... | no  _ = f i (fold' f init (Fin.reduce≥ (suc i) (s≤s z≤n)))
 
 
 --  calculating algebra values  --------------------------------------------
@@ -286,19 +307,15 @@ val {n} g i with NArgs g i
 
 -- computing the values of the whole graph (recursively)
 
--- TODO: prove
-postulate
-  p6 : ∀ {n k} → (_ : ℕsuc k ℕ.≤ n) → k ℕ.≤ n
-  p7 : ∀ {n k} → ℕsuc (n ∸ ℕsuc k) ℕ.≤ n
-
 compute : ∀ {n} → AGraph n → AGraph n
 compute {n} g = compute' {n} {_} {≤-reflexive refl} g g
   where
   compute' : ∀ {n k} → {_ : k ℕ.≤ n} → AGraph n → AGraph k → AGraph k
-  compute' _ ∅ = ∅
-  compute' {n} {k} {p} g0 ((context (Ln nd _) sucs) & g) =
-    (context (Ln nd (val g0 (Fin.inject≤ (Fin.fromℕ (n ∸ k)) p7))) sucs)
-    & compute' {n} {k ∸ 1} {p6 p} g0 g
+  compute' {ℕzero} _ ∅ = ∅
+  compute' {ℕsuc _} _ ∅ = ∅
+  compute' {ℕsuc n} {ℕsuc k} {p} g0 ((context (Ln nd _) sucs) & g) =
+    (context (Ln nd (val g0 (Fin.inject≤ (Fin.fromℕ (ℕsuc n ∸ ℕsuc k)) (s≤s (n∸m≤n k n))))) sucs)
+    & compute' {ℕsuc n} {k} {p6 p} g0 g
 
 
 
@@ -318,22 +335,6 @@ c-ing g ic = RoleIdx←Idx g ic conflicting
 
 c-ed : ∀ {n} → AGraph n → (ic : Fin n) → Maybe (Fin (n - suc ic))
 c-ed g ic = RoleIdx←Idx g ic conflicted
-
-p1 : ∀ (n i) → (n - suc i) ℕ.≤ n
-p1 (ℕsuc n) Fin.0F = ≤-step ≤-refl
-p1 (ℕsuc n) (suc i) = ≤-step (p1 n i)
-
-p2 : ∀ n i → ℕsuc ((toℕ i) + (ℕsuc n - i)) ℕ.≤ ℕsuc (ℕsuc n)
-p2 Fin.0F Fin.0F = s≤s (s≤s z≤n)
-p2 Fin.0F Fin.1F = ≤-reflexive refl
-p2 (ℕsuc n) Fin.0F = s≤s (s≤s (s≤s ≤-refl))
-p2 (ℕsuc n) (suc i) = s≤s (s≤s (≤-reflexive (pppp n i)))
-  where
-  pppp : ∀ n i → toℕ i + (ℕsuc n - i) ≡ ℕsuc n
-  pppp Fin.0F Fin.0F = refl
-  pppp Fin.0F Fin.1F = refl
-  pppp (ℕsuc n) Fin.0F = refl
-  pppp (ℕsuc n) (suc i) = cong ℕsuc (pppp n i)
 
 
 -- extract the 'conflicted' index for the 'conflicting' i from the (ic-th) CA-node
@@ -409,10 +410,12 @@ private
          → AGraph n  -- initial graph
          → AGraph n  -- current iteration
          → AGraph n  -- next iteration
-  step' {n} g0 gin = foldr (λ k → AGraph k) f ∅ gin
+  step' {ℕzero} ∅ _ = ∅
+  step' {ℕsuc n} g0 gin = foldr (λ k → AGraph k) f ∅ gin
     where
     f : ∀ {k} → AContext k → AGraph k → AGraph (ℕsuc k)
-    f {k} c g = (replaceVal c (iterationVal g0 gin (Fin.inject≤ (Fin.fromℕ (n ∸ (ℕsuc k))) p7))) & g
+    f {k} c g = (replaceVal c (iterationVal g0 gin
+      (Fin.inject≤ (Fin.fromℕ (ℕsuc n ∸ (ℕsuc k))) (s≤s (n∸m≤n k n))))) & g
 
 steps : ∀ {n}
         → ℕ         -- number of iterations 
