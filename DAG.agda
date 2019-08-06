@@ -20,7 +20,7 @@ open import Data.String renaming (_++_ to _+++_)
 open import Data.Vec as Vec using (Vec; []; _∷_)
 open import Data.Unit using (⊤)
 open import Function using (_∘_; _$_; id)
-open import Relation.Binary.PropositionalEquality using (_≡_; _≢_; refl)
+open import Relation.Binary.PropositionalEquality using (_≡_; _≢_; refl; cong)
 open import Relation.Nullary using (yes; no)
 
 -- for debugging
@@ -319,11 +319,23 @@ c-ing g ic = RoleIdx←Idx g ic conflicting
 c-ed : ∀ {n} → AGraph n → (ic : Fin n) → Maybe (Fin (n - suc ic))
 c-ed g ic = RoleIdx←Idx g ic conflicted
 
--- TODO: prove these
-postulate
-  p1 : ∀ (n i) → (n - suc i) ℕ.≤ n
-  p2 : ∀ n i → ℕsuc ((toℕ i) + (ℕsuc n - i)) ℕ.≤ ℕsuc (ℕsuc n)
-  
+p1 : ∀ (n i) → (n - suc i) ℕ.≤ n
+p1 (ℕsuc n) Fin.0F = ≤-step ≤-refl
+p1 (ℕsuc n) (suc i) = ≤-step (p1 n i)
+
+p2 : ∀ n i → ℕsuc ((toℕ i) + (ℕsuc n - i)) ℕ.≤ ℕsuc (ℕsuc n)
+p2 Fin.0F Fin.0F = s≤s (s≤s z≤n)
+p2 Fin.0F Fin.1F = ≤-reflexive refl
+p2 (ℕsuc n) Fin.0F = s≤s (s≤s (s≤s ≤-refl))
+p2 (ℕsuc n) (suc i) = s≤s (s≤s (≤-reflexive (pppp n i)))
+  where
+  pppp : ∀ n i → toℕ i + (ℕsuc n - i) ≡ ℕsuc n
+  pppp Fin.0F Fin.0F = refl
+  pppp Fin.0F Fin.1F = refl
+  pppp (ℕsuc n) Fin.0F = refl
+  pppp (ℕsuc n) (suc i) = cong ℕsuc (pppp n i)
+
+
 -- extract the 'conflicted' index for the 'conflicting' i from the (ic-th) CA-node
 -- (I don't actually use it)
 c-ed←CA : ∀ {n} → AGraph n → (ic : Fin n) → Fin (n - suc ic) → Maybe (Fin (n - suc ic))
