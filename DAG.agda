@@ -91,9 +91,6 @@ p3 {ℕsuc n} {suc i} = s≤s (s≤s (s≤s (pppp n i)))
   pppp (ℕsuc n) Fin.0F = s≤s ≤-refl
   pppp (ℕsuc n) (suc i) = ≤-pred (s≤s (s≤s (pppp n i))) 
 
-p4 : ∀ {n k} → (_ : ℕsuc k ℕ.≤ n) → k ℕ.≤ n
-p4 {n} {Fin.0F} = λ _ → z≤n
-p4 {n} {ℕsuc k} = λ x → ≤⇒pred≤ x 
 
 
 
@@ -320,7 +317,7 @@ compute {n} g = compute' {n} {_} {≤-reflexive refl} g g
   compute' {ℕsuc _} _ ∅ = ∅
   compute' {ℕsuc n} {ℕsuc k} {p} g0 ((context (Ln nd _) sucs) & g) =
     (context (Ln nd (val g0 (Fin.inject≤ (Fin.fromℕ (ℕsuc n ∸ ℕsuc k)) (s≤s (n∸m≤n k n))))) sucs)
-    & compute' {ℕsuc n} {k} {p4 p} g0 g
+    & compute' {ℕsuc n} {k} {≤⇒pred≤ p} g0 g
 
 
 
