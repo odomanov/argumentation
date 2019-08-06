@@ -13,7 +13,7 @@ open import Data.Float
 open import Data.Graph.Acyclic as Ac public
 open import Data.List as List using (List; []; _∷_)
 open import Data.Maybe
-open import Data.Nat as ℕ 
+open import Data.Nat as ℕ renaming (zero to ℕzero; suc to ℕsuc)
 open import Data.Nat.Properties
 open import Data.Product using (_×_; _,_; proj₁; proj₂)
 open import Data.String renaming (_++_ to _+++_)
@@ -50,7 +50,7 @@ _ ⟪ _ ⟫ _ = nothing
 
 
 -- δi-th graph relative to i  
-_[_>_] : ∀ {n} → AGraph (ℕ.suc n) → (i : Fin (ℕ.suc n)) → (δi : Fin (n - i))
+_[_>_] : ∀ {n} → AGraph (ℕsuc n) → (i : Fin (ℕsuc n)) → (δi : Fin (n - i))
          → AGraph _
 g [ i > δi ] = Ac.tail (g [ i ]) [ δi ]
 
@@ -59,14 +59,14 @@ _!_ : ∀ {n} → AGraph n → (i : Fin n) → AContext (n - suc i)
 g ! i = Ac.head (g [ i ])
 
 -- δi-th context relative to i  
-_![_>_] : ∀ {n} → AGraph (ℕ.suc n) → (i : Fin (ℕ.suc n)) → (δi : Fin (n - i))
+_![_>_] : ∀ {n} → AGraph (ℕsuc n) → (i : Fin (ℕsuc n)) → (δi : Fin (n - i))
           → AContext _ 
 _![_>_] g i δi = Ac.head (Ac.tail (g [ i ]) [ δi ])
 
 
 -- TODO: prove these
 postulate
-  p3 : ∀ {n} {i : Fin n} → ℕ.suc (ℕ.suc (ℕ.suc (toℕ i + (n - suc i)))) ℕ.≤ ℕ.suc (ℕ.suc n)
+  p3 : ∀ {n} {i : Fin n} → ℕsuc (ℕsuc (ℕsuc (toℕ i + (n - suc i)))) ℕ.≤ ℕsuc (ℕsuc n)
 
 -- i, δi → i
 realIdx : ∀ {n} → (i : Fin n) → Fin (n - suc i) → Fin n
@@ -209,8 +209,8 @@ fold↓ : ∀ {t n}
         → (Fin n → Ty → Ty)
         → Ty  -- initial
         → Ty
-fold↓ {n = ℕ.zero}  f init = init
-fold↓ {n = ℕ.suc n} f init = fold' f init (Fin.fromℕ n)
+fold↓ {n = ℕzero}  f init = init
+fold↓ {n = ℕsuc n} f init = fold' f init (Fin.fromℕ n)
   where
   fold' : ∀ {t n}
           → {Ty : Set t}
@@ -223,7 +223,7 @@ fold↓ {n = ℕ.suc n} f init = fold' f init (Fin.fromℕ n)
 
 -- TODO: prove
 postulate
-  p5 : ∀ {n} {i : Fin n} → ℕ.suc (toℕ {n} i) ≥ Fin.1F
+  p5 : ∀ {n} {i : Fin n} → ℕsuc (toℕ {n} i) ≥ Fin.1F
 
 {-# TERMINATING #-}    -- the termination check fails
 -- fold up on the whole Fin n
@@ -232,8 +232,8 @@ fold↑ : ∀ {t n}
         → (Fin n → Ty → Ty)
         → Ty  -- initial
         → Ty
-fold↑ {n = ℕ.zero}  f init = init
-fold↑ {n = ℕ.suc n} f init = fold' f init (zero)
+fold↑ {n = ℕzero}  f init = init
+fold↑ {n = ℕsuc n} f init = fold' f init (zero)
   where
   fold' : ∀ {t n}
           → {Ty : Set t}
@@ -241,7 +241,7 @@ fold↑ {n = ℕ.suc n} f init = fold' f init (zero)
           → Ty  -- initial
           → Fin n
           → Ty
-  fold' {n = n} f init i with n - suc i ≥? ℕ.zero
+  fold' {n = n} f init i with n - suc i ≥? ℕzero
   ... | yes _ = init
   ... | no  _ = f i (fold' f init (Fin.reduce≥ (suc i) p5))
 
@@ -288,8 +288,8 @@ val {n} g i with NArgs g i
 
 -- TODO: prove
 postulate
-  p6 : ∀ {n k} → (_ : ℕ.suc k ℕ.≤ n) → k ℕ.≤ n
-  p7 : ∀ {n k} → ℕ.suc (n ∸ ℕ.suc k) ℕ.≤ n
+  p6 : ∀ {n k} → (_ : ℕsuc k ℕ.≤ n) → k ℕ.≤ n
+  p7 : ∀ {n k} → ℕsuc (n ∸ ℕsuc k) ℕ.≤ n
 
 compute : ∀ {n} → AGraph n → AGraph n
 compute {n} g = compute' {n} {_} {≤-reflexive refl} g g
@@ -307,7 +307,7 @@ compute {n} g = compute' {n} {_} {≤-reflexive refl} g g
 
 -- i₁ and (i₂ + δi₂) denote the same context
 theSame : ∀ {n} → Fin n → (i₂ : Fin n) → Fin (n - suc i₂) → Bool
-theSame {ℕ.suc (ℕ.suc _)} i₁ i₂ δi₂ with (toℕ i₁) ℕ.≟ ℕ.suc ((toℕ i₂) ℕ.+ (toℕ δi₂))
+theSame {ℕsuc (ℕsuc _)} i₁ i₂ δi₂ with (toℕ i₁) ℕ.≟ ℕsuc ((toℕ i₂) ℕ.+ (toℕ δi₂))
 ... | yes _ = true
 ... | no _  = false
 theSame {_} _ _ _ = false  -- for n = 0, 1
@@ -322,14 +322,14 @@ c-ed g ic = RoleIdx←Idx g ic conflicted
 -- TODO: prove these
 postulate
   p1 : ∀ (n i) → (n - suc i) ℕ.≤ n
-  p2 : ∀ n i → ℕ.suc ((toℕ i) + (ℕ.suc n - i)) ℕ.≤ ℕ.suc (ℕ.suc n)
+  p2 : ∀ n i → ℕsuc ((toℕ i) + (ℕsuc n - i)) ℕ.≤ ℕsuc (ℕsuc n)
   
 -- extract the 'conflicted' index for the 'conflicting' i from the (ic-th) CA-node
 -- (I don't actually use it)
 c-ed←CA : ∀ {n} → AGraph n → (ic : Fin n) → Fin (n - suc ic) → Maybe (Fin (n - suc ic))
-c-ed←CA {ℕ.suc (ℕ.suc (ℕ.suc n))} g ic i with c-ing g ic
+c-ed←CA {ℕsuc (ℕsuc (ℕsuc n))} g ic i with c-ing g ic
 ... | nothing = nothing
-... | just δic with theSame (Fin.inject≤ i (p1 (ℕ.suc (ℕ.suc (ℕ.suc n))) ic)) ic δic
+... | just δic with theSame (Fin.inject≤ i (p1 (ℕsuc (ℕsuc (ℕsuc n))) ic)) ic δic
 ...           | false = nothing
 ...           | true = c-ed g ic
 c-ed←CA {_} _ _ _ = nothing   -- for n = 0, 1, 2
@@ -347,7 +347,7 @@ NConflicts {n} g i = fold↓ f (NConflicts0 g i)
 
   -- the list of conflicts of the 0-th context
   NConflicts0 : ∀ {n} → AGraph n → Fin n → List (Fin n)
-  NConflicts0 {ℕ.suc n} g i with c-ing g zero
+  NConflicts0 {ℕsuc n} g i with c-ing g zero
   ... | nothing = []
   ... | just ing with theSame i (# 0) ing | c-ed g (# 0)
   ...            | true | just ied = ((Fin.inject≤ (suc ied) (s≤s (≤-reflexive refl))) ∷ [])
@@ -363,7 +363,7 @@ replaceVal (context (Ln nd _) sucs) v = context (Ln nd v) sucs
 -- replaceInGraph : ∀ {n} → AGraph n → Fin n → MC → AGraph n
 -- replaceInGraph {n} g i v = foldr (λ k → AGraph k) f ∅ g
 --   where
---   f : ∀ {k} → AContext k → AGraph k → AGraph (ℕ.suc k)
+--   f : ∀ {k} → AContext k → AGraph k → AGraph (ℕsuc k)
 --   f {k} c g with k ℕ.≟ n - suc i 
 --   ... | yes _ = (replaceVal c v) & g
 --   ... | no _  = c & g
@@ -399,12 +399,12 @@ private
          → AGraph n  -- next iteration
   step' {n} g0 gin = foldr (λ k → AGraph k) f ∅ gin
     where
-    f : ∀ {k} → AContext k → AGraph k → AGraph (ℕ.suc k)
-    f {k} c g = (replaceVal c (iterationVal g0 gin (Fin.inject≤ (Fin.fromℕ (n ∸ (ℕ.suc k))) p7))) & g
+    f : ∀ {k} → AContext k → AGraph k → AGraph (ℕsuc k)
+    f {k} c g = (replaceVal c (iterationVal g0 gin (Fin.inject≤ (Fin.fromℕ (n ∸ (ℕsuc k))) p7))) & g
 
 steps : ∀ {n}
         → ℕ         -- number of iterations 
         → AGraph n  -- initial graph
         → AGraph n  -- final iteration
-steps  ℕ.zero   g = compute g
-steps (ℕ.suc i) g = step' g (steps i g)
+steps  ℕzero   g = compute g
+steps (ℕsuc i) g = step' g (steps i g)
