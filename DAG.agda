@@ -64,12 +64,8 @@ _![_>_] : ∀ {n} → AGraph (ℕsuc n) → (i : Fin (ℕsuc n)) → (δi : Fin 
 _![_>_] g i δi = Ac.head (Ac.tail (g [ i ]) [ δi ])
 
 
--- Auxiliary statements
 
--- TODO: prove these
-postulate
-  p3 : ∀ {n} {i : Fin n} → ℕsuc (ℕsuc (ℕsuc (toℕ i + (n - suc i)))) ℕ.≤ ℕsuc (ℕsuc n)
-  -- p7 : ∀ {n k} → ℕsuc (n ∸ ℕsuc k) ℕ.≤ n
+-- Auxiliary statements
 
 p1 : ∀ (n i) → (n - suc i) ℕ.≤ n
 p1 (ℕsuc n) Fin.0F = ≤-step ≤-refl
@@ -87,9 +83,18 @@ p2 (ℕsuc n) (suc i) = s≤s (s≤s (≤-reflexive (pppp n i)))
   pppp (ℕsuc n) Fin.0F = refl
   pppp (ℕsuc n) (suc i) = cong ℕsuc (pppp n i)
 
-p6 : ∀ {n k} → (_ : ℕsuc k ℕ.≤ n) → k ℕ.≤ n
-p6 {n} {Fin.0F} = λ _ → z≤n
-p6 {n} {ℕsuc k} = λ x → ≤⇒pred≤ x 
+p3 : ∀ {n} {i : Fin n} → ℕsuc (ℕsuc (ℕsuc (toℕ i + (n - suc i)))) ℕ.≤ ℕsuc (ℕsuc n)
+p3 {ℕsuc n} {Fin.0F} = s≤s (s≤s (s≤s ≤-refl))
+p3 {ℕsuc n} {suc i} = s≤s (s≤s (s≤s (pppp n i)))
+  where
+  pppp : ∀ n i → ℕsuc (toℕ i + (n - suc i)) ℕ.≤ n
+  pppp (ℕsuc n) Fin.0F = s≤s ≤-refl
+  pppp (ℕsuc n) (suc i) = ≤-pred (s≤s (s≤s (pppp n i))) 
+
+p4 : ∀ {n k} → (_ : ℕsuc k ℕ.≤ n) → k ℕ.≤ n
+p4 {n} {Fin.0F} = λ _ → z≤n
+p4 {n} {ℕsuc k} = λ x → ≤⇒pred≤ x 
+
 
 
 -- i, δi → i
@@ -315,7 +320,7 @@ compute {n} g = compute' {n} {_} {≤-reflexive refl} g g
   compute' {ℕsuc _} _ ∅ = ∅
   compute' {ℕsuc n} {ℕsuc k} {p} g0 ((context (Ln nd _) sucs) & g) =
     (context (Ln nd (val g0 (Fin.inject≤ (Fin.fromℕ (ℕsuc n ∸ ℕsuc k)) (s≤s (n∸m≤n k n))))) sucs)
-    & compute' {ℕsuc n} {k} {p6 p} g0 g
+    & compute' {ℕsuc n} {k} {p4 p} g0 g
 
 
 
