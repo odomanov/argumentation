@@ -56,12 +56,28 @@ fmax x y with primFloatLess x y
 ... | false = x
 
 postulate
-  min0≤v : ∀ x y → (0.0 LessEq (fmin (value x) (value y)) ≡ true)
-  minv≤1 : ∀ x y → (fmin (value x) (value y)) LessEq 1.0 ≡ true
-  max0≤v : ∀ x y → (0.0 LessEq (fmax (value x) (value y)) ≡ true)
-  maxv≤1 : ∀ x y → (fmax (value x) (value y)) LessEq 1.0 ≡ true
   ½0≤v : ∀ x → (0.0 LessEq primFloatTimes 0.5 (value x)) ≡ true  
   ½v≤1 : ∀ x → (primFloatTimes 0.5 (value x) LessEq 1.0) ≡ true   
+
+min0≤v : ∀ x y → (0.0 LessEq (fmin (value x) (value y)) ≡ true)
+min0≤v x y with primFloatLess (value x) (value y)
+min0≤v (mkFUnit _ 0≤v₁ _) y | true = 0≤v₁
+min0≤v x (mkFUnit _ 0≤v₁ _) | false = 0≤v₁
+
+minv≤1 : ∀ x y → (fmin (value x) (value y)) LessEq 1.0 ≡ true
+minv≤1 x y with primFloatLess (value x) (value y)
+minv≤1 (mkFUnit _ _ v≤2) y | true = v≤2
+minv≤1 x (mkFUnit _ _ v≤2) | false = v≤2
+
+max0≤v : ∀ x y → (0.0 LessEq (fmax (value x) (value y)) ≡ true)
+max0≤v x y with primFloatLess (value x) (value y)
+max0≤v x (mkFUnit _ 0≤v₁ _) | true = 0≤v₁
+max0≤v (mkFUnit _ 0≤v₁ _) y | false = 0≤v₁
+
+maxv≤1 : ∀ x y → (fmax (value x) (value y)) LessEq 1.0 ≡ true
+maxv≤1 x y with primFloatLess (value x) (value y)
+maxv≤1 x (mkFUnit _ _ v≤2) | true = v≤2
+maxv≤1 (mkFUnit _ _ v≤2) y | false = v≤2
 
 
 
@@ -69,14 +85,20 @@ postulate
 -- Trust Algebra
 
 postulate
-  0≤v⊙ : ∀ x y → 0.0 LessEq (primFloatTimes x y) ≡ true
-  v≤1⊙ : ∀ x y → (primFloatTimes x y) LessEq 1.0 ≡ true
+  0≤v⊙ : ∀ x y → 0.0 LessEq (primFloatTimes (value x) (value y)) ≡ true
+  v≤1⊙ : ∀ x y → (primFloatTimes (value x) (value y)) LessEq 1.0 ≡ true
+
+-- 0≤v⊙ : ∀ x y → 0.0 LessEq (primFloatTimes (value x) (value y)) ≡ true
+-- 0≤v⊙ (mkFUnit value₁ 0≤v₁ v≤2) (mkFUnit value₂ 0≤v₂ v≤3) = {!0≤v₁!}
+
+-- 0≤v⊙ : ∀ {x y} (v) → {_ : v ≡ primFloatTimes (value x) (value y)} → 0.0 LessEq v ≡ true
+-- 0≤v⊙ {mkFUnit value₁ 0≤v₁ v≤2} {mkFUnit value₂ 0≤v₂ v≤3} v {p} = {!0≤v₁!}
 
 Trust⊙ : FUnit → FUnit → FUnit
 Trust⊙ a b = record
   { value = primFloatTimes (value a) (value b)
-  ; 0≤v = 0≤v⊙ (value a) (value b)
-  ; v≤1 = v≤1⊙ (value a) (value b)
+  ; 0≤v = 0≤v⊙ a b
+  ; v≤1 = v≤1⊙ a b
   }
 
 postulate
