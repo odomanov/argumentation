@@ -99,16 +99,16 @@ value⊖ a b with primFloatEquality 1.0 a | primFloatEquality 1.0 b
 ...            | _    | _     = 0.0
 value⊖ _ _ | _ | _ = 0.0
 
-postulate
-  0≤v⊖ : ∀ x y → 0.0 LessEq (value⊖ x y) ≡ true
-  v≤1⊖ : ∀ x y → (value⊖ x y) LessEq 1.0 ≡ true
+-- postulate
+--   0≤v⊖ : ∀ x y → 0.0 LessEq (value⊖ x y) ≡ true
+--   v≤1⊖ : ∀ x y → (value⊖ x y) LessEq 1.0 ≡ true
 
-Trust⊖ : FUnit → FUnit → FUnit
-Trust⊖ a b = record
-  { value = value⊖ (value a) (value b)
-  ; 0≤v = 0≤v⊖ (value a) (value b)
-  ; v≤1 = v≤1⊖ (value a) (value b)
-  }
+-- Trust⊖ : FUnit → FUnit → FUnit
+-- Trust⊖ a b = record
+--   { value = value⊖ (value a) (value b)
+--   ; 0≤v = 0≤v⊖ (value a) (value b)
+--   ; v≤1 = v≤1⊖ (value a) (value b)
+--   }
 
 postulate
   0≤v⊘ : ∀ x → 0.0 LessEq (primFloatMinus (value FU1) x) ≡ true
@@ -140,7 +140,8 @@ Trust½ x = x                       -- dummy definition !!
 
 postulate
   Trust-isLabelAlgebra : IsLabelAlgebra
-    FUEquality FULessEq Trust⊙ Trust⊕ Trust⊖ Trust⊘ Trust∧ Trust∨ Trust½ FU1 FU0
+    FUEquality FULessEq Trust⊙ Trust⊕ -- Trust⊖
+      Trust⊘ Trust∧ Trust∨ Trust½ FU1 FU0
 
 Trust : LabelAlgebra _ _ _
 Trust = record
@@ -149,7 +150,7 @@ Trust = record
   ; _≤_ = FULessEq
   ; _⊙_ = Trust⊙
   ; _⊕_ = Trust⊕
-  ; _⊖_ = Trust⊖
+  -- ; _⊖_ = Trust⊖
   ; ⊘   = Trust⊘
   ; _∧_ = Trust∧
   ; _∨_ = Trust∨
@@ -187,16 +188,16 @@ Pref⊕ a b = record
   ; v≤1 = prefv≤1⊕ a b 
   }
 
-postulate
-  pref0≤v⊖ : ∀ x y → 0.0 LessEq (fmax (primFloatMinus (value x) (value y)) 0.0) ≡ true
-  prefv≤1⊖ : ∀ x y → (fmax (primFloatMinus (value x) (value y)) 0.0) LessEq 1.0 ≡ true
+-- postulate
+--   pref0≤v⊖ : ∀ x y → 0.0 LessEq (fmax (primFloatMinus (value x) (value y)) 0.0) ≡ true
+--   prefv≤1⊖ : ∀ x y → (fmax (primFloatMinus (value x) (value y)) 0.0) LessEq 1.0 ≡ true
 
-Pref⊖ : FUnit → FUnit → FUnit
-Pref⊖ a b = record
-  { value = fmax (primFloatMinus (value a) (value b)) 0.0
-  ; 0≤v = pref0≤v⊖ a b 
-  ; v≤1 = prefv≤1⊖ a b 
-  }
+-- Pref⊖ : FUnit → FUnit → FUnit
+-- Pref⊖ a b = record
+--   { value = fmax (primFloatMinus (value a) (value b)) 0.0
+--   ; 0≤v = pref0≤v⊖ a b 
+--   ; v≤1 = prefv≤1⊖ a b 
+--   }
 
 Pref⊘ : FUnit → FUnit
 Pref⊘ a = record
@@ -221,7 +222,8 @@ Pref½ x = record
 
 postulate
   Pref-isLabelAlgebra : IsLabelAlgebra
-    FUEquality FULessEq Pref⊙ Pref⊕ Pref⊖ Pref⊘ Pref⊙ Pref∨ Pref½ FU1 FU0
+    FUEquality FULessEq Pref⊙ Pref⊕ -- Pref⊖
+      Pref⊘ Pref⊙ Pref∨ Pref½ FU1 FU0
 
 Pref : LabelAlgebra _ _ _
 Pref = record
@@ -230,7 +232,7 @@ Pref = record
   ; _≤_ = FULessEq
   ; _⊙_ = Pref⊙
   ; _⊕_ = Pref⊕
-  ; _⊖_ = Pref⊖
+  -- ; _⊖_ = Pref⊖
   ; ⊘   = Pref⊘
   ; _∧_ = Pref⊙
   ; _∨_ = Pref∨

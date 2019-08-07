@@ -14,7 +14,7 @@ record IsLabelAlgebra {c ℓ₁ ℓ₂} {A : Set c}
                          (_≤_ : Rel A ℓ₂)
                          (_⊙_ : Op₂ A)
                          (_⊕_ : Op₂ A)
-                         (_⊖_ : Op₂ A)
+                         -- (_⊖_ : Op₂ A)
                          (⊘   : Op₁ A)
                          (_∧_ : Op₂ A)
                          (_∨_ : Op₂ A)
@@ -37,12 +37,12 @@ record IsLabelAlgebra {c ℓ₁ ℓ₂} {A : Set c}
     ⊕-assoc   : Associative _≈_ _⊕_
     ⊕-neut    : ∀ (a) → (a ⊕ ⊥) ≈ a
     -- conflict
-    ⊖-1       : ∀ (a b) → b ≤ a → ¬ a ≈ b → (a ⊖ b) ≤ a
-    ⊖-2       : ∀ (a b) → a ≤ b → (a ⊖ b) ≈ ⊥
-    ⊖-mono    : ∀ (p q r) → p ≤ q → (p ⊖ r) ≤ (q ⊖ r) --  Monotone 
-    ⊖-neut    : ∀ (a) → (a ⊖ ⊥) ≈ a
-    ⊖-3       : ∀ (a b) → (a ⊖ b) ≈ ⊥ → (b ⊖ a) ≈ ⊥ → a ≈ b
-    ⊖-4       : ∀ (a b) → (a ⊕ b) ≤ ⊤ → ¬ ((a ⊕ b) ≈ ⊤) → ((a ⊕ b) ⊖ b) ≈ a
+    -- ⊖-1       : ∀ (a b) → b ≤ a → ¬ a ≈ b → (a ⊖ b) ≤ a
+    -- ⊖-2       : ∀ (a b) → a ≤ b → (a ⊖ b) ≈ ⊥
+    -- ⊖-mono    : ∀ (p q r) → p ≤ q → (p ⊖ r) ≤ (q ⊖ r) --  Monotone 
+    -- ⊖-neut    : ∀ (a) → (a ⊖ ⊥) ≈ a
+    -- ⊖-3       : ∀ (a b) → (a ⊖ b) ≈ ⊥ → (b ⊖ a) ≈ ⊥ → a ≈ b
+    -- ⊖-4       : ∀ (a b) → (a ⊕ b) ≤ ⊤ → ¬ ((a ⊕ b) ≈ ⊤) → ((a ⊕ b) ⊖ b) ≈ a
     -- min, max
     sup       : Supremum _≤_ _∨_
     inf       : Infimum  _≤_ _∧_
@@ -51,7 +51,7 @@ record IsLabelAlgebra {c ℓ₁ ℓ₂} {A : Set c}
 record LabelAlgebra c ℓ₁ ℓ₂ : Set (suc (c ⊔ ℓ₁ ⊔ ℓ₂)) where
   infix  4 _≈_ _≤_
   infixr 6 _⊕_
-  infixr 7 _⊖_
+  -- infixr 7 _⊖_
   infixr 7 _⊙_
   field
     Carrier : Set c
@@ -59,14 +59,15 @@ record LabelAlgebra c ℓ₁ ℓ₂ : Set (suc (c ⊔ ℓ₁ ⊔ ℓ₂)) where
     _≤_     : Rel Carrier ℓ₂  -- The partial order.
     _⊙_     : Op₂ Carrier     -- The support operation.
     _⊕_     : Op₂ Carrier     -- The aggregation operation.
-    _⊖_     : Op₂ Carrier     -- The conflict operation.
+    -- _⊖_     : Op₂ Carrier     -- The conflict operation.
     ⊘       : Op₁ Carrier     -- The negation operation.
     _∧_     : Op₂ Carrier     -- The minimum operation.
     _∨_     : Op₂ Carrier     -- The maximum operation.
     ½       : Op₁ Carrier     -- The half operation.
     ⊤       : Carrier         -- The maximum.
     ⊥       : Carrier         -- The minimum.
-    isLabelAlgebra : IsLabelAlgebra _≈_ _≤_ _⊙_ _⊕_ _⊖_ ⊘ _∧_ _∨_ ½ ⊤ ⊥ 
+    isLabelAlgebra : IsLabelAlgebra _≈_ _≤_ _⊙_ _⊕_ -- _⊖_
+                                    ⊘ _∧_ _∨_ ½ ⊤ ⊥ 
     
   open IsLabelAlgebra isLabelAlgebra public
 
