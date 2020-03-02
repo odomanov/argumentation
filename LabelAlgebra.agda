@@ -28,12 +28,12 @@ record IsLabelAlgebra {c ℓ₁ ℓ₂} {A : Set c}
     minimum   : Minimum _≤_ ⊥
     -- support
     ⊙-comm    : Commutative _≈_ _⊙_
-    ⊙-mono    : ∀ (p q r) → p ≤ q → (p ⊙ r) ≤ (q ⊙ r) --  Monotone 
+    ⊙-mono    : ∀ p q r → p ≤ q → (p ⊙ r) ≤ (q ⊙ r) --  Monotone 
     ⊙-assoc   : Associative _≈_ _⊙_
     ⊙-neut    : ∀ (a) → (a ⊙ ⊤) ≈ a
     -- aggregation    
     ⊕-comm    : Commutative _≈_ _⊕_
-    ⊕-mono    : ∀ (p q r) → p ≤ q → (p ⊕ r) ≤ (q ⊕ r) --  Monotone 
+    ⊕-mono    : ∀ p q r → p ≤ q → (p ⊕ r) ≤ (q ⊕ r) --  Monotone 
     ⊕-assoc   : Associative _≈_ _⊕_
     ⊕-neut    : ∀ (a) → (a ⊕ ⊥) ≈ a
     -- conflict

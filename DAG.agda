@@ -9,6 +9,7 @@ open import Data.Bool
 open import Data.Empty using (⊥)
 open import Data.Fin as Fin
   using (Fin; Fin′; zero; suc; #_; toℕ; _≟_) renaming (_ℕ-ℕ_ to _-_)
+open import Data.Fin.Patterns as FinP 
 open import Data.Float
 open import Data.Graph.Acyclic as Ac public
 open import Data.List as List using (List; []; _∷_)
@@ -67,28 +68,28 @@ _![_>_] g i δi = Ac.head (Ac.tail (g [ i ]) [ δi ])
 
 -- Auxiliary statements
 
-p1 : ∀ (n i) → (n - suc i) ℕ.≤ n
-p1 (ℕsuc n) Fin.0F = ≤-step ≤-refl
+p1 : ∀ n i → (n - suc i) ℕ.≤ n
+p1 (ℕsuc n) FinP.0F = ≤-step ≤-refl
 p1 (ℕsuc n) (suc i) = ≤-step (p1 n i)
 
 p2 : ∀ n i → ℕsuc ((toℕ i) + (ℕsuc n - i)) ℕ.≤ ℕsuc (ℕsuc n)
-p2 Fin.0F Fin.0F = s≤s (s≤s z≤n)
-p2 Fin.0F Fin.1F = ≤-reflexive refl
-p2 (ℕsuc n) Fin.0F = s≤s (s≤s (s≤s ≤-refl))
+p2 0 FinP.0F = s≤s (s≤s z≤n)
+p2 0 FinP.1F = ≤-reflexive refl
+p2 (ℕsuc n) FinP.0F = s≤s (s≤s (s≤s ≤-refl))
 p2 (ℕsuc n) (suc i) = s≤s (s≤s (≤-reflexive (pppp n i)))
   where
   pppp : ∀ n i → toℕ i + (ℕsuc n - i) ≡ ℕsuc n
-  pppp Fin.0F Fin.0F = refl
-  pppp Fin.0F Fin.1F = refl
-  pppp (ℕsuc n) Fin.0F = refl
+  pppp 0 FinP.0F = refl
+  pppp 0 FinP.1F = refl
+  pppp (ℕsuc n) FinP.0F = refl
   pppp (ℕsuc n) (suc i) = cong ℕsuc (pppp n i)
 
 p3 : ∀ {n} {i : Fin n} → ℕsuc (ℕsuc (ℕsuc (toℕ i + (n - suc i)))) ℕ.≤ ℕsuc (ℕsuc n)
-p3 {ℕsuc n} {Fin.0F} = s≤s (s≤s (s≤s ≤-refl))
+p3 {ℕsuc n} {FinP.0F} = s≤s (s≤s (s≤s ≤-refl))
 p3 {ℕsuc n} {suc i} = s≤s (s≤s (s≤s (pppp n i)))
   where
   pppp : ∀ n i → ℕsuc (toℕ i + (n - suc i)) ℕ.≤ n
-  pppp (ℕsuc n) Fin.0F = s≤s ≤-refl
+  pppp (ℕsuc n) FinP.0F = s≤s ≤-refl
   pppp (ℕsuc n) (suc i) = ≤-pred (s≤s (s≤s (pppp n i))) 
 
 
@@ -316,7 +317,7 @@ compute {n} g = compute' {n} {_} {≤-reflexive refl} g g
   compute' {ℕzero} _ ∅ = ∅
   compute' {ℕsuc _} _ ∅ = ∅
   compute' {ℕsuc n} {ℕsuc k} {p} g0 ((context (Ln nd _) sucs) & g) =
-    (context (Ln nd (val g0 (Fin.inject≤ (Fin.fromℕ (ℕsuc n ∸ ℕsuc k)) (s≤s (n∸m≤n k n))))) sucs)
+    (context (Ln nd (val g0 (Fin.inject≤ (Fin.fromℕ (ℕsuc n ∸ ℕsuc k)) (s≤s (m∸n≤m n k))))) sucs)
     & compute' {ℕsuc n} {k} {≤⇒pred≤ p} g0 g
 
 
@@ -417,7 +418,7 @@ private
     where
     f : ∀ {k} → AContext k → AGraph k → AGraph (ℕsuc k)
     f {k} c g = (replaceVal c (iterationVal g0 gin
-      (Fin.inject≤ (Fin.fromℕ (ℕsuc n ∸ (ℕsuc k))) (s≤s (n∸m≤n k n))))) & g
+      (Fin.inject≤ (Fin.fromℕ (ℕsuc n ∸ (ℕsuc k))) (s≤s (m∸n≤m n k))))) & g
 
 steps : ∀ {n}
         → ℕ         -- number of iterations 

@@ -73,12 +73,12 @@ x' ≟T y' with x' | y'
 ... | Pos x | Pos y = (Thesis'.pos x) String.≟ (Thesis'.pos y)
 ... | Neg x | Neg y = (Thesis'.neg x) String.≟ (Thesis'.neg y)
 ... | Th x  | Th y  = x String.≟ y
-... | Pos x | Neg y = no id 
-... | Pos x | Th y  = no id
-... | Neg x | Pos y = no id
-... | Neg x | Th y  = no id
-... | Th x  | Pos y = no id
-... | Th x  | Neg y = no id
+... | Pos _ | Neg _ = no id 
+... | Pos _ | Th  _ = no id
+... | Neg _ | Pos _ = no id
+... | Neg _ | Th  _ = no id
+... | Th  _ | Pos _ = no id
+... | Th  _ | Neg _ = no id
 
 
 instance
