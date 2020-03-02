@@ -30,6 +30,7 @@ open import Relation.Nullary using (yes; no)
 
 open import ArgPrelude 
 open import AIF
+open import WLPretty
 
 LNode = Node {la = la}
 AContext = Context LNode Role   -- argumentation context
@@ -426,3 +427,14 @@ steps : ∀ {n}
         → AGraph n  -- final iteration
 steps  ℕzero   g = compute g
 steps (ℕsuc i) g = step' g (steps i g)
+
+
+
+docMC : MC → Doc
+docMC nothing = empty
+docMC (just x) = (doc la) x
+
+instance
+  ppMC : Pretty MC
+  pretty {{ppMC}} = docMC
+  

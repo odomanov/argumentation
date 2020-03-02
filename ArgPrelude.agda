@@ -41,6 +41,7 @@ filterb P (x ∷ xs) with P x
 -- preliminary
 
 record Thesis' : Set where
+  constructor th'
   field
     pos : String  -- positive form
     neg : String  -- negative form
@@ -111,41 +112,3 @@ instance
   _===_ {{SEq}} x y = x =S y
 
 
-
-
-
--- Show handlers
-
-record ShowClass {ℓ} (A : Set ℓ) : Set ℓ where
-  field
-    sh : String → A → String
-
-open ShowClass {{...}} public
-
-instance
-  shBool : ShowClass Bool
-  sh {{shBool}} pre b = pre +++ (Data.Bool.Show.show b)
-
-  shString : ShowClass String
-  sh {{shString}} pre s = pre +++ (String.show s)
-
-  shNat : ShowClass Nat
-  sh {{shNat}} pre n = pre +++ (Data.Nat.Show.show n)
-
-  shThesis : ShowClass Thesis
-  sh {{shThesis}} pre t = showThesis pre t
-    where
-    showThesis : String → Thesis → String
-    showThesis pre (Pos t) = pre +++ "POS: " +++ Thesis'.pos t
-    showThesis pre (Neg t) = pre +++ "NEG: " +++ Thesis'.neg t
-    showThesis pre (Th s) = pre +++ s
-
-  shStatement : ShowClass Statement
-  sh {{shStatement}} pre s = showStatement pre s
-    where 
-    showStatement : String → Statement → String
-    showStatement pre (st nothing th) = "\n"
-      +++ pre +++ sh "" th 
-    showStatement pre (st (just t) th) = "\n"
-      +++ pre +++ sh "" th +++ "\n" 
-      +++ pre +++ "(TEXT: " +++ t +++ ")" 

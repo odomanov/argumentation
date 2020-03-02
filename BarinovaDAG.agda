@@ -18,6 +18,8 @@ open import LabelAlgebras
 open import AIF
 open import DAG Pref
 
+open import WLPretty
+
 -- Statements
 
 S-гладстон-литератор = record
@@ -227,4 +229,5 @@ main = run (putStrLn stringToPrint)
     pre = "  "
 
     stringToPrint = ""
-      +++ =line +++ sh "  " G
+      -- +++ (pretty 110 (docGraph G))
+      +++ (pprint {p = ppGraph} 110 G)

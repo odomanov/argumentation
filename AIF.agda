@@ -248,9 +248,5 @@ module _ {c ℓ₁ ℓ₂} {la : LabelAlgebra c ℓ₁ ℓ₂} where
 --   выводarg = In record { Body = A-от-эксперта.вывод arg }
 
 
--- printing functions
 
-instance
-  shRole : ShowClass Role
-  sh {{shRole}} pre (role r) = pre +++ r 
 

@@ -13,6 +13,8 @@ open import Data.Unit
 open import Level
 open import Relation.Binary.PropositionalEquality using (_≡_; _≢_; refl)
 
+open import WLPretty
+
 open import LabelAlgebra public
   renaming (⊤ to LA⊤; ⊥ to LA⊥; _∧_ to _LA∧_; _∨_ to _LA∨_)
 
@@ -165,6 +167,9 @@ postulate
     FUEquality FULessEq Trust⊙ Trust⊕ -- Trust⊖
       Trust⊘ Trust∧ Trust∨ Trust½ FU1 FU0
 
+docTrust : FUnit → Doc
+docTrust (mkFUnit x _ _) = text (Data.Float.show x)
+
 Trust : LabelAlgebra _ _ _
 Trust = record
   { Carrier = FUnit
@@ -180,6 +185,7 @@ Trust = record
   ; ⊤ = FU1
   ; ⊥ = FU0
   ; isLabelAlgebra = Trust-isLabelAlgebra
+  ; doc = docTrust
   }
 
 TV : (x : Float) → {p1 : 0.0 LessEq x ≡ true} → {p2 : x LessEq 1.0 ≡ true}
@@ -247,6 +253,9 @@ postulate
     FUEquality FULessEq Pref⊙ Pref⊕ -- Pref⊖
       Pref⊘ Pref⊙ Pref∨ Pref½ FU1 FU0
 
+docPref : FUnit → Doc
+docPref (mkFUnit x _ _) = text (Data.Float.show x)
+
 Pref : LabelAlgebra _ _ _
 Pref = record
   { Carrier = FUnit
@@ -262,6 +271,7 @@ Pref = record
   ; ⊤ = FU1
   ; ⊥ = FU0
   ; isLabelAlgebra = Pref-isLabelAlgebra
+  ; doc = docPref
   }
 
 PV : (x : Float) → {p1 : 0.0 LessEq x ≡ true} → {p2 : x LessEq 1.0 ≡ true}

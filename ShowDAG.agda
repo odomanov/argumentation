@@ -19,73 +19,75 @@ open import ArgPrelude
 open import AIF
 open import LabelAlgebras
 open import ArgSchemes
+open import WLPretty
 
 open import DAG Pref
 
+docRole : Role → Doc
+docRole (role s) = text s
+
+docRoles : List Role → Doc
+docRoles [] = empty
+docRoles (x ∷ []) = docRole x
+docRoles (x ∷ xs) = docRole x <> text ", " <> docRoles xs
+
+docThesis : String → Thesis → Doc
+docThesis _ (Pos (th' pos neg)) = text "THESIS.Pos = "
+  <> string pos <> text " / " <> string neg
+docThesis _ (Neg (th' pos neg)) = text "THESIS.Neg = "
+  <> string pos <> text " / " <> string neg
+docThesis tx (Th th) with tx == th
+... | true  = text "THESIS = TEXT"
+... | false = text "THESIS = " <> nest 9 (string th)
+
+docStmt : Statement → Doc
+docStmt (st nothing th) = docThesis "" th
+docStmt (st (just tx) th) = text "TEXT   = "
+  <> nest 9 (string tx) <> line <> docThesis tx th
+
+docLabel : (Maybe FUnit) → Doc
+docLabel nothing = text "NOTHING"
+docLabel (just (mkFUnit x _ _)) = text (Data.Float.show x)
+
+docNode : LNode → Doc
+docNode (Ln (In (mkI s)) v) = text "I: " <> nest 3 (docStmt s)
+  <> line <> group (text "вес   = " <> docLabel v)
+docNode (Ln (Sn (SR (mkRA p c))) v) = text "SR: "
+  <> nest 4 (group (docRoles p <> line <> text "=> " <> docRole c))
+  <> line <> group (text "вес   = " <> docLabel v)
+docNode (Ln (Sn (SC (mkCA c1 c2))) v) = text "CONFLICT: "
+  <> nest 4 (docRole c1 <> text " --> " <> docRole c2) 
+  <> line <> group (text "вес   = " <> docLabel v)
+docNode (Ln (Sn (SP (mkPA p1 p2))) v) = text "PREF: "
+  <> nest 4 (docRole p1 <> text " --> " <> docRole p2)
+  <> line <> group (text "вес   = " <> docLabel v)
+
+docNodes : ∀ {n} → List (Fin n × LNode) → Doc
+docNodes [] = empty
+docNodes ((i , nd) ∷ xs) = text ((ℕshow (toℕ i)) +++ " : ")
+                           <> docNode nd <> docNodes xs
+
+docSucs : ∀ {n} → List (Role × Fin n) → Doc
+docSucs [] = empty
+docSucs ((r , i) ∷ []) = group (docRole r <> text (":" +++ ℕshow (toℕ i)))
+docSucs ((r , i) ∷ xs) = group (docRole r <> text (":" +++ ℕshow (toℕ i) +++ ", ") <> docSucs xs)
+
+docCtx : ∀ {n} → AContext n → Doc
+docCtx (context nd sucs) = nest 2 (docNode nd)
+  <> nest 2 (line <> text "связи = ( " <> docSucs sucs <> text " )")
+
+docGraph : ∀ {n} → AGraph n → Doc
+docGraph ∅ = empty 
+docGraph (ctx & g) = line <> text "& " <> docCtx ctx <> docGraph g
+
 
 instance
-  shLabel : ShowClass (Maybe FUnit)
-  sh {{shLabel}} pre fu = pre +++ showlabel fu
-    where
-    showlabel : Maybe FUnit → String
-    showlabel nothing = "NOTHING"
-    showlabel (just (mkFUnit x _ _)) = Data.Float.show x
-
-  shNode : ShowClass (LNode)
-  sh {{shNode}} pre nd = showNode pre nd
-    where
-    showNode' : String → Node' → String
-    showNode' pre (In (mkI s)) = sh pre s
-    showNode' pre (Sn (SR (mkRA p c))) = sh "" c 
-    showNode' pre (Sn (SC (mkCA c1 c2))) = pre +++ sh "CONFLICT1: " c1
-      +++ sh "CONFLICT2: " c2
-    showNode' pre (Sn (SP (mkPA p1 p2))) = pre +++ sh "PREF1: " p1
-      +++ sh "PREF2: " p2
-
-    showNode : String → LNode → String
-    showNode pre (Ln n v) = pre +++ showNode' pre n +++ sh " ---> " v
-
-  shSucs : ∀ {n} → ShowClass (List (Role × Fin n))
-  sh {{shSucs}} pre l = showSucs pre l
-    where
-    showSucs : ∀ {n} → String → List (Role × Fin n) → String
-    showSucs _ [] = ""
-    showSucs pre (x ∷ xs) = pre +++ sh ":" (proj₁ x) +++ ": "
-      +++ (sh "" (toℕ (proj₂ x)))
-      +++ "\n" +++ showSucs pre xs 
-
-  shContext : ∀ {n} → ShowClass (AContext n)
-  sh {{shContext}} pre c = showContext pre c
-    where
-    showContext : ∀ {n} → String → AContext n → String
-    showContext pre (context nd sucs) = pre +++ sh pre nd
-      +++ "\n" +++ sh pre sucs
-
-  shGraph : ∀ {n} → ShowClass (AGraph n)
-  sh {{shGraph}} pre g = showAGraph pre g
-    where
-    showAGraph : ∀ {n} → String → AGraph n → String
-    showAGraph {n} _ ∅ = ""
-    showAGraph {suc n} pre (ctx & g) = sh ":: " n 
-      +++ sh pre ctx +++ "\n" +++ showAGraph {n} pre g
-
-  shFin : ∀ {n} → ShowClass (Fin n)
-  sh {{shFin}} pre i = showFin pre i
-    where
-    showFin : ∀ {n} → String → Fin n → String
-    showFin pre i = pre +++ ℕshow (toℕ i)
-
-  shFinList : ∀ {n} → ShowClass (List (Fin n))
-  sh {{shFinList}} pre l = showFinList pre l
-    where
-    showFinList : ∀ {n} → String → List (Fin n) → String
-    showFinList pre [] = pre
-    showFinList pre (x ∷ xs) = pre +++ (ℕshow (toℕ x)) +++ showFinList pre xs
-
-  shFinNodeList : ∀ {n} → ShowClass (List (Fin n × LNode))
-  sh {{shFinNodeList}} pre l = showFinNodeList pre l
-    where
-    showFinNodeList : ∀ {n} → String → List (Fin n × LNode) → String
-    showFinNodeList pre [] = pre
-    showFinNodeList pre (x ∷ xs) = pre +++ (ℕshow (toℕ (proj₁ x)))
-      +++ " : " +++ sh "" (proj₂ x) +++ showFinNodeList pre xs
+  ppRole : Pretty Role
+  pretty {{ppRole}} x = (docRole x)
+  ppThesis : Pretty Thesis
+  pretty {{ppThesis}} t = (docThesis "" t)
+  ppNode : Pretty LNode
+  pretty {{ppNode}} nd = (docNode nd)
+  ppGraph : ∀ {n} → Pretty (AGraph n)
+  pretty {{ppGraph}} g = (docGraph g)
+  

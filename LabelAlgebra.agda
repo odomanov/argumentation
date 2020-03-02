@@ -9,6 +9,8 @@ open import Relation.Binary.Lattice using (Supremum; Infimum)
 open import Relation.Binary.PropositionalEquality using (_≡_; _≢_; refl)
 open import Relation.Nullary
 
+open import WLPretty
+
 record IsLabelAlgebra {c ℓ₁ ℓ₂} {A : Set c}
                          (_≈_ : Rel A ℓ₁)
                          (_≤_ : Rel A ℓ₂)
@@ -49,6 +51,7 @@ record IsLabelAlgebra {c ℓ₁ ℓ₂} {A : Set c}
 
 
 record LabelAlgebra c ℓ₁ ℓ₂ : Set (suc (c ⊔ ℓ₁ ⊔ ℓ₂)) where
+  constructor mkLabelAlgebra
   infix  4 _≈_ _≤_
   infixr 6 _⊕_
   -- infixr 7 _⊖_
@@ -68,6 +71,7 @@ record LabelAlgebra c ℓ₁ ℓ₂ : Set (suc (c ⊔ ℓ₁ ⊔ ℓ₂)) where
     ⊥       : Carrier         -- The minimum.
     isLabelAlgebra : IsLabelAlgebra _≈_ _≤_ _⊙_ _⊕_ -- _⊖_
                                     ⊘ _∧_ _∨_ ½ ⊤ ⊥ 
+    doc : Carrier → Doc
     
   open IsLabelAlgebra isLabelAlgebra public
 
