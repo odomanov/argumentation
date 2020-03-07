@@ -16,6 +16,8 @@ open import Relation.Binary
 open import Relation.Binary.PropositionalEquality using (_≡_; _≢_; refl)
 open import Relation.Nullary
 
+open import WLPretty public
+
 -- boolean equality
 
 record BEq {ℓ} (A : Set ℓ): Set (lsuc ℓ) where
@@ -110,5 +112,10 @@ x ≟S y = (Statement.thesis x) ≟T (Statement.thesis y)
 instance
   SEq : BEq Statement
   _===_ {{SEq}} x y = x =S y
+
+
+docSection : ℕ → String → Doc
+docSection n s = line <> text (s +++ "  ")
+                 <> text (S.replicate (0 ℕ.⊔ ((n ∸ 2) ∸ S.length s)) '=')
 
 

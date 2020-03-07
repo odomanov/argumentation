@@ -84,10 +84,21 @@ docGraph (ctx & g) = line <> text "& " <> docCtx ctx <> docGraph g
 instance
   ppRole : Pretty Role
   pretty {{ppRole}} x = (docRole x)
+  pppRole : PPrint Role
+  prettytype {{pppRole}} = ppRole
+
   ppThesis : Pretty Thesis
   pretty {{ppThesis}} t = (docThesis "" t)
+  pppThesis : PPrint Thesis
+  prettytype {{pppThesis}} = ppThesis
+
   ppNode : Pretty LNode
   pretty {{ppNode}} nd = (docNode nd)
+  pppNode : PPrint LNode
+  prettytype {{pppNode}} = ppNode
+
   ppGraph : ∀ {n} → Pretty (AGraph n)
   pretty {{ppGraph}} g = (docGraph g)
+  pppGraph : ∀ {n} → PPrint (AGraph n)
+  prettytype {{pppGraph}} = ppGraph
   
