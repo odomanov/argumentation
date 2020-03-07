@@ -94,7 +94,7 @@ instance
 record Statement : Set where
   constructor st
   field
-    text   : Maybe String  -- the text
+    sttext : Maybe String  -- the statement text
     thesis : Thesis        -- it's meaning (proposition)
 
 -- bool equality
