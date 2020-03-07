@@ -1,9 +1,11 @@
 module ArgPrelude where
 
+open import Agda.Builtin.Float
 open import Agda.Builtin.Nat
-open import Data.Bool using (Bool; true; false)
+open import Data.Bool using (Bool; true; false; _∨_)
 open import Data.Bool.Show using (show)
 open import Data.Empty
+open import Data.Float public
 open import Data.List
 open import Data.Maybe
 open import Data.Nat as ℕ using (suc; ℕ; _∸_; _⊔_)
@@ -119,3 +121,24 @@ docSection n s = line <> text (s +++ "  ")
                  <> text (S.replicate (0 ℕ.⊔ ((n ∸ 2) ∸ S.length s)) '=')
 
 
+
+-- float arithmetics
+
+infix 5 _[<]_ _[≤]_ _[=]_
+infix 6 _[+]_ _[-]_ 
+infix 7 _[*]_
+
+_[+]_ : Float → Float → Float 
+x [+] y = primFloatPlus x y
+_[-]_ : Float → Float → Float 
+x [-] y = primFloatMinus x y
+_[*]_ : Float → Float → Float 
+x [*] y = primFloatTimes x y
+_[/]_ : Float → Float → Float 
+x [/] y = primFloatDiv x y
+_[=]_ : Float → Float → Bool
+x [=] y = primFloatEquality x y
+_[<]_ : Float → Float → Bool 
+x [<] y = primFloatLess x y
+_[≤]_ : Float → Float → Bool 
+x [≤] y = primFloatLess x y ∨ primFloatEquality x y 
