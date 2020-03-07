@@ -6,9 +6,9 @@ open import Data.Bool.Show using (show)
 open import Data.Empty
 open import Data.List
 open import Data.Maybe
-open import Data.Nat using (suc; ℕ)
+open import Data.Nat as ℕ using (suc; ℕ; _∸_; _⊔_)
 open import Data.Nat.Show
-open import Data.String as String using (String) renaming (_++_ to _+++_)
+open import Data.String as S using (String) renaming (_++_ to _+++_)
 open import Data.Unit
 open import Function using (id)
 open import Level renaming (zero to lzero; suc to lsuc)
@@ -53,9 +53,9 @@ data Thesis : Set where
 
 -- bool equality
 _=T_ : Thesis → Thesis → Bool
-(Pos x) =T (Pos y) = (Thesis'.pos x) String.== (Thesis'.pos y)
-(Neg x) =T (Neg y) = (Thesis'.pos x) String.== (Thesis'.pos y)
-(Th x) =T (Th y) = x String.== y
+(Pos x) =T (Pos y) = (Thesis'.pos x) S.== (Thesis'.pos y)
+(Neg x) =T (Neg y) = (Thesis'.pos x) S.== (Thesis'.pos y)
+(Th x) =T (Th y) = x S.== y
 _ =T _ = false
 
 infix 4 _≟T_
@@ -71,9 +71,9 @@ private
 -- decidable equality
 _≟T_ : Decidable _≡T_
 x' ≟T y' with x' | y'
-... | Pos x | Pos y = (Thesis'.pos x) String.≟ (Thesis'.pos y)
-... | Neg x | Neg y = (Thesis'.neg x) String.≟ (Thesis'.neg y)
-... | Th x  | Th y  = x String.≟ y
+... | Pos x | Pos y = (Thesis'.pos x) S.≟ (Thesis'.pos y)
+... | Neg x | Neg y = (Thesis'.neg x) S.≟ (Thesis'.neg y)
+... | Th x  | Th y  = x S.≟ y
 ... | Pos _ | Neg _ = no id 
 ... | Pos _ | Th  _ = no id
 ... | Neg _ | Pos _ = no id

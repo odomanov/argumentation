@@ -239,14 +239,3 @@ module _ {c ℓ₁ ℓ₂} {la : LabelAlgebra c ℓ₁ ℓ₂} where
 
 
 
-
-
-
-
-
---   выводarg : Node
---   выводarg = In record { Body = A-от-эксперта.вывод arg }
-
-
-
-

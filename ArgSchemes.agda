@@ -39,15 +39,3 @@ instance
   Conclusion {{A-ad-populum}} = вывод
   
 
-
--- Печать цели / вывода
-
-
-
-concl-line = "----------"
-dpre : String → String
-dpre pre = pre +++ pre
-npre : String → String
-npre pre = "\n" +++ pre
-
-

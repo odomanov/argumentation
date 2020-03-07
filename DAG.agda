@@ -17,7 +17,7 @@ open import Data.Maybe
 open import Data.Nat as ℕ renaming (zero to ℕzero; suc to ℕsuc)
 open import Data.Nat.Properties
 open import Data.Product using (_×_; _,_; proj₁; proj₂)
-open import Data.String renaming (_++_ to _+++_)
+open import Data.String as S renaming (_++_ to _+++_)
 open import Data.Vec as Vec using (Vec; []; _∷_)
 open import Data.Unit using (⊤)
 open import Function using (_∘_; _$_; id)
@@ -30,7 +30,6 @@ open import Relation.Nullary using (yes; no)
 
 open import ArgPrelude 
 open import AIF
-open import WLPretty
 
 LNode = Node {la = la}
 AContext = Context LNode Role   -- argumentation context
@@ -44,7 +43,7 @@ _⟪_⟫_ : MC → ((Carrier la) → (Carrier la) → (Carrier la)) → MC → M
 (just v1) ⟪ op ⟫ (just v2) = just (op v1 v2)
 _ ⟪ _ ⟫ _ = nothing
 
--- same for an unary opeation
+-- same for a unary opeation
 ⟪_⟫_ : ((Carrier la) → (Carrier la)) → MC → MC
 ⟪ op ⟫ (just v) = just (op v)
 ⟪ _ ⟫ _ = nothing
@@ -301,6 +300,7 @@ val {n} g i with NArgs g i
   gg  = Ac.tail (g [ i ])
   ggg = λ δi → Ac.tail (gg [ δi ])
 
+  -- extracts values from sucs
   fex : Role × Fin (n - suc i) → MC
   fex (_ , δi) = foldsucs gg δi
                           (λ x → val (ggg δi) (proj₂ x))  -- extracting values from sucs
@@ -431,10 +431,13 @@ steps (ℕsuc i) g = step' g (steps i g)
 
 
 docMC : MC → Doc
-docMC nothing = empty
-docMC (just x) = (doc la) x
+docMC nothing = text (" - " +++ spaces 7)
+docMC (just x) = text s <> text (spaces (0 ℕ.⊔ (10 ∸ S.length s)))
+  where
+  s = layout (renderPretty 1.0 8 ((doc la) x))
 
 instance
   ppMC : Pretty MC
   pretty {{ppMC}} = docMC
-  
+  pppMC : PPrint MC
+  prettytype {{pppMC}} = ppMC
