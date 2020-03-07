@@ -1,0 +1,176 @@
+-- Examples: Direct Acyclic Graph
+-- Example from Pereira et al. Changing One's Mind...
+
+module ExDAG2 where
+
+open import Agda.Builtin.Float
+open import Data.Bool
+open import Data.Empty
+open import Data.Fin as Fin
+  using (Fin; Fin′; zero; suc; #_; toℕ; _≟_)
+open import Data.Float
+open import Data.List as List using (List; []; _∷_)
+open import Data.Maybe
+open import Data.Nat as Nat using (suc; ℕ)
+open import Data.Nat.Show renaming (show to ℕshow)
+open import Data.Product using (_×_; _,_; proj₁; proj₂)
+open import Data.String renaming (_++_ to _+++_)
+open import Data.Vec as Vec using (Vec; []; _∷_)
+open import Data.Unit
+open import Relation.Binary.PropositionalEquality using (_≡_; _≢_; refl)
+
+open import ArgPrelude 
+open import AIF
+open import LabelAlgebras
+open import ArgSchemes
+
+import DAG
+module DAGPref = DAG Pref
+open DAGPref
+
+
+St1  = let t = "St1"
+       in record { sttext = just t; thesis = Th t}
+St2  = let t = "St2"
+       in record { sttext = just t; thesis = Th t}
+St3  = let t = "St3"
+       in record { sttext = just t; thesis = Th t}
+
+A : LNode
+A = Ln (In record { Body = St1 }) (just (PV 1.0 {refl} {refl}))
+
+B : LNode
+B = Ln (In record { Body = St2 }) (just (PV 0.4 {refl} {refl}))
+
+C : LNode
+C = Ln (In record { Body = St3 }) (just (PV 0.2 {refl} {refl}))
+
+CA→B : LNode
+CA→B = Ln (Sn (SC record {Conflicting = conflicting; Conflicted = conflicted}))
+           (just (PV 1.0 {refl} {refl}))
+
+CB→C : LNode
+CB→C = Ln (Sn (SC record {Conflicting = conflicting; Conflicted = conflicted}))
+           (just (PV 1.0 {refl} {refl}))
+
+CC→A : LNode
+CC→A = Ln (Sn (SC record {Conflicting = conflicting; Conflicted = conflicted}))
+           (just (PV 1.0 {refl} {refl}))
+
+
+
+G : AGraph _
+G =
+     context CC→A ((conflicted , # 2) ∷ (conflicting , # 4) ∷ []) &
+     context CB→C ((conflicted , # 2) ∷ (conflicting , # 1) ∷ []) &
+     context CA→B ((conflicted , # 2) ∷ (conflicting , # 1) ∷ []) &
+     context C [] &
+     context B [] &
+     context A [] &
+     ∅
+
+
+_ : nodes G ≡ (# 0 , CC→A) ∷ (# 1 , CB→C) ∷ (# 2 , CA→B)
+             ∷ (# 3 , C)    ∷ (# 4 , B)    ∷ (# 5 , A)    ∷ []
+_ = refl
+
+_ : roots G ≡ (# 0 , CC→A) ∷ (# 1 , CB→C) ∷ (# 2 , CA→B) ∷ []
+_ = refl
+
+_ : roots¬CA G ≡ (# 3 , C) ∷ (# 4 , B)  ∷ (# 5 , A)  ∷ []
+_ = refl
+
+_ : NConflicts G (# 3) ≡ (# 4) ∷ []
+_ = refl
+
+_ : NConflicts G (# 4) ≡ (# 5) ∷ []
+_ = refl
+
+_ : NConflicts G (# 5) ≡ (# 3) ∷ []
+_ = refl
+
+
+G0 = compute G
+
+_ : G0 ≡ steps 0 G
+_ = refl
+
+G1 = steps 1 G
+
+G2 = steps 2 G
+
+G3 = steps 3 G
+
+G4 = steps 4 G
+
+G5 = steps 5 G
+
+G6 = steps 6 G
+
+G7 = steps 7 G
+
+Glim = steps 200 G
+
+
+
+
+
+
+------------------------------------------------------------------------
+
+open import ShowDAG
+
+open import IO
+
+w = 110
+ws = 50 -- "section" title width
+
+printABC : AGraph 6 → String
+printABC g = "\nA = " +++ pprint w (val←Idx g (# 5))
+         +++ "\nB = " +++ pprint w (val←Idx g (# 4))
+         +++ "\nC = " +++ pprint w (val←Idx g (# 3))
+
+main = run (putStrLn stringToPrint)
+  where
+  stringToPrint = "--------------------------------------------"
+    +++ ppretty ws (docSection ws "\nG orig")
+    +++ printABC G
+    +++ ppretty ws (docSection ws "G computed")
+    +++ "\nA = " +++ pprint w (val G (# 5))
+    +++ "\nB = " +++ pprint w (val G (# 4))
+    +++ "\nC = " +++ pprint w (val G (# 3))
+    +++ ppretty ws (docSection ws "G0")
+    +++ printABC G0
+    +++ ppretty ws (docSection ws "G1")
+    +++ printABC G1
+    +++ ppretty ws (docSection ws "G2")
+    +++ printABC G2
+    +++ ppretty ws (docSection ws "G3")
+    +++ printABC G3
+    +++ ppretty ws (docSection ws "G4")
+    +++ printABC G4
+    +++ ppretty ws (docSection ws "G5")
+    +++ printABC G5
+    +++ ppretty ws (docSection ws "G6")
+    +++ printABC G6
+    +++ ppretty ws (docSection ws "G7")
+    +++ printABC G7
+    +++ ppretty ws (docSection ws "Glim")
+    +++ printABC Glim
+    -- +++ "\nfoldConflicts:G:A: " +++ pprint w (foldConflicts G (# 5))
+    -- +++ "\nfoldConflicts:G:B: " +++ pprint w (foldConflicts G (# 4))
+    -- +++ "\nfoldConflicts:G:C: " +++ pprint w (foldConflicts G (# 3))
+    -- +++ "\nfoldConflicts:G5:A: " +++ pprint w (foldConflicts G5 (# 5))
+    -- +++ "\nfoldConflicts:G5:B: " +++ pprint w (foldConflicts G5 (# 4))
+    -- +++ "\nfoldConflicts:G5:C: " +++ pprint w (foldConflicts G5 (# 3))
+    -- +++ "\n-foldConflicts:G5:A: " +++ pprint w (¬foldConflicts G5 (# 5))
+    -- +++ "\n-foldConflicts:G5:B: " +++ pprint w (¬foldConflicts G5 (# 4))
+    -- +++ "\n-foldConflicts:G5:C: " +++ pprint w (¬foldConflicts G5 (# 3))
+    -- +++ "\nval+conflicts:G5:A: " +++ pprint w (val+conflicts G0 G5 (# 5))
+    -- +++ "\nval+conflicts:G5:B: " +++ pprint w (val+conflicts G0 G5 (# 4))
+    -- +++ "\nval+conflicts:G5:C: " +++ pprint w (val+conflicts G0 G5 (# 3))
+    -- +++ "\niterationVal:G5:A: " +++ pprint w (iterationVal G0 G5 (# 5))
+    -- +++ "\niterationVal:G5:B: " +++ pprint w (iterationVal G0 G5 (# 4))
+    -- +++ "\niterationVal:G5:C: " +++ pprint w (iterationVal G0 G5 (# 3))
+
+    +++ (pprint 110 G)
