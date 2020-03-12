@@ -26,9 +26,6 @@ open import WLPretty public
 record BEq {ℓ} (A : Set ℓ): Set (lsuc ℓ) where
   field
     _===_ : A → A → Bool
-    -- beqrefl  : ∀ x → x === x ≡ true
-    -- beqtrans : ∀ x y z → x === y ≡ true → y === z ≡ true → x === z ≡ true
-    -- beqsymm  : ∀ x y → x === y ≡ true → y === x ≡ true
     -- isEquivalence = IsEquivalence _===_
 
 open BEq {{...}} public

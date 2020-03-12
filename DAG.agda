@@ -42,7 +42,7 @@ _⟪_⟫_ : MC → ((Carrier la) → (Carrier la) → (Carrier la)) → MC → M
 (just v1) ⟪ op ⟫ (just v2) = just (op v1 v2)
 _ ⟪ _ ⟫ _ = nothing
 
--- same for a unary opeation
+-- same for a unary operation
 ⟪_⟫_ : ((Carrier la) → (Carrier la)) → MC → MC
 ⟪ op ⟫ (just v) = just (op v)
 ⟪ _ ⟫ _ = nothing
@@ -94,6 +94,13 @@ p3 {ℕsuc n} {suc i} = s≤s (s≤s (s≤s (pppp n i)))
 
 
 
+-- i₁ and (i₂ + δi₂) denote the same context
+theSame : ∀ {n} → Fin n → (i₂ : Fin n) → Fin (n - suc i₂) → Bool
+theSame {ℕsuc (ℕsuc _)} i₁ i₂ δi₂ with (toℕ i₁) ℕ.≟ ℕsuc ((toℕ i₂) ℕ.+ (toℕ δi₂))
+... | yes _ = true
+... | no _  = false
+theSame {_} _ _ _ = false  -- for n = 0, 1
+
 -- i, δi → i
 realIdx : ∀ {n} → (i : Fin n) → Fin (n - suc i) → Fin n
 realIdx zero δi = Fin.inject≤ (suc δi) (s≤s (≤-reflexive refl)) 
@@ -102,8 +109,8 @@ realIdx (suc (suc i)) δi = Fin.inject≤ (suc ((suc (suc i)) Fin.+ δi)) p3
 
 -- should be true, but I can't prove it
 -- lm : ∀ n i δi → theSame {n} (realIdx {n} i δi) i δi ≡ true
--- lm .(suc _) zero δi = {!refl!}
--- lm .(suc _) (suc i) δi = {!!}
+-- lm .(ℕsuc _) zero δi = {!!}
+-- lm .(ℕsuc _) (suc i) δi = {!!}
 
 -- extracting info from the i-th context
 
@@ -324,13 +331,6 @@ compute {n} g = compute' {n} {_} {≤-reflexive refl} g g
 
 
 --   Conflicts  --------------------------------------------
-
--- i₁ and (i₂ + δi₂) denote the same context
-theSame : ∀ {n} → Fin n → (i₂ : Fin n) → Fin (n - suc i₂) → Bool
-theSame {ℕsuc (ℕsuc _)} i₁ i₂ δi₂ with (toℕ i₁) ℕ.≟ ℕsuc ((toℕ i₂) ℕ.+ (toℕ δi₂))
-... | yes _ = true
-... | no _  = false
-theSame {_} _ _ _ = false  -- for n = 0, 1
 
 -- 'conflicting' and 'conflicted' indexes
 c-ing : ∀ {n} → AGraph n → (ic : Fin n) → Maybe (Fin (n - suc ic))

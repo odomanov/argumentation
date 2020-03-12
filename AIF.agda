@@ -92,11 +92,6 @@ Roles =
   conflicted  ∷
   []
 
-_=R_ : Role → Role → Bool
-role r =R role r' with r Data.String.≟ r'
-... | yes _ = true
-... | no _ = false
-
 _≡R_ : Role → Role → Set
 role r ≡R role r' = r ≡ r'
 
@@ -105,23 +100,26 @@ role r ≟R role r' = r Data.String.≟ r'
 
 instance
   REq : BEq Role
-  _===_ {{REq}} x y = x =R y
+  _===_ {{REq}} (role x) (role y) = x == y
   
 -- TODO: get rid of the dependence on order
 _=LR_ : List Role → List Role → Bool
 [] =LR [] = true
 [] =LR _  = false
 _  =LR [] = false
-(x ∷ xs) =LR (y ∷ ys) = (x =R y) ∧ xs =LR ys
+(role x ∷ xs) =LR (role y ∷ ys) = (x == y) ∧ xs =LR ys
 
 _≡LR_ : List Role → List Role → Set
 [] ≡LR [] = ⊤
 (_ ∷ _)  ≡LR [] = ⊥
 [] ≡LR (_ ∷ _)  = ⊥
--- x ≡LR y = ∀ z → (z ∈ x ⇔ z ∈ y)
 x ≡LR y = (∀ z → (z ∈ x → z ∈ y)) × (∀ z → (z ∈ y → z ∈ x))
--- x ≡LR y = (All (λ z → z ∈ y) x) × (All (λ z → z ∈ x) y)
 
+
+instance
+  LREq : BEq (List Role)
+  _===_ {{LREq}} x y = x =LR y
+  
 
 
 
@@ -171,7 +169,7 @@ open RA-Scheme {{...}} public
 -- various equalities
 
 _=RA_ : RA-Scheme → RA-Scheme → Bool
-(mkRA p c) =RA (mkRA p' c') = p =LR p' ∧ c === c'
+(mkRA p c) =RA (mkRA p' c') = p === p' ∧ c === c'
 
 _=CA_ : CA-Scheme → CA-Scheme → Bool
 (mkCA x y) =CA (mkCA x' y') = x === x' ∧ y === y'

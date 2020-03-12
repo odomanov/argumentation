@@ -223,8 +223,5 @@ open import IO
 
 main = run (putStr stringToPrint)
   where
-    =line = "\n= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = "
-
     stringToPrint = ""
-      -- +++ =line +++ sh "  " G
       +++ (pprint 110 G)
