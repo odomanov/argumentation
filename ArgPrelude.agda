@@ -6,6 +6,7 @@ open import Data.Bool using (Bool; true; false; _∨_)
 open import Data.Bool.Show using (show)
 open import Data.Empty
 open import Data.Float public
+open import Data.Integer
 open import Data.List
 open import Data.Maybe
 open import Data.Nat as ℕ using (suc; ℕ; _∸_; _⊔_)
@@ -142,3 +143,17 @@ _[<]_ : Float → Float → Bool
 x [<] y = primFloatLess x y
 _[≤]_ : Float → Float → Bool 
 x [≤] y = primFloatLess x y ∨ primFloatEquality x y 
+
+
+docFloat : Float → Doc
+docFloat x = text (Data.Float.show x)
+
+-- rounded to 3 decimal places
+docFloatRounded : Float → Doc
+docFloatRounded x = text (Data.Float.show ((primRound (x [*] 1000.0)) /1000))
+  where
+  _/1000 : ℤ → Float
+  (+ n) /1000 = (primNatToFloat n) [/] 1000.0
+  (-[1+ n ]) /1000 = primFloatNegate ((primNatToFloat (n ∸ 1)) [/] 1000.0)
+
+

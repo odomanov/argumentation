@@ -35,8 +35,7 @@ LNode = Node {la = la}
 AContext = Context LNode Role   -- argumentation context
 AGraph = Graph LNode Role       -- argumentation graph     
 
-private
-  MC = Maybe (Carrier la)
+MC = Maybe (Carrier la)
 
 -- applying a binary operation to the Maybe label (TODO: rewrite with >>=)
 _⟪_⟫_ : MC → ((Carrier la) → (Carrier la) → (Carrier la)) → MC → MC

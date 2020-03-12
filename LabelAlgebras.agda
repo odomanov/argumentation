@@ -7,7 +7,9 @@ open import Agda.Builtin.Float
 open import Data.Bool
 open import Data.Empty
 open import Data.Float
+open import Data.Integer
 open import Data.Maybe
+open import Data.Nat
 open import Data.String renaming (_++_ to _+++_)
 open import Data.Unit
 open import Level
@@ -167,7 +169,7 @@ postulate
       Trust⊘ Trust∧ Trust∨ Trust½ FU1 FU0
 
 docTrust : FUnit → Doc
-docTrust (mkFUnit x _ _) = text (Data.Float.show x)
+docTrust (mkFUnit x _ _) = docFloatRounded x
 
 Trust : LabelAlgebra _ _ _
 Trust = record
@@ -253,7 +255,7 @@ postulate
       Pref⊘ Pref⊙ Pref∨ Pref½ FU1 FU0
 
 docPref : FUnit → Doc
-docPref (mkFUnit x _ _) = text (Data.Float.show x)
+docPref (mkFUnit x _ _) = docFloatRounded x 
 
 Pref : LabelAlgebra _ _ _
 Pref = record
