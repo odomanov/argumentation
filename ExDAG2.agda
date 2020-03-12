@@ -109,7 +109,7 @@ G6 = steps 6 G
 
 G7 = steps 7 G
 
-Glim = steps 200 G
+G200 = steps 200 G
 
 
 
@@ -125,52 +125,49 @@ open import IO
 w = 110
 ws = 50 -- "section" title width
 
-printABC : AGraph 6 → String
-printABC g = "\nA = " +++ pprint w (val←Idx g (# 5))
-         +++ "\nB = " +++ pprint w (val←Idx g (# 4))
-         +++ "\nC = " +++ pprint w (val←Idx g (# 3))
+printABC : AGraph 6 → (AGraph 6 → Fin 6 → MC) → String
+printABC g f = "\nA = " +++ pprint w (f g (# 5))
+           +++ "  B = " +++ pprint w (f g (# 4))
+           +++ "  C = " +++ pprint w (f g (# 3))
 
 main = run (putStrLn stringToPrint)
   where
   stringToPrint = "--------------------------------------------"
     +++ ppretty ws (docSection ws "\nG orig")
-    +++ printABC G
+    +++ printABC G val←Idx
     +++ ppretty ws (docSection ws "G computed")
-    +++ "\nA = " +++ pprint w (val G (# 5))
-    +++ "\nB = " +++ pprint w (val G (# 4))
-    +++ "\nC = " +++ pprint w (val G (# 3))
+    +++ printABC G val
     +++ ppretty ws (docSection ws "G0")
-    +++ printABC G0
+    +++ printABC G0 val←Idx
     +++ ppretty ws (docSection ws "G1")
-    +++ printABC G1
+    +++ printABC G1 val←Idx
     +++ ppretty ws (docSection ws "G2")
-    +++ printABC G2
+    +++ printABC G2 val←Idx
     +++ ppretty ws (docSection ws "G3")
-    +++ printABC G3
+    +++ printABC G3 val←Idx
     +++ ppretty ws (docSection ws "G4")
-    +++ printABC G4
+    +++ printABC G4 val←Idx
     +++ ppretty ws (docSection ws "G5")
-    +++ printABC G5
+    +++ printABC G5 val←Idx
     +++ ppretty ws (docSection ws "G6")
-    +++ printABC G6
+    +++ printABC G6 val←Idx
     +++ ppretty ws (docSection ws "G7")
-    +++ printABC G7
-    +++ ppretty ws (docSection ws "Glim")
-    +++ printABC Glim
-    -- +++ "\nfoldConflicts:G:A: " +++ pprint w (foldConflicts G (# 5))
-    -- +++ "\nfoldConflicts:G:B: " +++ pprint w (foldConflicts G (# 4))
-    -- +++ "\nfoldConflicts:G:C: " +++ pprint w (foldConflicts G (# 3))
+    +++ printABC G7 val←Idx
+    +++ ppretty ws (docSection ws "G200")
+    +++ printABC G200 val←Idx
+
+    +++ ppretty ws (docSection ws "foldConflicts:G")
+    +++ printABC G foldConflicts
+
     -- +++ "\nfoldConflicts:G5:A: " +++ pprint w (foldConflicts G5 (# 5))
     -- +++ "\nfoldConflicts:G5:B: " +++ pprint w (foldConflicts G5 (# 4))
     -- +++ "\nfoldConflicts:G5:C: " +++ pprint w (foldConflicts G5 (# 3))
     -- +++ "\n-foldConflicts:G5:A: " +++ pprint w (¬foldConflicts G5 (# 5))
     -- +++ "\n-foldConflicts:G5:B: " +++ pprint w (¬foldConflicts G5 (# 4))
     -- +++ "\n-foldConflicts:G5:C: " +++ pprint w (¬foldConflicts G5 (# 3))
-    -- +++ "\nval+conflicts:G5:A: " +++ pprint w (val+conflicts G0 G5 (# 5))
-    -- +++ "\nval+conflicts:G5:B: " +++ pprint w (val+conflicts G0 G5 (# 4))
-    -- +++ "\nval+conflicts:G5:C: " +++ pprint w (val+conflicts G0 G5 (# 3))
-    -- +++ "\niterationVal:G5:A: " +++ pprint w (iterationVal G0 G5 (# 5))
-    -- +++ "\niterationVal:G5:B: " +++ pprint w (iterationVal G0 G5 (# 4))
-    -- +++ "\niterationVal:G5:C: " +++ pprint w (iterationVal G0 G5 (# 3))
+    +++ ppretty ws (docSection ws "val+conflicts:G5")
+    +++ printABC G5 (val+conflicts G0)
+    +++ ppretty ws (docSection ws "iterationVal:G5")
+    +++ printABC G5 (iterationVal G0)
 
     +++ (pprint 110 G)

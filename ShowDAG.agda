@@ -55,11 +55,11 @@ docNode (Ln (In (mkI s)) v) = text "I: " <> nest 3 (docStmt s)
 docNode (Ln (Sn (SR (mkRA p c))) v) = text "SR: "
   <> nest 4 (group (docRoles p <> line <> text "=> " <> docRole c))
   <> line <> group (text "вес   = " <> docLabel v)
-docNode (Ln (Sn (SC (mkCA c1 c2))) v) = text "CONFLICT: "
-  <> nest 4 (docRole c1 <> text " --> " <> docRole c2) 
+docNode (Ln (Sn (SC (mkCA c1 c2))) v) = text "CONFLICT"
+  -- <> nest 4 (docRole c1 <> text " --> " <> docRole c2) 
   <> line <> group (text "вес   = " <> docLabel v)
-docNode (Ln (Sn (SP (mkPA p1 p2))) v) = text "PREF: "
-  <> nest 4 (docRole p1 <> text " --> " <> docRole p2)
+docNode (Ln (Sn (SP (mkPA p1 p2))) v) = text "PREF"
+  -- <> nest 4 (docRole p1 <> text " --> " <> docRole p2)
   <> line <> group (text "вес   = " <> docLabel v)
 
 docNodes : ∀ {n} → List (Fin n × LNode) → Doc

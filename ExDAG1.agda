@@ -72,6 +72,12 @@ CN1 : LNode
 CN1 = Ln (Sn (SC record {Conflicting = conflicting; Conflicted = conflicted}))
          (just (PV 0.8 {refl} {refl}))
 
+CN2 : LNode
+CN2 = Ln (Sn (SC record {Conflicting = conflicting; Conflicted = conflicted}))
+         (just (PV 0.8 {refl} {refl}))
+
+
+
 -- N1 ---+
 --        \
 --         N4 ---> N3
@@ -181,6 +187,12 @@ _ = refl
 
 
 _ : NArgs G2 (# 0) ≡ (атака , # 0) ∷ (поддержка , # 2) ∷ []
+_ = refl
+
+_ : NArgs+ G2 (# 0) ≡ (поддержка , # 2) ∷ []
+_ = refl
+
+_ : NArgs- G2 (# 0) ≡ (атака , # 0) ∷ []
 _ = refl
 
 _ : NArgs G2 (# 4) ≡ []
@@ -355,6 +367,12 @@ G5 =
      context N7 [] &
      G2
 
+G6 : AGraph _
+G6 =
+     context CN2 ((conflicted , # 4) ∷ (conflicting , # 1) ∷ []) &
+     G5
+
+
 _ : nodes G5 ≡ (# 0 , CN1) ∷ (# 1 , ¬N3) ∷ (# 2 , N8) ∷ (# 3 , N7)
              ∷ (# 4 , N3)  ∷ (# 5 , N6)  ∷ (# 6 , N5) ∷ (# 7 , N4)
              ∷ (# 8 , N2)  ∷ (# 9 , N1)  ∷ []
@@ -417,7 +435,28 @@ G52 = steps 2 G5
 
 G53 = steps 3 G5
 
-G54 = steps 20 G5
+G54 = steps 4 G5
+
+G5100 = steps 100 G5
+
+G5200 = steps 200 G5
+
+
+
+
+G60 = compute G6
+
+G61 = steps 1 G6
+
+G62 = steps 2 G6
+
+G63 = steps 3 G6
+
+G64 = steps 4 G6
+
+G6100 = steps 100 G6
+
+G6200 = steps 200 G6
 
 
 
@@ -446,14 +485,37 @@ printG2 g = "\nN1  = " +++ pprint w (val←Idx g (# 5))
         +++ "\nN5  = " +++ pprint w (val←Idx g (# 2))
         +++ "  N6  = " +++ pprint w (val←Idx g (# 1))
 printG4 : AGraph 8 → String
-printG4 g = "\nN1 = " +++ pprint w (val←Idx G4 (# 7))
-        +++ "  N2 = " +++ pprint w (val←Idx G4 (# 6))
-        +++ "\nN3 = " +++ pprint w (val←Idx G4 (# 0))
-        +++ "  N4 = " +++ pprint w (val←Idx G4 (# 5))
-        +++ "\nN5 = " +++ pprint w (val←Idx G4 (# 4))
-        +++ "  N6 = " +++ pprint w (val←Idx G4 (# 3))
-        +++ "\nN7 = " +++ pprint w (val←Idx G4 (# 2))
-        +++ "  N8 = " +++ pprint w (val←Idx G4 (# 1))
+printG4 g = "\nN1 = " +++ pprint w (val←Idx g (# 7))
+        +++ "  N2 = " +++ pprint w (val←Idx g (# 6))
+        +++ "\nN3 = " +++ pprint w (val←Idx g (# 0))
+        +++ "  N4 = " +++ pprint w (val←Idx g (# 5))
+        +++ "\nN5 = " +++ pprint w (val←Idx g (# 4))
+        +++ "  N6 = " +++ pprint w (val←Idx g (# 3))
+        +++ "\nN7 = " +++ pprint w (val←Idx g (# 2))
+        +++ "  N8 = " +++ pprint w (val←Idx g (# 1))
+printG5 : AGraph 10 → String
+printG5 g = "\nN1  = " +++ pprint w (val←Idx g (# 9))
+        +++ "  N2  = " +++ pprint w (val←Idx g (# 8))
+        +++ "\nN3  = " +++ pprint w (val←Idx g (# 4))
+        +++ "  N4  = " +++ pprint w (val←Idx g (# 7))
+        +++ "\nN5  = " +++ pprint w (val←Idx g (# 6))
+        +++ "  N6  = " +++ pprint w (val←Idx g (# 5))
+        +++ "\nN7  = " +++ pprint w (val←Idx g (# 3))
+        +++ "  N8  = " +++ pprint w (val←Idx g (# 2))
+        +++ "\n-N3 = " +++ pprint w (val←Idx g (# 1))
+        +++ "  CN1 = " +++ pprint w (val←Idx g (# 0))
+printG6 : AGraph 11 → (∀ {n} → AGraph n → Fin n → MC) → String
+printG6 g f = "\nN1  = " +++ pprint w (f g (# 10))
+          +++ "  N2  = " +++ pprint w (f g (# 9))
+          +++ "  N3  = " +++ pprint w (f g (# 5))
+          +++ "\nN4  = " +++ pprint w (f g (# 8))
+          +++ "  N5  = " +++ pprint w (f g (# 7))
+          +++ "  N6  = " +++ pprint w (f g (# 6))
+          +++ "\nN7  = " +++ pprint w (f g (# 4))
+          +++ "  N8  = " +++ pprint w (f g (# 3))
+          +++ "  -N3 = " +++ pprint w (f g (# 2))
+          +++ "\nCN1 = " +++ pprint w (f g (# 1))
+          +++ "  CN2 = " +++ pprint w (f g (# 0))
 
 -- docFilled : ℕ → Doc → BChar → Doc
 -- docFilled n d filler = d <> text ((S.replicate (n ∸ S.length ss)) filler)
@@ -485,27 +547,27 @@ main = run (putStrLn stringToPrint)
     -- +++ ppretty ws (docSection ws "G1lim")
     -- +++ printG1 G1lim
 
-    +++ ppretty ws (docSection ws "G2 orig")
-    +++ printG2 G2
-    +++ ppretty ws (docSection ws "G2 computed")
-    +++ "\nN1  = " +++ pprint w (val G2 (# 5))
-    +++ "  N2  = " +++ pprint w (val G2 (# 4))
-    +++ "\nN3  = " +++ pprint w (val G2 (# 0))
-    +++ "  N4  = " +++ pprint w (val G2 (# 3))
-    +++ "\nN5  = " +++ pprint w (val G2 (# 2))
-    +++ "  N6  = " +++ pprint w (val G2 (# 1))
-    +++ ppretty ws (docSection ws "G20")
-    +++ printG2 G20
-    -- +++ ppretty ws (docSection ws "G21")
-    -- +++ printG2 G21
-    -- +++ ppretty ws (docSection ws "G22")
-    -- +++ printG2 G22
-    -- +++ ppretty ws (docSection ws "G23")
-    -- +++ printG2 G23
-    -- +++ ppretty ws (docSection ws "G24")
-    -- +++ printG2 G24
-    +++ ppretty ws (docSection ws "G2lim")
-    +++ printG2 G2lim
+    -- +++ ppretty ws (docSection ws "G2 orig")
+    -- +++ printG2 G2
+    -- +++ ppretty ws (docSection ws "G2 computed")
+    -- +++ "\nN1  = " +++ pprint w (val G2 (# 5))
+    -- +++ "  N2  = " +++ pprint w (val G2 (# 4))
+    -- +++ "\nN3  = " +++ pprint w (val G2 (# 0))
+    -- +++ "  N4  = " +++ pprint w (val G2 (# 3))
+    -- +++ "\nN5  = " +++ pprint w (val G2 (# 2))
+    -- +++ "  N6  = " +++ pprint w (val G2 (# 1))
+    -- +++ ppretty ws (docSection ws "G20")
+    -- +++ printG2 G20
+    -- -- +++ ppretty ws (docSection ws "G21")
+    -- -- +++ printG2 G21
+    -- -- +++ ppretty ws (docSection ws "G22")
+    -- -- +++ printG2 G22
+    -- -- +++ ppretty ws (docSection ws "G23")
+    -- -- +++ printG2 G23
+    -- -- +++ ppretty ws (docSection ws "G24")
+    -- -- +++ printG2 G24
+    -- +++ ppretty ws (docSection ws "G2lim")
+    -- +++ printG2 G2lim
 
     -- +++ pprint 110 G2
     
@@ -527,111 +589,79 @@ main = run (putStrLn stringToPrint)
     -- +++ ppretty ws (docSection ws "G4lim")
     -- +++ printG4 G4lim
 
-    -- +++ "\nN1 = " +++ pprint w (val G2 (# 5))
-    -- +++ "\nN2 = " +++ pprint w (val G2 (# 4))
-    -- +++ "\nN3 = " +++ pprint w (val G2 (# 0))
-    -- +++ "\nN4 = " +++ pprint w (val G2 (# 3))
-    -- +++ "\nN5 = " +++ pprint w (val G2 (# 2))
-    -- +++ "\nN6 = " +++ pprint w (val G2 (# 1))
+    -- +++ ppretty ws (docSection ws "G5 orig")
+    -- +++ printG5 G5
+    -- +++ ppretty ws (docSection ws "G5 computed")
+    -- +++ "\nN1  = " +++ pprint w (val G5 (# 9))
+    -- +++ "  N2  = " +++ pprint w (val G5 (# 8))
+    -- +++ "\nN3  = " +++ pprint w (val G5 (# 4))
+    -- +++ "  N4  = " +++ pprint w (val G5 (# 7))
+    -- +++ "\nN5  = " +++ pprint w (val G5 (# 6))
+    -- +++ "  N6  = " +++ pprint w (val G5 (# 5))
+    -- +++ "\nN7  = " +++ pprint w (val G5 (# 3))
+    -- +++ "  N8  = " +++ pprint w (val G5 (# 2))
+    -- +++ "\n-N3 = " +++ pprint w (val G5 (# 1))
+    -- +++ "  CN1 = " +++ pprint w (val G5 (# 0))
+    -- +++ ppretty ws (docSection ws "G50")
+    -- +++ printG5 G50
+    -- +++ ppretty ws (docSection ws "G51")
+    -- +++ printG5 G51
+    -- +++ ppretty ws (docSection ws "G52")
+    -- +++ printG5 G52
+    -- +++ ppretty ws (docSection ws "G53")
+    -- +++ printG5 G53
+    -- +++ ppretty ws (docSection ws "G54")
+    -- +++ printG5 G54
+    -- +++ ppretty ws (docSection ws "G5100")
+    -- +++ printG5 G5100
+    -- +++ ppretty ws (docSection ws "G5200")
+    -- +++ printG5 G5200
+
+    -- +++ (pprint 110 G5)
+
+    +++ ppretty ws (docSection ws "G6 orig")
+    +++ printG6 G6 val←Idx
+    +++ ppretty ws (docSection ws "G6 computed")
+    +++ printG6 G6 val
+    -- +++ "\nN1  = " +++ pprint w (val G6 (# 10))
+    -- +++ "  N2  = " +++ pprint w (val G6 (# 9))
+    -- +++ "\nN3  = " +++ pprint w (val G6 (# 5))
+    -- +++ "  N4  = " +++ pprint w (val G6 (# 8))
+    -- +++ "\nN5  = " +++ pprint w (val G6 (# 7))
+    -- +++ "  N6  = " +++ pprint w (val G6 (# 6))
+    -- +++ "\nN7  = " +++ pprint w (val G6 (# 4))
+    -- +++ "  N8  = " +++ pprint w (val G6 (# 3))
+    -- +++ "\n-N3 = " +++ pprint w (val G6 (# 2))
+    -- +++ "  CN1 = " +++ pprint w (val G6 (# 1))
+    -- +++ "  CN2 = " +++ pprint w (val G6 (# 0))
+    +++ ppretty ws (docSection ws "G60")
+    +++ printG6 G60 val←Idx
+    +++ ppretty ws (docSection ws "G61")
+    +++ printG6 G61 val←Idx
+    +++ ppretty ws (docSection ws "G62")
+    +++ printG6 G62 val←Idx
+    +++ ppretty ws (docSection ws "G63")
+    +++ printG6 G63 val←Idx
+    +++ ppretty ws (docSection ws "G64")
+    +++ printG6 G64 val←Idx
+    +++ ppretty ws (docSection ws "G6100")
+    +++ printG6 G6100 val←Idx
+    +++ ppretty ws (docSection ws "G6200")
+    +++ printG6 G6200 val←Idx
+
+    -- +++ (pprint 110 G6)
+
     -- +++ "\nN1+N2 = " +++ pprint w (val←Ctx G2 (# 5) ⟪ _⊕_ Pref ⟫ val←Ctx G2 (# 4))
     -- +++ "\nN4+N6 = " +++ pprint w (val←Ctx G2 (# 3) ⟪ _⊕_ Pref ⟫ val←Ctx G2 (# 1))
     -- +++ "\nN1+N5 = " +++ pprint w (val←Ctx G2 (# 5) ⟪ _⊕_ Pref ⟫ val←Ctx G2 (# 2))
     -- +++ "\nN1.N2 = " +++ pprint w (val←Ctx G2 (# 5) ⟪ _⊙_ Pref ⟫ val←Ctx G2 (# 4))
     -- +++ "\nN4.N6 = " +++ pprint w (val←Ctx G2 (# 3) ⟪ _⊙_ Pref ⟫ val←Ctx G2 (# 1))
     -- +++ "\nN1.N5 = " +++ pprint w (val←Ctx G2 (# 5) ⟪ _⊙_ Pref ⟫ val←Ctx G2 (# 2))
-    -- +++ "\nG4  ======================="
-    -- +++ "\nN1 = " +++ pprint w (val G4 (# 7))
-    -- +++ "\nN2 = " +++ pprint w (val G4 (# 6))
-    -- +++ "\nN3 = " +++ pprint w (val G4 (# 0))
-    -- +++ "\nN4 = " +++ pprint w (val G4 (# 5))
-    -- +++ "\nN5 = " +++ pprint w (val G4 (# 4))
-    -- +++ "\nN6 = " +++ pprint w (val G4 (# 3))
-    -- +++ "\nN7 = " +++ pprint w (val G4 (# 2))
-    -- +++ "\nN8 = " +++ pprint w (val G4 (# 1))
-    -- +++ "\nG5 orig ======================="
-    -- +++ "\nN1  = " +++ pprint w (val←Idx G5 (# 9))
-    -- +++ "\nN2  = " +++ pprint w (val←Idx G5 (# 8))
-    -- +++ "\nN3  = " +++ pprint w (val←Idx G5 (# 4))
-    -- +++ "\nN4  = " +++ pprint w (val←Idx G5 (# 7))
-    -- +++ "\nN5  = " +++ pprint w (val←Idx G5 (# 6))
-    -- +++ "\nN6  = " +++ pprint w (val←Idx G5 (# 5))
-    -- +++ "\nN7  = " +++ pprint w (val←Idx G5 (# 3))
-    -- +++ "\nN8  = " +++ pprint w (val←Idx G5 (# 2))
-    -- +++ "\n-N3 = " +++ pprint w (val←Idx G5 (# 1))
-    -- +++ "\nCN1 = " +++ pprint w (val←Idx G5 (# 0))
-    -- +++ "\nG5 computed  ======================="
-    -- +++ "\nN1  = " +++ pprint w (val G5 (# 9))
-    -- +++ "\nN2  = " +++ pprint w (val G5 (# 8))
-    -- +++ "\nN3  = " +++ pprint w (val G5 (# 4))
-    -- +++ "\nN4  = " +++ pprint w (val G5 (# 7))
-    -- +++ "\nN5  = " +++ pprint w (val G5 (# 6))
-    -- +++ "\nN6  = " +++ pprint w (val G5 (# 5))
-    -- +++ "\nN7  = " +++ pprint w (val G5 (# 3))
-    -- +++ "\nN8  = " +++ pprint w (val G5 (# 2))
-    -- +++ "\n-N3 = " +++ pprint w (val G5 (# 1))
-    -- +++ "\nCN1 = " +++ pprint w (val G5 (# 0))
-    -- -- +++ "\n============================\n"
-    -- -- +++ "  " +++ pprint w G2
     -- -- +++ "\nNConflicts 0: " +++ "" +++ pprint w (NConflicts G5 (# 0))
     -- -- +++ "\nNConflicts 1: " +++ "" +++ pprint w (NConflicts G5 (# 1))
     -- -- +++ "\nNConflicts 2: " +++ "" +++ pprint w (NConflicts G5 (# 2))
     -- -- +++ "\nNConflicts 3: " +++ "" +++ pprint w (NConflicts G5 (# 3))
     -- -- +++ "\nNConflicts 4: " +++ "" +++ pprint w (NConflicts G5 (# 4))
-    -- +++ "\nG50  ======================="
-    -- +++ "\nN1  = " +++ pprint w (val←Idx G50 (# 9))
-    -- +++ "\nN2  = " +++ pprint w (val←Idx G50 (# 8))
-    -- +++ "\nN3  = " +++ pprint w (val←Idx G50 (# 4))
-    -- +++ "\nN4  = " +++ pprint w (val←Idx G50 (# 7))
-    -- +++ "\nN5  = " +++ pprint w (val←Idx G50 (# 6))
-    -- +++ "\nN6  = " +++ pprint w (val←Idx G50 (# 5))
-    -- +++ "\nN7  = " +++ pprint w (val←Idx G50 (# 3))
-    -- +++ "\nN8  = " +++ pprint w (val←Idx G50 (# 2))
-    -- +++ "\n-N3 = " +++ pprint w (val←Idx G50 (# 1))
-    -- +++ "\nCN1 = " +++ pprint w (val←Idx G50 (# 0))
-    -- +++ "\nG51  ======================="
-    -- +++ "\nN1  = " +++ pprint w (val←Idx G51 (# 9))
-    -- +++ "\nN2  = " +++ pprint w (val←Idx G51 (# 8))
-    -- +++ "\nN3  = " +++ pprint w (val←Idx G51 (# 4))
-    -- +++ "\nN4  = " +++ pprint w (val←Idx G51 (# 7))
-    -- +++ "\nN5  = " +++ pprint w (val←Idx G51 (# 6))
-    -- +++ "\nN6  = " +++ pprint w (val←Idx G51 (# 5))
-    -- +++ "\nN7  = " +++ pprint w (val←Idx G51 (# 3))
-    -- +++ "\nN8  = " +++ pprint w (val←Idx G51 (# 2))
-    -- +++ "\n-N3 = " +++ pprint w (val←Idx G51 (# 1))
-    -- +++ "\nCN1 = " +++ pprint w (val←Idx G51 (# 0))
-    -- +++ "\nG52  ======================="
-    -- +++ "\nN1  = " +++ pprint w (val←Idx G52 (# 9))
-    -- +++ "\nN2  = " +++ pprint w (val←Idx G52 (# 8))
-    -- +++ "\nN3  = " +++ pprint w (val←Idx G52 (# 4))
-    -- +++ "\nN4  = " +++ pprint w (val←Idx G52 (# 7))
-    -- +++ "\nN5  = " +++ pprint w (val←Idx G52 (# 6))
-    -- +++ "\nN6  = " +++ pprint w (val←Idx G52 (# 5))
-    -- +++ "\nN7  = " +++ pprint w (val←Idx G52 (# 3))
-    -- +++ "\nN8  = " +++ pprint w (val←Idx G52 (# 2))
-    -- +++ "\n-N3 = " +++ pprint w (val←Idx G52 (# 1))
-    -- +++ "\nCN1 = " +++ pprint w (val←Idx G52 (# 0))
-    -- +++ "\nG53  ======================="
-    -- +++ "\nN1  = " +++ pprint w (val←Idx G53 (# 9))
-    -- +++ "\nN2  = " +++ pprint w (val←Idx G53 (# 8))
-    -- +++ "\nN3  = " +++ pprint w (val←Idx G53 (# 4))
-    -- +++ "\nN4  = " +++ pprint w (val←Idx G53 (# 7))
-    -- +++ "\nN5  = " +++ pprint w (val←Idx G53 (# 6))
-    -- +++ "\nN6  = " +++ pprint w (val←Idx G53 (# 5))
-    -- +++ "\nN7  = " +++ pprint w (val←Idx G53 (# 3))
-    -- +++ "\nN8  = " +++ pprint w (val←Idx G53 (# 2))
-    -- +++ "\n-N3 = " +++ pprint w (val←Idx G53 (# 1))
-    -- +++ "\nCN1 = " +++ pprint w (val←Idx G53 (# 0))
-    -- +++ "\nG54  ======================="
-    -- +++ "\nN1  = " +++ pprint w (val←Idx G54 (# 9))
-    -- +++ "\nN2  = " +++ pprint w (val←Idx G54 (# 8))
-    -- +++ "\nN3  = " +++ pprint w (val←Idx G54 (# 4))
-    -- +++ "\nN4  = " +++ pprint w (val←Idx G54 (# 7))
-    -- +++ "\nN5  = " +++ pprint w (val←Idx G54 (# 6))
-    -- +++ "\nN6  = " +++ pprint w (val←Idx G54 (# 5))
-    -- +++ "\nN7  = " +++ pprint w (val←Idx G54 (# 3))
-    -- +++ "\nN8  = " +++ pprint w (val←Idx G54 (# 2))
-    -- +++ "\n-N3 = " +++ pprint w (val←Idx G54 (# 1))
-    -- +++ "\nCN1 = " +++ pprint w (val←Idx G54 (# 0))
     -- +++ "\nG5repl0  ======================="
     -- +++ "\nN1 = " +++ pprint w (val←Idx (replaceInGraph G5 (# 0) (just (LA⊤ Pref))) (# 7))
     -- +++ "\nN2 = " +++ pprint w (val←Idx (replaceInGraph G5 (# 0) (just (LA⊤ Pref))) (# 6))
@@ -669,4 +699,3 @@ main = run (putStrLn stringToPrint)
     -- +++ "\nNArgs1: " +++ "  " +++ pprint w (NArgs G5 (# 1))
     -- +++ "\nNArgs4: " +++ "  " +++ pprint w (NArgs G5 (# 4))
 
-    -- +++ (pprint 110 G5)
