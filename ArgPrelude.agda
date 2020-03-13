@@ -115,10 +115,6 @@ instance
   _===_ {{SEq}} x y = x =S y
 
 
-docSection : ℕ → String → Doc
-docSection n s = line <> text (s +++ "  ")
-                 <> text (S.replicate (0 ℕ.⊔ ((n ∸ 2) ∸ S.length s)) '=')
-
 
 
 -- float arithmetics
@@ -142,6 +138,13 @@ x [<] y = primFloatLess x y
 _[≤]_ : Float → Float → Bool 
 x [≤] y = primFloatLess x y ∨ primFloatEquality x y 
 
+
+
+-- Some Docs
+
+docSection : ℕ → String → Doc
+docSection n s = line <> text (s +++ "  ")
+                 <> text (S.replicate (0 ℕ.⊔ ((n ∸ 2) ∸ S.length s)) '=')
 
 docFloat : Float → Doc
 docFloat x = text (Data.Float.show x)
