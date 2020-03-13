@@ -31,34 +31,36 @@ docRoles [] = empty
 docRoles (x ∷ []) = docRole x
 docRoles (x ∷ xs) = docRole x <> text ", " <> docRoles xs
 
-docThesis : String → Thesis → Doc
-docThesis _ (Pos (th' pos neg)) = text "THESIS.Pos = "
-  <> string pos <> text " / " <> string neg
-docThesis _ (Neg (th' pos neg)) = text "THESIS.Neg = "
-  <> string pos <> text " / " <> string neg
-docThesis tx (Th th) with tx == th
-... | true  = text "THESIS = TEXT"
-... | false = text "THESIS = " <> nest 9 (string th)
+docProp : Proposition → Doc
+docProp (mkProp s) = text s
+docProp (NOT x) = text "NOT " <> docProp x
+docProp (x AND y) = docProp x <> text " AND " <> docProp y
+docProp (x OR  y) = docProp x <> text " OR " <> docProp y
 
 docStmt : Statement → Doc
-docStmt (st nothing th) = docThesis "" th
-docStmt (st (just tx) th) = text "TEXT   = "
-  <> nest 9 (string tx) <> line <> docThesis tx th
+docStmt (st nothing p) = docProp p
+docStmt (st (just tx) p) = text "TEXT = " <> nest 7 (string tx) <> line <> ppp p
+  where
+  ppp : Proposition → Doc
+  ppp (mkProp t) with tx == t
+  ... | true  = text "PROP = TEXT"
+  ... | false = text "PROP = " <> docProp p
+  ppp _ = text "PROP = " <> docProp p
 
 docLabel : (Maybe FUnit) → Doc
 docLabel nothing = text "NOTHING"
 docLabel (just (mkFUnit x _ _)) = text (Data.Float.show x)
 
 docNode : LNode → Doc
-docNode (Ln (In (mkI s)) v) = text "I: " <> nest 3 (docStmt s)
+docNode (Ln (Lni s) v) = text "I: " <> nest 3 (docStmt s)
   <> line <> group (text "вес   = " <> docLabel v)
-docNode (Ln (Sn (SR (mkRA p c))) v) = text "SR: "
+docNode (Ln (Lnr (mkRA p c)) v) = text "SR: "
   <> nest 4 (group (docRoles p <> line <> text "=> " <> docRole c))
   <> line <> group (text "вес   = " <> docLabel v)
-docNode (Ln (Sn (SC (mkCA c1 c2))) v) = text "CONFLICT"
+docNode (Ln (Lnc (mkCA c1 c2)) v) = text "CONFLICT"
   -- <> nest 4 (docRole c1 <> text " --> " <> docRole c2) 
   <> line <> group (text "вес   = " <> docLabel v)
-docNode (Ln (Sn (SP (mkPA p1 p2))) v) = text "PREF"
+docNode (Ln (Lnp (mkPA p1 p2)) v) = text "PREF"
   -- <> nest 4 (docRole p1 <> text " --> " <> docRole p2)
   <> line <> group (text "вес   = " <> docLabel v)
 
@@ -73,6 +75,7 @@ docSucs ((r , i) ∷ []) = group (docRole r <> text (":" +++ ℕshow (toℕ i)))
 docSucs ((r , i) ∷ xs) = group (docRole r <> text (":" +++ ℕshow (toℕ i) +++ ", ") <> docSucs xs)
 
 docCtx : ∀ {n} → AContext n → Doc
+docCtx (context nd [])   = nest 2 (docNode nd)
 docCtx (context nd sucs) = nest 2 (docNode nd)
   <> nest 2 (line <> text "связи = ( " <> docSucs sucs <> text " )")
 
@@ -87,10 +90,10 @@ instance
   pppRole : PPrint Role
   prettytype {{pppRole}} = ppRole
 
-  ppThesis : Pretty Thesis
-  pretty {{ppThesis}} t = (docThesis "" t)
-  pppThesis : PPrint Thesis
-  prettytype {{pppThesis}} = ppThesis
+  ppProp : Pretty Proposition
+  pretty {{ppProp}} p = (docProp p)
+  pppProp : PPrint Proposition
+  prettytype {{pppProp}} = ppProp
 
   ppNode : Pretty LNode
   pretty {{ppNode}} nd = (docNode nd)

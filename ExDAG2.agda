@@ -30,32 +30,32 @@ open DAGPref
 
 
 St1  = let t = "St1"
-       in record { sttext = just t; thesis = Th t}
+       in record { sttext = just t; stprop = mkProp t}
 St2  = let t = "St2"
-       in record { sttext = just t; thesis = Th t}
+       in record { sttext = just t; stprop = mkProp t}
 St3  = let t = "St3"
-       in record { sttext = just t; thesis = Th t}
+       in record { sttext = just t; stprop = mkProp t}
 
 A : LNode
-A = Ln (In record { Body = St1 }) (just (PV 1.0 {refl} {refl}))
+A = Ln (Lni St1) (just (PV 1.0 {refl} {refl}))
 
 B : LNode
-B = Ln (In record { Body = St2 }) (just (PV 0.4 {refl} {refl}))
+B = Ln (Lni St2) (just (PV 0.4 {refl} {refl}))
 
 C : LNode
-C = Ln (In record { Body = St3 }) (just (PV 0.2 {refl} {refl}))
+C = Ln (Lni St3) (just (PV 0.2 {refl} {refl}))
 
 CA→B : LNode
-CA→B = Ln (Sn (SC record {Conflicting = conflicting; Conflicted = conflicted}))
-           (just (PV 1.0 {refl} {refl}))
+CA→B = Ln (Lnc record {Conflicting = conflicting; Conflicted = conflicted})
+          (just (PV 1.0 {refl} {refl}))
 
 CB→C : LNode
-CB→C = Ln (Sn (SC record {Conflicting = conflicting; Conflicted = conflicted}))
-           (just (PV 1.0 {refl} {refl}))
+CB→C = Ln (Lnc record {Conflicting = conflicting; Conflicted = conflicted})
+          (just (PV 1.0 {refl} {refl}))
 
 CC→A : LNode
-CC→A = Ln (Sn (SC record {Conflicting = conflicting; Conflicted = conflicted}))
-           (just (PV 1.0 {refl} {refl}))
+CC→A = Ln (Lnc record {Conflicting = conflicting; Conflicted = conflicted})
+          (just (PV 1.0 {refl} {refl}))
 
 
 

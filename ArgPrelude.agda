@@ -1,8 +1,7 @@
 module ArgPrelude where
 
 open import Agda.Builtin.Float
-open import Agda.Builtin.Nat
-open import Data.Bool using (Bool; true; false; _∨_)
+open import Data.Bool using (Bool; true; false; _∧_; _∨_)
 open import Data.Bool.Show using (show)
 open import Data.Empty
 open import Data.Float public
@@ -11,6 +10,7 @@ open import Data.List
 open import Data.Maybe
 open import Data.Nat as ℕ using (suc; ℕ; _∸_; _⊔_)
 open import Data.Nat.Show
+open import Data.Product 
 open import Data.String as S using (String) renaming (_++_ to _+++_)
 open import Data.Unit
 open import Function using (id)
@@ -42,73 +42,80 @@ filterb P (x ∷ xs) with P x
 
 -- preliminary
 
-record Thesis' : Set where
-  constructor th'
-  field
-    pos : String  -- positive form
-    neg : String  -- negative form
-
-data Thesis : Set where
-  Pos : Thesis' → Thesis  -- тезис
-  Neg : Thesis' → Thesis  -- отрицание тезиса
-  Th  : String  → Thesis  -- если отрицание не определено / не требуется
-
--- bool equality
-private
-  _=T_ : Thesis → Thesis → Bool
-  (Pos x) =T (Pos y) = (Thesis'.pos x) S.== (Thesis'.pos y)
-  (Neg x) =T (Neg y) = (Thesis'.pos x) S.== (Thesis'.pos y)
-  (Th x) =T (Th y) = x S.== y
-  _ =T _ = false
-
-infix 4 _≡T_ _≟T_
+data Proposition : Set where
+  mkProp : String → Proposition
+  NOT    : Proposition → Proposition
+  _AND_  : Proposition → Proposition → Proposition
+  _OR_   : Proposition → Proposition → Proposition
 
 private
-  _≡T_ : Thesis → Thesis → Set
-  (Pos x) ≡T (Pos y) = (Thesis'.pos x) ≡ (Thesis'.pos y)
-  (Neg x) ≡T (Neg y) = (Thesis'.neg x) ≡ (Thesis'.neg y)
-  (Th x)  ≡T (Th y)  = x ≡ y
-  _ ≡T _ = ⊥
-  
+  _=P_ : Proposition → Proposition → Bool
+  (mkProp x) =P (mkProp y) = x S.== y
+  NOT x      =P NOT y      = x =P y
+  (x₁ AND x₂)  =P (y₁ AND y₂)  = (x₁ =P y₁) ∧ (x₂ =P y₂) 
+  (x₁ OR  x₂)  =P (y₁ OR  y₂)  = (x₁ =P y₁) ∧ (x₂ =P y₂)
+  _ =P _ = false
 
--- decidable equality
-_≟T_ : Decidable _≡T_
-x' ≟T y' with x' | y'
-... | Pos x | Pos y = (Thesis'.pos x) S.≟ (Thesis'.pos y)
-... | Neg x | Neg y = (Thesis'.neg x) S.≟ (Thesis'.neg y)
-... | Th x  | Th y  = x S.≟ y
-... | Pos _ | Neg _ = no id 
-... | Pos _ | Th  _ = no id
-... | Neg _ | Pos _ = no id
-... | Neg _ | Th  _ = no id
-... | Th  _ | Pos _ = no id
-... | Th  _ | Neg _ = no id
+infix 4 _≡P_ _≟P_
 
+_≡P_ : Proposition → Proposition → Set
+(mkProp x) ≡P (mkProp y) = x ≡ y
+NOT x      ≡P NOT y      = x ≡P y
+(x₁ AND x₂)  ≡P (y₁ AND y₂)  = (x₁ ≡P y₁) × (x₂ ≡P y₂) 
+(x₁ OR  x₂)  ≡P (y₁ OR  y₂)  = (x₁ ≡P y₁) × (x₂ ≡P y₂)
+_ ≡P _ = ⊥
+
+_≟P_ : Decidable _≡P_
+(mkProp x) ≟P (mkProp y) = x S.≟ y
+NOT x      ≟P NOT y      = x ≟P y
+(x₁ AND x₂)  ≟P (y₁ AND y₂)  with (x₁ ≟P y₁) | (x₂ ≟P y₂)
+... | yes p₁ | yes p₂ = yes (p₁ , p₂)
+... | yes _  | no ¬p₂ = no λ x → ¬p₂ (proj₂ x)
+... | no ¬p₁ | yes _  = no λ x → ¬p₁ (proj₁ x)
+... | no ¬p₁ | no  _  = no λ x → ¬p₁ (proj₁ x) 
+(x₁ OR  x₂)  ≟P (y₁ OR  y₂)  with (x₁ ≟P y₁) | (x₂ ≟P y₂)
+... | yes p₁ | yes p₂ = yes (p₁ , p₂)
+... | yes _  | no ¬p₂ = no λ x → ¬p₂ (proj₂ x)
+... | no ¬p₁ | yes _  = no λ x → ¬p₁ (proj₁ x)
+... | no ¬p₁ | no  _  = no λ x → ¬p₁ (proj₁ x) 
+(mkProp _) ≟P NOT _ = no id
+(mkProp _) ≟P _ AND _ = no id
+(mkProp _) ≟P _ OR _ = no id
+(NOT _) ≟P (mkProp _) = no id
+(NOT _) ≟P _ AND _ = no id
+(NOT _) ≟P _ OR _ = no id
+(_ AND _) ≟P (mkProp _) = no id
+(_ AND _) ≟P NOT _ = no id
+(_ AND _) ≟P _ OR _ = no id
+(_ OR _) ≟P (mkProp _) = no id
+(_ OR _) ≟P NOT _ = no id
+(_ OR _) ≟P _ AND _ = no id
 
 instance
-  TEq : BEq Thesis
-  _===_ {{TEq}} x y = x =T y
+  PEq : BEq Proposition
+  _===_ {{PEq}} x y = x =P y
 
--- Statement consists of Thesis and a particular text this thesis is stated in.
+
+-- Statement consists of Proposition and a particular text this proposition is stated in.
 record Statement : Set where
   constructor st
   field
     sttext : Maybe String  -- the statement text
-    thesis : Thesis        -- it's meaning (proposition)
+    stprop : Proposition   -- it's meaning (proposition)
 
 infix 4 _≡S_ _≟S_
 
 _≡S_ : Statement → Statement → Set
-x ≡S y = (Statement.thesis x) ≡T (Statement.thesis y)
+x ≡S y = (Statement.stprop x) ≡P (Statement.stprop y)
 
 _≟S_ : Decidable _≡S_
-x ≟S y = (Statement.thesis x) ≟T (Statement.thesis y)
+x ≟S y = (Statement.stprop x) ≟P (Statement.stprop y)
 
 
 -- bool equality
 private
   _=S_ : Statement → Statement → Bool
-  (st _ x) =S (st _ y) = x =T y
+  (st _ x) =S (st _ y) = x =P y
 
 instance
   SEq : BEq Statement

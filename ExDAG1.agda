@@ -30,50 +30,50 @@ open DAGPref
 
 
 St1  = let t = "St1"
-       in record { sttext = just t; thesis = Th t}
+       in record { sttext = just t; stprop = mkProp t}
 St2  = let t = "St2"
-       in record { sttext = just t; thesis = Th t}
-Th3  = record { pos = "St3"; neg = "Not St3"}
-St3  = record { sttext = nothing; thesis = Pos Th3}
-¬St3 = record { sttext = nothing; thesis = Neg Th3}
+       in record { sttext = just t; stprop = mkProp t}
+P3 = mkProp "St3"       
+St3  = record { sttext = nothing; stprop = P3}
+¬St3 = record { sttext = nothing; stprop = NOT P3}
 St5  = let t = "St5"
-       in record { sttext = just t; thesis = Th t}
+       in record { sttext = just t; stprop = mkProp t}
 St7  = let t = "St7"
-       in record { sttext = just t; thesis = Th t}
+       in record { sttext = just t; stprop = mkProp t}
 
 N1 : LNode
-N1 = Ln (In record { Body = St1 }) (just (PV 0.7 {refl} {refl}))
+N1 = Ln (Lni St1) (just (PV 0.7 {refl} {refl}))
 
 N2 : LNode
-N2 = Ln (In record { Body = St2 }) (just (PV 1.0 {refl} {refl}))
+N2 = Ln (Lni St2) (just (PV 1.0 {refl} {refl}))
 
 N3 : LNode
-N3 = Ln (In record { Body = St3 }) nothing -- (just (PV 1.3 {refl} {refl}))
+N3 = Ln (Lni St3) nothing -- (just (PV 1.3 {refl} {refl}))
 
 ¬N3 : LNode
-¬N3 = Ln (In record { Body = ¬St3 }) nothing -- (just (PV 0.3 {refl} {refl}))
+¬N3 = Ln (Lni ¬St3) nothing -- (just (PV 0.3 {refl} {refl}))
 
 N4 : LNode
-N4 = Ln (Sn (SR A-от-эксперта)) (just (PV 0.5 {refl} {refl}))
+N4 = Ln (Lnr A-от-эксперта) (just (PV 0.5 {refl} {refl}))
 
 N5 : LNode
-N5 = Ln (In record { Body = St5 }) (just (PV 0.6 {refl} {refl}))
+N5 = Ln (Lni St5) (just (PV 0.6 {refl} {refl}))
 
 N6 : LNode
-N6 = Ln (Sn (SR A-от-эксперта)) (just (PV 0.4 {refl} {refl}))
+N6 = Ln (Lnr A-от-эксперта) (just (PV 0.4 {refl} {refl}))
 
 N7 : LNode
-N7 = Ln (In record { Body = St7 }) (just (PV 0.9 {refl} {refl}))
+N7 = Ln (Lni St7) (just (PV 0.9 {refl} {refl}))
 
 N8 : LNode
-N8 = Ln (Sn (SR A-ad-populum)) (just (PV 0.9 {refl} {refl}))
+N8 = Ln (Lnr A-ad-populum) (just (PV 0.9 {refl} {refl}))
 
 CN1 : LNode
-CN1 = Ln (Sn (SC record {Conflicting = conflicting; Conflicted = conflicted}))
+CN1 = Ln (Lnc record {Conflicting = conflicting; Conflicted = conflicted})
          (just (PV 0.8 {refl} {refl}))
 
 CN2 : LNode
-CN2 = Ln (Sn (SC record {Conflicting = conflicting; Conflicted = conflicted}))
+CN2 = Ln (Lnc record {Conflicting = conflicting; Conflicted = conflicted})
          (just (PV 0.8 {refl} {refl}))
 
 

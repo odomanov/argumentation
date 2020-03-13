@@ -115,19 +115,19 @@ realIdx (suc (suc i)) δi = Fin.inject≤ (suc ((suc (suc i)) Fin.+ δi)) p3
 -- extracting info from the i-th context
 
 isInode : LNode → Bool
-isInode (Ln (In _) _) = true
+isInode (Ln (Lni _) _) = true
 isInode _ = false
 
 isRAnode : LNode → Bool
-isRAnode (Ln (Sn (SR _)) _) = true
+isRAnode (Ln (Lnr _) _) = true
 isRAnode _ = false
 
 isCAnode : LNode → Bool
-isCAnode (Ln (Sn (SC _)) _) = true
+isCAnode (Ln (Lnc _) _) = true
 isCAnode _ = false
 
 isPAnode : LNode → Bool
-isPAnode (Ln (Sn (SP _)) _) = true
+isPAnode (Ln (Lnp _) _) = true
 isPAnode _ = false
 
 Nvalue : LNode → MC

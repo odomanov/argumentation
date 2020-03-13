@@ -166,6 +166,7 @@ data S-node : Set where
   SP : PA-Scheme → S-node
 
 open RA-Scheme {{...}} public
+open CA-Scheme {{...}} public
 
 
 -- various equalities
@@ -198,24 +199,29 @@ module _ {c ℓ₁ ℓ₂} {la : LabelAlgebra c ℓ₁ ℓ₂} where
 
   mutual
    
+    data Node' : Set where
+      Lni : Statement → Node' 
+      Lnr : RA-Scheme → Node' 
+      Lnc : CA-Scheme → Node' 
+      Lnp : PA-Scheme → Node' 
+
     -- Nodes are labeled. The node's value may be 'nothing'.
-    data Node' : Set (c ⊔ ℓ₁ ⊔ ℓ₂) where
-      In : I-node → Node'
-      Sn : S-node → Node'
-   
     data Node : Set (c ⊔ ℓ₁ ⊔ ℓ₂) where
       Ln : Node' → Maybe (Carrier la) → Node
 
     -- Node equality, boolean.
-    -- Label value is not checked.
     private
-      _=N_ : Node → Node → Bool
-      Lni (mkI x1) v1 =N Lni (mkI x2) v2 = x1  === x2 -- ∧ (v1 =L v2)
-      Lnr ra1 _       =N Lnr ra2 _       = ra1 === ra2
-      Lnc ca1 _       =N Lnc ca2 _       = ca1 === ca2
-      Lnp pa1 _       =N Lnp pa2 _       = pa1 === pa2
-      _ =N _ = false
+      _=N'_ : Node' → Node' → Bool
+      Lni x1  =N' Lni x2  = x1  === x2 
+      Lnr ra1 =N' Lnr ra2 = ra1 === ra2
+      Lnc ca1 =N' Lnc ca2 = ca1 === ca2
+      Lnp pa1 =N' Lnp pa2 = pa1 === pa2
+      _ =N' _ = false
 
+      -- Label value is not checked!
+      _=N_ : Node → Node → Bool
+      Ln x1 _ =N Ln x2 _ = x1 =N' x2
+      
     instance 
       NEq : BEq Node
       _===_ {{NEq}} x y = x =N y
