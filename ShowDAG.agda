@@ -29,17 +29,18 @@ docRole (role s) = text s
 docRoles : List Role → Doc
 docRoles [] = empty
 docRoles (x ∷ []) = docRole x
-docRoles (x ∷ xs) = docRole x <> text ", " <> docRoles xs
+docRoles (x ∷ xs) = docRole x <> text ", " <> line <> docRoles xs
 
 docProp : Proposition → Doc
-docProp (mkProp s) = text s
+docProp (mkProp s) = string s
 docProp (NOT x) = text "NOT " <> docProp x
 docProp (x AND y) = docProp x <> text " AND " <> docProp y
 docProp (x OR  y) = docProp x <> text " OR " <> docProp y
 
 docStmt : Statement → Doc
-docStmt (st nothing p) = docProp p
-docStmt (st (just tx) p) = text "TEXT = " <> nest 7 (string tx) <> line <> ppp p
+docStmt (st nothing p) = text "PROP = " <> nest 7 (docProp p)
+docStmt (st (just tx) p) = text "TEXT = " <> nest 7 (string tx)
+                                  <> line <> nest 7 (ppp p)
   where
   ppp : Proposition → Doc
   ppp (mkProp t) with tx == t
@@ -72,12 +73,13 @@ docNodes ((i , nd) ∷ xs) = text ((ℕshow (toℕ i)) +++ " : ")
 docSucs : ∀ {n} → List (Role × Fin n) → Doc
 docSucs [] = empty
 docSucs ((r , i) ∷ []) = group (docRole r <> text (":" +++ ℕshow (toℕ i)))
-docSucs ((r , i) ∷ xs) = group (docRole r <> text (":" +++ ℕshow (toℕ i) +++ ", ") <> docSucs xs)
+docSucs ((r , i) ∷ xs) = group (docRole r <> text (":" +++ ℕshow (toℕ i) +++ ", ")
+                                <> line <> docSucs xs)
 
 docCtx : ∀ {n} → AContext n → Doc
 docCtx (context nd [])   = nest 2 (docNode nd)
 docCtx (context nd sucs) = nest 2 (docNode nd)
-  <> nest 2 (line <> text "связи = ( " <> docSucs sucs <> text " )")
+  <> nest 2 (line <> text "связи = ( " <> nest 10 (docSucs sucs) <> text " )")
 
 docGraph : ∀ {n} → AGraph n → Doc
 docGraph ∅ = empty 
