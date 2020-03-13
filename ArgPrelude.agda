@@ -54,13 +54,14 @@ data Thesis : Set where
   Th  : String  → Thesis  -- если отрицание не определено / не требуется
 
 -- bool equality
-_=T_ : Thesis → Thesis → Bool
-(Pos x) =T (Pos y) = (Thesis'.pos x) S.== (Thesis'.pos y)
-(Neg x) =T (Neg y) = (Thesis'.pos x) S.== (Thesis'.pos y)
-(Th x) =T (Th y) = x S.== y
-_ =T _ = false
+private
+  _=T_ : Thesis → Thesis → Bool
+  (Pos x) =T (Pos y) = (Thesis'.pos x) S.== (Thesis'.pos y)
+  (Neg x) =T (Neg y) = (Thesis'.pos x) S.== (Thesis'.pos y)
+  (Th x) =T (Th y) = x S.== y
+  _ =T _ = false
 
-infix 4 _≟T_
+infix 4 _≡T_ _≟T_
 
 private
   _≡T_ : Thesis → Thesis → Set
@@ -95,19 +96,19 @@ record Statement : Set where
     sttext : Maybe String  -- the statement text
     thesis : Thesis        -- it's meaning (proposition)
 
--- bool equality
-_=S_ : Statement → Statement → Bool
-(st _ x) =S (st _ y) = x =T y
+infix 4 _≡S_ _≟S_
 
-infix 4 _≟S_
-
-private
-  _≡S_ : Statement → Statement → Set
-  x ≡S y = (Statement.thesis x) ≡T (Statement.thesis y)
+_≡S_ : Statement → Statement → Set
+x ≡S y = (Statement.thesis x) ≡T (Statement.thesis y)
 
 _≟S_ : Decidable _≡S_
 x ≟S y = (Statement.thesis x) ≟T (Statement.thesis y)
 
+
+-- bool equality
+private
+  _=S_ : Statement → Statement → Bool
+  (st _ x) =S (st _ y) = x =T y
 
 instance
   SEq : BEq Statement

@@ -101,14 +101,16 @@ role r ≟R role r' = r Data.String.≟ r'
 instance
   REq : BEq Role
   _===_ {{REq}} (role x) (role y) = x == y
-  
--- TODO: get rid of the dependence on order
-_=LR_ : List Role → List Role → Bool
-[] =LR [] = true
-[] =LR _  = false
-_  =LR [] = false
-(role x ∷ xs) =LR (role y ∷ ys) = (x == y) ∧ xs =LR ys
 
+
+-- TODO: get rid of the dependence on order
+private
+  _=LR_ : List Role → List Role → Bool
+  [] =LR [] = true
+  [] =LR _  = false
+  _  =LR [] = false
+  (role x ∷ xs) =LR (role y ∷ ys) = (x == y) ∧ xs =LR ys
+  
 _≡LR_ : List Role → List Role → Set
 [] ≡LR [] = ⊤
 (_ ∷ _)  ≡LR [] = ⊥
@@ -168,14 +170,15 @@ open RA-Scheme {{...}} public
 
 -- various equalities
 
-_=RA_ : RA-Scheme → RA-Scheme → Bool
-(mkRA p c) =RA (mkRA p' c') = p === p' ∧ c === c'
-
-_=CA_ : CA-Scheme → CA-Scheme → Bool
-(mkCA x y) =CA (mkCA x' y') = x === x' ∧ y === y'
-
-_=PA_ : PA-Scheme → PA-Scheme → Bool
-(mkPA x y) =PA (mkPA x' y') = x === x' ∧ y === y'
+private
+  _=RA_ : RA-Scheme → RA-Scheme → Bool
+  (mkRA p c) =RA (mkRA p' c') = p === p' ∧ c === c'
+  
+  _=CA_ : CA-Scheme → CA-Scheme → Bool
+  (mkCA x y) =CA (mkCA x' y') = x === x' ∧ y === y'
+  
+  _=PA_ : PA-Scheme → PA-Scheme → Bool
+  (mkPA x y) =PA (mkPA x' y') = x === x' ∧ y === y'
 
 instance
   RAEq : BEq RA-Scheme
@@ -205,30 +208,33 @@ module _ {c ℓ₁ ℓ₂} {la : LabelAlgebra c ℓ₁ ℓ₂} where
 
     -- Node equality, boolean.
     -- Label value is not checked.
-    _=N_ : Node → Node → Bool
-    Ln (In (mkI x1)) v1 =N Ln (In (mkI x2)) v2 = x1  === x2 -- ∧ (v1 =L v2)
-    Ln (Sn (SR ra1)) _  =N Ln (Sn (SR ra2)) _  = ra1 === ra2
-    Ln (Sn (SC ca1)) _  =N Ln (Sn (SC ca2)) _  = ca1 === ca2
-    Ln (Sn (SP pa1)) _  =N Ln (Sn (SP pa2)) _  = pa1 === pa2
-    _ =N _ = false
+    private
+      _=N_ : Node → Node → Bool
+      Lni (mkI x1) v1 =N Lni (mkI x2) v2 = x1  === x2 -- ∧ (v1 =L v2)
+      Lnr ra1 _       =N Lnr ra2 _       = ra1 === ra2
+      Lnc ca1 _       =N Lnc ca2 _       = ca1 === ca2
+      Lnp pa1 _       =N Lnp pa2 _       = pa1 === pa2
+      _ =N _ = false
 
     instance 
       NEq : BEq Node
       _===_ {{NEq}} x y = x =N y
-  
-    _=RN_ : (Role × Node) → (Role × Node) → Bool
-    (r1 , nd1) =RN (r2 , nd2) = r1 === r2 ∧ nd1 === nd2
+
+    private
+      _=RN_ : (Role × Node) → (Role × Node) → Bool
+      (r1 , nd1) =RN (r2 , nd2) = r1 === r2 ∧ nd1 === nd2
     
     instance 
       RNEq : BEq (Role × Node)
       _===_ {{RNEq}} x y = x =RN y
 
     -- TODO: get rid of the order
-    _=LRN_ : List (Role × Node) → List (Role × Node) → Bool
-    [] =LRN [] = true
-    [] =LRN _  = false
-    _  =LRN [] = false
-    (x ∷ xs) =LRN (y ∷ ys) = x === y ∧ xs =LRN ys
+    private
+      _=LRN_ : List (Role × Node) → List (Role × Node) → Bool
+      [] =LRN [] = true
+      [] =LRN _  = false
+      _  =LRN [] = false
+      (x ∷ xs) =LRN (y ∷ ys) = x === y ∧ xs =LRN ys
   
     instance 
       LRNEq : BEq (List (Role × Node))
