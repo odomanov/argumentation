@@ -24,10 +24,10 @@ open import AIF
 open import LabelAlgebras
 open import ArgSchemes
 
-import DAG
-module DAGPref = DAG Pref
-open DAGPref
-
+open import DAG Pref
+V = PV
+-- open import DAG Luk
+-- V = LV
 
 St1  = let t = "St1"
        in record { sttext = just t; stprop = mkProp t}
@@ -37,25 +37,25 @@ St3  = let t = "St3"
        in record { sttext = just t; stprop = mkProp t}
 
 A : LNode
-A = Ln (Lni St1) (just (PV 1.0 {refl} {refl}))
+A = Ln (Lni St1) (just (V 1.0 {refl} {refl}))
 
 B : LNode
-B = Ln (Lni St2) (just (PV 0.4 {refl} {refl}))
+B = Ln (Lni St2) (just (V 0.4 {refl} {refl}))
 
 C : LNode
-C = Ln (Lni St3) (just (PV 0.2 {refl} {refl}))
+C = Ln (Lni St3) (just (V 0.2 {refl} {refl}))
 
 CA→B : LNode
 CA→B = Ln (Lnc record {Conflicting = conflicting; Conflicted = conflicted})
-          (just (PV 1.0 {refl} {refl}))
+          (just (V 1.0 {refl} {refl}))
 
 CB→C : LNode
 CB→C = Ln (Lnc record {Conflicting = conflicting; Conflicted = conflicted})
-          (just (PV 1.0 {refl} {refl}))
+          (just (V 1.0 {refl} {refl}))
 
 CC→A : LNode
 CC→A = Ln (Lnc record {Conflicting = conflicting; Conflicted = conflicted})
-          (just (PV 1.0 {refl} {refl}))
+          (just (V 1.0 {refl} {refl}))
 
 
 
@@ -109,6 +109,8 @@ G6 = steps 6 G
 
 G7 = steps 7 G
 
+G100 = steps 100 G
+
 G200 = steps 200 G
 
 
@@ -153,21 +155,20 @@ main = run (putStrLn stringToPrint)
     +++ printABC G6 val←Idx
     +++ ppretty ws (docSection ws "G7")
     +++ printABC G7 val←Idx
+    +++ ppretty ws (docSection ws "G100")
+    +++ printABC G100 val←Idx
     +++ ppretty ws (docSection ws "G200")
     +++ printABC G200 val←Idx
 
-    +++ ppretty ws (docSection ws "foldConflicts:G")
-    +++ printABC G foldConflicts
-
-    -- +++ "\nfoldConflicts:G5:A: " +++ pprint w (foldConflicts G5 (# 5))
-    -- +++ "\nfoldConflicts:G5:B: " +++ pprint w (foldConflicts G5 (# 4))
-    -- +++ "\nfoldConflicts:G5:C: " +++ pprint w (foldConflicts G5 (# 3))
-    -- +++ "\n-foldConflicts:G5:A: " +++ pprint w (¬foldConflicts G5 (# 5))
-    -- +++ "\n-foldConflicts:G5:B: " +++ pprint w (¬foldConflicts G5 (# 4))
-    -- +++ "\n-foldConflicts:G5:C: " +++ pprint w (¬foldConflicts G5 (# 3))
-    +++ ppretty ws (docSection ws "val+conflicts:G5")
-    +++ printABC G5 (val+conflicts G0)
-    +++ ppretty ws (docSection ws "iterationVal:G5")
-    +++ printABC G5 (iterationVal G0)
+    -- +++ ppretty ws (docSection ws "foldConflicts:G")
+    -- +++ printABC G foldConflicts
+    -- +++ ppretty ws (docSection ws "foldConflicts:G5")
+    -- +++ printABC G5 foldConflicts
+    -- +++ ppretty ws (docSection ws "¬foldConflicts:G5")
+    -- +++ printABC G5 ¬foldConflicts
+    -- +++ ppretty ws (docSection ws "val+conflicts:G5")
+    -- +++ printABC G5 (val+conflicts G0)
+    -- +++ ppretty ws (docSection ws "iterationVal:G5")
+    -- +++ printABC G5 (iterationVal G0)
 
     +++ (pprint 110 G)

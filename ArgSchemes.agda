@@ -23,19 +23,19 @@ open import AIF
 
 instance
   A-от-эксперта : RA-Scheme
-  Premises {{A-от-эксперта}} = (эксперт) ∷ (говорит) ∷ (область) ∷ []
+  Premises {{A-от-эксперта}} = эксперт ∷ говорит ∷ область ∷ []
   Conclusion {{A-от-эксперта}} = вывод
 
   A-от-примера : RA-Scheme
-  Premises {{A-от-примера}} = (пример) ∷ []
+  Premises {{A-от-примера}} = пример ∷ []
   Conclusion {{A-от-примера}} = вывод
 
   A-абдукция : RA-Scheme
-  Premises {{A-абдукция}} = (факт) ∷ (объяснение) ∷ []
+  Premises {{A-абдукция}} = факт ∷ объяснение ∷ []
   Conclusion {{A-абдукция}} = вывод
 
   A-ad-populum : RA-Scheme
-  Premises {{A-ad-populum}} = (все-признают) ∷ []
+  Premises {{A-ad-populum}} = все-признают ∷ []
   Conclusion {{A-ad-populum}} = вывод
   
 

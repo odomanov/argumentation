@@ -20,9 +20,6 @@ open import ArgPrelude
 open import LabelAlgebra public
   renaming (⊤ to LA⊤; ⊥ to LA⊥; _∧_ to _LA∧_; _∨_ to _LA∨_)
 
--- _LessEq_ : Float → Float → Bool
--- x LessEq y = (primFloatLess x y ∨ primFloatEquality x y)
-
 -- Float interval [0..1]
 record FUnit : Set where
   constructor mkFUnit
@@ -43,21 +40,17 @@ FU= : FUnit → FUnit → Set
 FU= a b = value a ≡ value b
 
 FU< : FUnit → FUnit → Set
-FU< a b = if ((value a) [<] (value b)) then ⊤ else ⊥ 
+FU< a b = if (value a) [<] (value b) then ⊤ else ⊥ 
 
 FU≤ : FUnit → FUnit → Set
 FU≤ a b = if (value a) [≤] (value b) then ⊤ else ⊥ 
 
 
 fmin : Float → Float → Float
-fmin x y with x [<] y 
-... | true  = x
-... | false = y
+fmin x y = if x [<] y then x else y 
 
 fmax : Float → Float → Float
-fmax x y with x [<] y 
-... | true  = y
-... | false = x
+fmax x y = if x [<] y then y else x 
 
 postulate
   0≤½v : ∀ x → (0.0 [≤] (0.5 [*] (value x))) ≡ true  
@@ -111,18 +104,18 @@ postulate
 
 Trust⊕ : FUnit → FUnit → FUnit
 Trust⊕ a b = record
-  { value = ((value a) [+] (value b)) [-] ((value a) [*] (value b))
+  { value = (value a) [+] (value b) [-] ((value a) [*] (value b))
   ; 0≤v = 0≤v⊕ (value a) (value b)
   ; v≤1 = v≤1⊕ (value a) (value b)
   }
 
-value⊖ : Float → Float → Float
-value⊖ a b with 1.0 [=] a | 1.0 [=] b
-... | true  | false = 1.0
-... | false | _ with (a [<] b) ∨ not (a [=] b) | 1.0 [=] b
-...            | true | false = ((a [-] b) [/] (1.0 [-] b))
-...            | _    | _     = 0.0
-value⊖ _ _ | _ | _ = 0.0
+-- value⊖ : Float → Float → Float
+-- value⊖ a b with 1.0 [=] a | 1.0 [=] b
+-- ... | true  | false = 1.0
+-- ... | false | _ with (a [<] b) ∨ not (a [=] b) | 1.0 [=] b
+-- ...            | true | false = ((a [-] b) [/] (1.0 [-] b))
+-- ...            | _    | _     = 0.0
+-- value⊖ _ _ | _ | _ = 0.0
 
 -- postulate
 --   0≤v⊖ : ∀ x y → 0.0 [≤] (value⊖ x y) ≡ true
@@ -136,14 +129,14 @@ value⊖ _ _ | _ | _ = 0.0
 --   }
 
 postulate
-  0≤v⊘ : ∀ x → 0.0 [≤] (value FU1) [-] x ≡ true
-  v≤1⊘ : ∀ x → (value FU1) [-] x [≤] 1.0 ≡ true
+  0≤v⊘ : ∀ x → 0.0 [≤] (value FU1) [-] value x ≡ true
+  v≤1⊘ : ∀ x → (value FU1) [-] value x [≤] 1.0 ≡ true
 
 Trust⊘ : FUnit → FUnit
 Trust⊘ a = record
   { value = (value FU1) [-] (value a)
-  ; 0≤v = 0≤v⊘ (value a) 
-  ; v≤1 = v≤1⊘ (value a) 
+  ; 0≤v = 0≤v⊘ a
+  ; v≤1 = v≤1⊘ a 
   }
 
 Trust∧ : FUnit → FUnit → FUnit
@@ -231,8 +224,8 @@ Pref⊕ a b = record
 Pref⊘ : FUnit → FUnit
 Pref⊘ a = record
   { value = (value FU1) [-] (value a)
-  ; 0≤v = 0≤v⊘ (value a) 
-  ; v≤1 = v≤1⊘ (value a) 
+  ; 0≤v = 0≤v⊘ a 
+  ; v≤1 = v≤1⊘ a 
   }
 
 Pref∨ : FUnit → FUnit → FUnit
