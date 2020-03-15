@@ -24,9 +24,8 @@ open import AIF
 open import LabelAlgebras
 open import ArgSchemes
 
-import DAG
-module DAGPref = DAG Pref
-open DAGPref
+la = Pref
+open import DAG la
 
 
 St1  = let t = "St1"
@@ -42,39 +41,39 @@ St7  = let t = "St7"
        in record { sttext = just t; stprop = mkProp t}
 
 N1 : LNode
-N1 = Ln (Lni St1) (just (PV 0.7 {refl} {refl}))
+N1 = Ln (Lni St1) (just (V 0.7 {refl} {refl}))
 
 N2 : LNode
-N2 = Ln (Lni St2) (just (PV 1.0 {refl} {refl}))
+N2 = Ln (Lni St2) (just (V 1.0 {refl} {refl}))
 
 N3 : LNode
-N3 = Ln (Lni St3) nothing -- (just (PV 1.3 {refl} {refl}))
+N3 = Ln (Lni St3) nothing -- (just (V 1.3 {refl} {refl}))
 
 ¬N3 : LNode
-¬N3 = Ln (Lni ¬St3) nothing -- (just (PV 0.3 {refl} {refl}))
+¬N3 = Ln (Lni ¬St3) nothing -- (just (V 0.3 {refl} {refl}))
 
 N4 : LNode
-N4 = Ln (Lnr A-от-эксперта) (just (PV 0.5 {refl} {refl}))
+N4 = Ln (Lnr A-от-эксперта) (just (V 0.5 {refl} {refl}))
 
 N5 : LNode
-N5 = Ln (Lni St5) (just (PV 0.6 {refl} {refl}))
+N5 = Ln (Lni St5) (just (V 0.6 {refl} {refl}))
 
 N6 : LNode
-N6 = Ln (Lnr A-от-эксперта) (just (PV 0.4 {refl} {refl}))
+N6 = Ln (Lnr A-от-эксперта) (just (V 0.4 {refl} {refl}))
 
 N7 : LNode
-N7 = Ln (Lni St7) (just (PV 0.9 {refl} {refl}))
+N7 = Ln (Lni St7) (just (V 0.9 {refl} {refl}))
 
 N8 : LNode
-N8 = Ln (Lnr A-ad-populum) (just (PV 0.9 {refl} {refl}))
+N8 = Ln (Lnr A-ad-populum) (just (V 0.9 {refl} {refl}))
 
 CN1 : LNode
 CN1 = Ln (Lnc record {Conflicting = conflicting; Conflicted = conflicted})
-         (just (PV 0.8 {refl} {refl}))
+         (just (V 0.8 {refl} {refl}))
 
 CN2 : LNode
 CN2 = Ln (Lnc record {Conflicting = conflicting; Conflicted = conflicted})
-         (just (PV 0.8 {refl} {refl}))
+         (just (V 0.8 {refl} {refl}))
 
 
 
@@ -465,7 +464,7 @@ G6200 = steps 200 G6
 
 ------------------------------------------------------------------------
 
-open import ShowDAG
+open import ShowDAG la
 
 open import IO
 

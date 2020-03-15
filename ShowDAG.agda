@@ -1,4 +1,6 @@
-module ShowDAG where
+open import LabelAlgebra renaming (⊤ to LA⊤; ⊥ to LA⊥; _∧_ to _LA∧_; _∨_ to _LA∨_) 
+
+module ShowDAG {c ℓ₁ ℓ₂} (la : LabelAlgebra c ℓ₁ ℓ₂) where
 
 open import Data.Bool
 open import Data.Empty
@@ -21,7 +23,7 @@ open import LabelAlgebras
 open import ArgSchemes
 open import WLPretty
 
-open import DAG Pref
+open import DAG la
 
 docRole : Role → Doc
 docRole (role s) = text s
@@ -48,9 +50,9 @@ docStmt (st (just tx) p) = text "TEXT = " <> nest 7 (string tx)
   ... | false = text "PROP = " <> docProp p
   ppp _ = text "PROP = " <> docProp p
 
-docLabel : (Maybe FUnit) → Doc
+docLabel : MC → Doc
 docLabel nothing = text "NOTHING"
-docLabel (just (mkFUnit x _ _)) = text (Data.Float.show x)
+docLabel (just x) = (doc la) x 
 
 docNode : LNode → Doc
 docNode (Ln (Lni s) v) = text "I: " <> nest 3 (docStmt s)

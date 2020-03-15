@@ -30,6 +30,9 @@ record FUnit : Set where
 
 open FUnit public
 
+V : (x : Float) → {p1 : 0.0 [≤] x ≡ true} → {p2 : x [≤] 1.0 ≡ true} → FUnit
+V x {p1} {p2} = record { value = x; 0≤v = p1; v≤1 = p2 }
+
 FU0 : FUnit
 FU0 = record { value = 0.0; 0≤v = refl; v≤1 = refl }
 

@@ -24,10 +24,9 @@ open import AIF
 open import LabelAlgebras
 open import ArgSchemes
 
-open import DAG Pref
-V = PV
--- open import DAG Luk
--- V = LV
+la = Pref
+-- la = Luk
+open import DAG la
 
 St1  = let t = "St1"
        in record { sttext = just t; stprop = mkProp t}
@@ -120,7 +119,7 @@ G200 = steps 200 G
 
 ------------------------------------------------------------------------
 
-open import ShowDAG
+open import ShowDAG la
 
 open import IO
 

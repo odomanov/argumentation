@@ -16,7 +16,9 @@ open import ArgSchemes
 -- open import ArgVariants
 open import LabelAlgebras
 open import AIF
-open import DAG Pref
+
+la = Pref
+open import DAG la
 
 -- Statements
 
@@ -211,7 +213,7 @@ G =
 
 ------------------------------------------------------------------------
 
-open import ShowDAG
+open import ShowDAG la
 
 open import IO
 
