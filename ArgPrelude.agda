@@ -127,8 +127,8 @@ instance
 -- float arithmetics
 
 infix 5 _[<]_ _[≤]_ _[=]_
-infix 6 _[+]_ _[-]_ 
-infix 7 _[*]_
+infixl 6 _[+]_ _[-]_ 
+infixl 7 _[*]_
 
 _[+]_ : Float → Float → Float 
 x [+] y = primFloatPlus x y
