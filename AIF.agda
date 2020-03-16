@@ -43,7 +43,7 @@ open import Data.List
 open import Data.List.Membership.Propositional
 open import Data.Maybe
 open import Data.Product
-open import Data.String renaming (_++_ to _+++_)
+open import Data.String as S renaming (_++_ to _+++_)
 open import Data.Unit using (⊤)
 open import Level renaming (zero to lzero; suc to lsuc)
 open import Relation.Binary using (Decidable)
@@ -96,11 +96,11 @@ _≡R_ : Role → Role → Set
 role r ≡R role r' = r ≡ r'
 
 _≟R_ : Decidable _≡R_
-role r ≟R role r' = r Data.String.≟ r'
+role r ≟R role r' = r S.≟ r'
 
 instance
   REq : BEq Role
-  _===_ {{REq}} (role x) (role y) = x == y
+  _===_ {{REq}} (role x) (role y) = x S.== y
 
 
 -- TODO: get rid of the dependence on order
@@ -109,7 +109,7 @@ private
   [] =LR [] = true
   [] =LR _  = false
   _  =LR [] = false
-  (role x ∷ xs) =LR (role y ∷ ys) = (x == y) ∧ xs =LR ys
+  (role x ∷ xs) =LR (role y ∷ ys) = (x S.== y) ∧ xs =LR ys
   
 _≡LR_ : List Role → List Role → Set
 [] ≡LR [] = ⊤

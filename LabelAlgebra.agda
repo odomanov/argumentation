@@ -2,7 +2,7 @@
 
 module LabelAlgebra where
 
-open import Algebra.FunctionProperties
+open import Algebra
 open import Level
 open import Relation.Binary
 open import Relation.Binary.Lattice using (Supremum; Infimum)
