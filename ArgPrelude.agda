@@ -2,21 +2,19 @@ module ArgPrelude where
 
 open import Agda.Builtin.Float
 open import Data.Bool using (Bool; true; false; _∧_; _∨_)
-open import Data.Bool.Show using (show)
 open import Data.Empty
 open import Data.Float public hiding (_==_; _-_; _+_)
 open import Data.Integer hiding (_*_)
 open import Data.List
 open import Data.Maybe
 open import Data.Nat as ℕ using (suc; ℕ; _∸_; _⊔_)
-open import Data.Nat.Show
 open import Data.Product 
 open import Data.String as S using (String) renaming (_++_ to _+++_)
 open import Data.Unit
 open import Function using (id)
-open import Level renaming (zero to lzero; suc to lsuc)
+open import Level public renaming (zero to lzero; suc to lsuc)
 open import Relation.Binary
-open import Relation.Binary.PropositionalEquality using (_≡_; _≢_; refl)
+open import Relation.Binary.PropositionalEquality public using (_≡_; _≢_; refl)
 open import Relation.Nullary
 
 open import WLPretty public

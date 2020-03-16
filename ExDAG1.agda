@@ -2,22 +2,19 @@
 
 module ExDAG1 where
 
-open import Agda.Builtin.Float
 open import Data.Bool
 open import Data.Char renaming (Char to BChar)
 open import Data.Empty
 open import Data.Fin as Fin
   using (Fin; Fin′; zero; suc; #_; toℕ; _≟_)
-open import Data.Float
 open import Data.List as List using (List; []; _∷_)
 open import Data.Maybe
-open import Data.Nat as Nat using (suc; ℕ; _∸_)
+open import Data.Nat as ℕ using (suc; ℕ; _∸_)
 open import Data.Nat.Show renaming (show to ℕshow)
 open import Data.Product using (_×_; _,_; proj₁; proj₂)
 open import Data.String as S renaming (_++_ to _+++_)
 open import Data.Vec as Vec using (Vec; []; _∷_)
 open import Data.Unit
-open import Relation.Binary.PropositionalEquality using (_≡_; _≢_; refl)
 
 open import ArgPrelude 
 open import AIF
@@ -32,7 +29,7 @@ St1  = let t = "St1"
        in record { sttext = just t; stprop = mkProp t}
 St2  = let t = "St2"
        in record { sttext = just t; stprop = mkProp t}
-P3 = mkProp "St3"       
+P3   = mkProp "St3"       
 St3  = record { sttext = nothing; stprop = P3}
 ¬St3 = record { sttext = nothing; stprop = NOT P3}
 St5  = let t = "St5"
@@ -638,21 +635,4 @@ main = run (putStrLn stringToPrint)
     -- +++ "\nN7 = " +++ pprint w (val←Idx (replaceInGraph G5 (# 2) (just (LA⊤ Pref))) (# 2))
     -- +++ "\nN8 = " +++ pprint w (val←Idx (replaceInGraph G5 (# 2) (just (LA⊤ Pref))) (# 1))
     -- +++ "\nG5repl7  ======================="
-    -- +++ "\nN1 = " +++ pprint w (val←Idx (replaceInGraph G5 (# 7) (just (LA⊤ Pref))) (# 7))
-    -- +++ "\nN2 = " +++ pprint w (val←Idx (replaceInGraph G5 (# 7) (just (LA⊤ Pref))) (# 6))
-    -- +++ "\nN3 = " +++ pprint w (val←Idx (replaceInGraph G5 (# 7) (just (LA⊤ Pref))) (# 0))
-    -- +++ "\nN4 = " +++ pprint w (val←Idx (replaceInGraph G5 (# 7) (just (LA⊤ Pref))) (# 5))
-    -- +++ "\nN5 = " +++ pprint w (val←Idx (replaceInGraph G5 (# 7) (just (LA⊤ Pref))) (# 4))
-    -- +++ "\nN6 = " +++ pprint w (val←Idx (replaceInGraph G5 (# 7) (just (LA⊤ Pref))) (# 3))
-    -- +++ "\nN7 = " +++ pprint w (val←Idx (replaceInGraph G5 (# 7) (just (LA⊤ Pref))) (# 2))
-    -- +++ "\nN8 = " +++ pprint w (val←Idx (replaceInGraph G5 (# 7) (just (LA⊤ Pref))) (# 1))
-    -- +++ "\nfoldConflicts0: " +++ pprint w (foldConflicts G5 (# 0))
-    -- +++ "\nfoldConflicts1: " +++ pprint w (foldConflicts G5 (# 1))
-    -- +++ "\nfoldConflicts2: " +++ pprint w (foldConflicts G5 (# 2))
-    -- +++ "\nfoldConflicts3: " +++ pprint w (foldConflicts G5 (# 3))
-    -- +++ "\nfoldConflicts4: " +++ pprint w (foldConflicts G5 (# 4))
-    -- +++ "\nroots: " +++ "" +++ pprint w (roots¬CA G5)
-    -- +++ "\nNArgs0: " +++ "  " +++ pprint w (NArgs G5 (# 0))
-    -- +++ "\nNArgs1: " +++ "  " +++ pprint w (NArgs G5 (# 1))
-    -- +++ "\nNArgs4: " +++ "  " +++ pprint w (NArgs G5 (# 4))
-
+    -- +++ "\nN1 = "

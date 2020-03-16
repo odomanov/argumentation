@@ -1,15 +1,10 @@
 module BarinovaDAG where
 
 open import Data.Fin
-open import Data.Float using (show)
 open import Data.List
 open import Data.Maybe
-open import Data.Nat
-open import Data.Nat.Show using (show)
 open import Data.Product
 open import Data.String renaming (_++_ to _+++_)
-open import Data.Unit using (⊤; tt)
-open import Relation.Binary.PropositionalEquality using (_≡_; _≢_; refl)
 
 open import ArgPrelude 
 open import ArgSchemes
@@ -78,7 +73,7 @@ G =
               (just (PV 0.2 {refl} {refl})))
           [] 
   & context (Ln (Lni record
-                     { sttext   = nothing
+                     { sttext = nothing
                      ; stprop = mkProp "Илиада относится к литературе."
                      })
               (just (PV 0.2 {refl} {refl})))
@@ -149,75 +144,4 @@ G =
   -- a5 =
   --   let instance
   --        aa : A-от-альтернативы
-  --        aa = record
-  --          { альтернатива = record
-  --            { sttext = nothing
-  --            ; stprop = mkProp "Гомер мог быть либо слеп, либо не слеп"
-  --            }
-  --          ; неверно = S-красочные-описания-в-илиаде
-  --          ; верно = S-гомер-не-был-слепым
-  --          }
-  --   in `от-альтернативы aa
-
-  -- a6 =
-  --   let instance
-  --        aa : A-от-эксперта
-  --        aa = record
-  --          { эксперт = S-гладстон-литератор
-  --          ; говорит = record
-  --            { sttext = just ("Исследователь, подняв другие древнегреческие тексты, обнаружил, "
-  --              +++ "что ни в одном из них нет слова 'синий'.")
-  --            ; stprop = mkProp "Гладстон обнаружил, что в др.-греч. текстах нет слова 'синий'."
-  --            }
-  --          ; область = record
-  --            { sttext = nothing
-  --            ; stprop = mkProp "Древнегреческие тексты относятся к литературе"
-  --            }
-  --          ; вывод = record
-  --            { sttext = just "В древнегреческих текстах нет слова 'синий'."
-  --            ; stprop = mkProp "В древнегреческих текстах нет слова 'синий'."
-  --            }
-  --          ; Q1 = nothing
-  --          }
-  --   in `от-эксперта aa
-
-  -- a7 =
-  --   let instance
-  --        aa : A-от-примера
-  --        aa = record
-  --          { пример =
-  --              let t = "в древнегреческих текстах нет слова 'синий'."
-  --              in record { sttext = just t; stprop = mkProp t }
-  --          ; вывод = S-человечество-в-прошлом-не-различало-цвета
-  --          }
-  --   in `от-примера aa
-
-  -- a8 =
-  --   let instance
-  --        aa : A-от-причины-к-следствию
-  --        aa = record
-  --          { причинная-связь = record
-  --            { sttext = nothing
-  --            ; stprop = mkProp "Если цвет не встречают часто, то его не различают"
-  --            }
-  --          ; причина = record
-  --            { sttext = just "В природе же, действительно, синий цвет распространен мало"
-  --            ; stprop = mkProp "В природе синий цвет распространен мало"
-  --            }
-  --          ; следствие = S-человечество-не-видело-синего
-  --          }
-  --   in `от-причины-к-следствию aa
-
-
-
-
-------------------------------------------------------------------------
-
-open import ShowDAG la
-
-open import IO
-
-main = run (putStr stringToPrint)
-  where
-    stringToPrint = ""
-      +++ (pprint 110 G)
+  --        

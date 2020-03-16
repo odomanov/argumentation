@@ -6,7 +6,6 @@ open import Data.Bool
 open import Data.Empty
 open import Data.Fin as Fin
   using (Fin; Fin′; zero; suc; #_; toℕ; _≟_) 
-open import Data.Float
 open import Data.List as List using (List; []; _∷_)
 open import Data.Maybe
 open import Data.Nat as Nat using (suc; ℕ)
@@ -61,10 +60,8 @@ docNode (Ln (Lnr (mkRA p c)) v) = text "SR: "
   <> nest 4 (group (docRoles p <> line <> text "=> " <> docRole c))
   <> line <> group (text "вес   = " <> docLabel v)
 docNode (Ln (Lnc (mkCA c1 c2)) v) = text "CONFLICT"
-  -- <> nest 4 (docRole c1 <> text " --> " <> docRole c2) 
   <> line <> group (text "вес   = " <> docLabel v)
 docNode (Ln (Lnp (mkPA p1 p2)) v) = text "PREF"
-  -- <> nest 4 (docRole p1 <> text " --> " <> docRole p2)
   <> line <> group (text "вес   = " <> docLabel v)
 
 docNodes : ∀ {n} → List (Fin n × LNode) → Doc

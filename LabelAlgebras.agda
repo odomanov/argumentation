@@ -3,11 +3,8 @@
 
 module LabelAlgebras where
 
-open import Agda.Builtin.Float
 open import Data.Bool
 open import Data.Empty
-open import Data.Float
-open import Data.Integer
 open import Data.Maybe
 open import Data.Nat
 open import Data.String renaming (_++_ to _+++_)
@@ -185,10 +182,6 @@ Trust = record
   ; doc = docTrust
   }
 
-TV : (x : Float) → {p1 : 0.0 [≤] x ≡ true} → {p2 : x [≤] 1.0 ≡ true}
-     → LabelAlgebra.Carrier Trust
-TV x {p1} {p2} = record { value = x; 0≤v = p1; v≤1 = p2 }
-
 
 
 
@@ -271,9 +264,7 @@ Pref = record
   ; doc = docPref
   }
 
-PV : (x : Float) → {p1 : 0.0 [≤] x ≡ true} → {p2 : x [≤] 1.0 ≡ true}
-     → LabelAlgebra.Carrier Pref
-PV x {p1} {p2} = record { value = x; 0≤v = p1; v≤1 = p2 }
+
 
 -------------------------------------------------------
 -- Lukasiewicz Algebra
@@ -354,7 +345,4 @@ Luk = record
   ; doc = docLuk
   }
 
-LV : (x : Float) → {p1 : 0.0 [≤] x ≡ true} → {p2 : x [≤] 1.0 ≡ true}
-     → LabelAlgebra.Carrier Luk
-LV x {p1} {p2} = record { value = x; 0≤v = p1; v≤1 = p2 }
 
