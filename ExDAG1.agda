@@ -469,170 +469,181 @@ w = 110
 ws = 50 -- "section" title width
 
 printG1 : AGraph 4 → (∀ {n} → AGraph n → Fin n → MC) → String
-printG1 g f = "\nN1  = " +++ pprint w (f g (# 3))
-          +++ "  N2  = " +++ pprint w (f g (# 2))
-          +++ "\nN3  = " +++ pprint w (f g (# 0))
-          +++ "  N4  = " +++ pprint w (f g (# 1))
+printG1 g f = "\nN1  = " +++ pprint (f g (# 3))
+          +++ "  N2  = " +++ pprint (f g (# 2))
+          +++ "\nN3  = " +++ pprint (f g (# 0))
+          +++ "  N4  = " +++ pprint (f g (# 1))
 printG2 : AGraph 6 → (∀ {n} → AGraph n → Fin n → MC) → String
-printG2 g f = "\nN1  = " +++ pprint w (f g (# 5))
-          +++ "  N2  = " +++ pprint w (f g (# 4))
-          +++ "\nN3  = " +++ pprint w (f g (# 0))
-          +++ "  N4  = " +++ pprint w (f g (# 3))
-          +++ "\nN5  = " +++ pprint w (f g (# 2))
-          +++ "  N6  = " +++ pprint w (f g (# 1))
+printG2 g f = "\nN1  = " +++ pprint (f g (# 5))
+          +++ "  N2  = " +++ pprint (f g (# 4))
+          +++ "\nN3  = " +++ pprint (f g (# 0))
+          +++ "  N4  = " +++ pprint (f g (# 3))
+          +++ "\nN5  = " +++ pprint (f g (# 2))
+          +++ "  N6  = " +++ pprint (f g (# 1))
 printG4 : AGraph 8 → (∀ {n} → AGraph n → Fin n → MC) → String
-printG4 g f = "\nN1 = " +++ pprint w (f g (# 7))
-          +++ "  N2 = " +++ pprint w (f g (# 6))
-          +++ "\nN3 = " +++ pprint w (f g (# 0))
-          +++ "  N4 = " +++ pprint w (f g (# 5))
-          +++ "\nN5 = " +++ pprint w (f g (# 4))
-          +++ "  N6 = " +++ pprint w (f g (# 3))
-          +++ "\nN7 = " +++ pprint w (f g (# 2))
-          +++ "  N8 = " +++ pprint w (f g (# 1))
+printG4 g f = "\nN1 = " +++ pprint (f g (# 7))
+          +++ "  N2 = " +++ pprint (f g (# 6))
+          +++ "\nN3 = " +++ pprint (f g (# 0))
+          +++ "  N4 = " +++ pprint (f g (# 5))
+          +++ "\nN5 = " +++ pprint (f g (# 4))
+          +++ "  N6 = " +++ pprint (f g (# 3))
+          +++ "\nN7 = " +++ pprint (f g (# 2))
+          +++ "  N8 = " +++ pprint (f g (# 1))
 printG5 : AGraph 10 → (∀ {n} → AGraph n → Fin n → MC) → String
-printG5 g f = "\nN1  = " +++ pprint w (f g (# 9))
-          +++ "  N2  = " +++ pprint w (f g (# 8))
-          +++ "\nN3  = " +++ pprint w (f g (# 4))
-          +++ "  N4  = " +++ pprint w (f g (# 7))
-          +++ "\nN5  = " +++ pprint w (f g (# 6))
-          +++ "  N6  = " +++ pprint w (f g (# 5))
-          +++ "\nN7  = " +++ pprint w (f g (# 3))
-          +++ "  N8  = " +++ pprint w (f g (# 2))
-          +++ "\n-N3 = " +++ pprint w (f g (# 1))
-          +++ "  CN1 = " +++ pprint w (f g (# 0))
+printG5 g f = "\nN1  = " +++ pprint (f g (# 9))
+          +++ "  N2  = " +++ pprint (f g (# 8))
+          +++ "\nN3  = " +++ pprint (f g (# 4))
+          +++ "  N4  = " +++ pprint (f g (# 7))
+          +++ "\nN5  = " +++ pprint (f g (# 6))
+          +++ "  N6  = " +++ pprint (f g (# 5))
+          +++ "\nN7  = " +++ pprint (f g (# 3))
+          +++ "  N8  = " +++ pprint (f g (# 2))
+          +++ "\n-N3 = " +++ pprint (f g (# 1))
+          +++ "  CN1 = " +++ pprint (f g (# 0))
 printG6 : AGraph 11 → (∀ {n} → AGraph n → Fin n → MC) → String
-printG6 g f = "\nN1  = " +++ pprint w (f g (# 10))
-          +++ "  N2  = " +++ pprint w (f g (# 9))
-          +++ "  N3  = " +++ pprint w (f g (# 5))
-          +++ "\nN4  = " +++ pprint w (f g (# 8))
-          +++ "  N5  = " +++ pprint w (f g (# 7))
-          +++ "  N6  = " +++ pprint w (f g (# 6))
-          +++ "\nN7  = " +++ pprint w (f g (# 4))
-          +++ "  N8  = " +++ pprint w (f g (# 3))
-          +++ "  -N3 = " +++ pprint w (f g (# 2))
-          +++ "\nCN1 = " +++ pprint w (f g (# 1))
-          +++ "  CN2 = " +++ pprint w (f g (# 0))
+printG6 g f = "\nN1  = " +++ pprint (f g (# 10))
+          +++ "  N2  = " +++ pprint (f g (# 9))
+          +++ "  N3  = " +++ pprint (f g (# 5))
+          +++ "\nN4  = " +++ pprint (f g (# 8))
+          +++ "  N5  = " +++ pprint (f g (# 7))
+          +++ "  N6  = " +++ pprint (f g (# 6))
+          +++ "\nN7  = " +++ pprint (f g (# 4))
+          +++ "  N8  = " +++ pprint (f g (# 3))
+          +++ "  -N3 = " +++ pprint (f g (# 2))
+          +++ "\nCN1 = " +++ pprint (f g (# 1))
+          +++ "  CN2 = " +++ pprint (f g (# 0))
+printG7 : AGraph 4 → (∀ {n} → AGraph n → Fin n → MC) → String
+printG7 g f = "\nN1  = " +++ pprint (f g (# 3))
+          +++ "  N2  = " +++ pprint (f g (# 2))
+          +++ "\nCN1 = " +++ pprint (f g (# 1))
+          +++ "  CN2 = " +++ pprint (f g (# 0))
 
 main = run (putStrLn stringToPrint)
   where
   stringToPrint = S.replicate ws '-'
-    -- +++ ppretty ws (docSection ws "G1 orig")
+    -- +++ render (docSection ws "G1 orig")
     -- +++ printG1 G1 val←Idx
-    -- +++ ppretty ws (docSection ws "G1 computed")
+    -- +++ render (docSection ws "G1 computed")
     -- +++ printG1 G1 val
-    -- +++ ppretty ws (docSection ws "G10")
+    -- +++ render (docSection ws "G10")
     -- +++ printG1 G10 val←Idx
-    -- +++ ppretty ws (docSection ws "G11")
+    -- +++ render (docSection ws "G11")
     -- +++ printG1 G11 val←Idx
-    -- +++ ppretty ws (docSection ws "G12")
+    -- +++ render (docSection ws "G12")
     -- +++ printG1 G12 val←Idx
-    -- +++ ppretty ws (docSection ws "G13")
+    -- +++ render (docSection ws "G13")
     -- +++ printG1 G13 val←Idx
-    -- +++ ppretty ws (docSection ws "G14")
+    -- +++ render (docSection ws "G14")
     -- +++ printG1 G14 val←Idx
-    -- +++ ppretty ws (docSection ws "G1lim")
+    -- +++ render (docSection ws "G1lim")
     -- +++ printG1 G1lim val←Idx
 
-    -- +++ ppretty ws (docSection ws "G2 orig")
+    -- +++ render (docSection ws "G2 orig")
     -- +++ printG2 G2 val←Idx
-    -- +++ ppretty ws (docSection ws "G2 computed")
+    -- +++ render (docSection ws "G2 computed")
     -- +++ printG2 G2 val
-    -- +++ ppretty ws (docSection ws "G20")
+    -- +++ render (docSection ws "G20")
     -- +++ printG2 G20 val←Idx
-    -- -- +++ ppretty ws (docSection ws "G21")
+    -- -- +++ render (docSection ws "G21")
     -- -- +++ printG2 G21 val←Idx
-    -- -- +++ ppretty ws (docSection ws "G22")
+    -- -- +++ render (docSection ws "G22")
     -- -- +++ printG2 G22 val←Idx
-    -- -- +++ ppretty ws (docSection ws "G23")
+    -- -- +++ render (docSection ws "G23")
     -- -- +++ printG2 G23 val←Idx
-    -- -- +++ ppretty ws (docSection ws "G24")
+    -- -- +++ render (docSection ws "G24")
     -- -- +++ printG2 G24 val←Idx
-    -- +++ ppretty ws (docSection ws "G2lim")
+    -- +++ render (docSection ws "G2lim")
     -- +++ printG2 G2lim val←Idx
 
-    -- +++ pprint 110 G2
+    -- +++ pprint G2
     
-    -- +++ ppretty ws (docSection ws "G4 orig")
+    -- +++ render (docSection ws "G4 orig")
     -- +++ printG4 G4 val←Idx
-    -- +++ ppretty ws (docSection ws "G4 computed")
+    -- +++ render (docSection ws "G4 computed")
     -- +++ printG4 G4 val
-    -- +++ ppretty ws (docSection ws "G40")
+    -- +++ render (docSection ws "G40")
     -- +++ printG4 G40 val←Idx
-    -- +++ ppretty ws (docSection ws "G41")
+    -- +++ render (docSection ws "G41")
     -- +++ printG4 G41 val←Idx
-    -- +++ ppretty ws (docSection ws "G4lim")
+    -- +++ render (docSection ws "G4lim")
     -- +++ printG4 G4lim val←Idx
 
-    -- +++ ppretty ws (docSection ws "G5 orig")
+    -- +++ render (docSection ws "G5 orig")
     -- +++ printG5 G5 val←Idx
-    -- +++ ppretty ws (docSection ws "G5 computed")
+    -- +++ render (docSection ws "G5 computed")
     -- +++ printG5 G5 val
-    -- +++ ppretty ws (docSection ws "G50")
+    -- +++ render (docSection ws "G50")
     -- +++ printG5 G50 val←Idx
-    -- +++ ppretty ws (docSection ws "G51")
+    -- +++ render (docSection ws "G51")
     -- +++ printG5 G51 val←Idx
-    -- +++ ppretty ws (docSection ws "G52")
+    -- +++ render (docSection ws "G52")
     -- +++ printG5 G52 val←Idx
-    -- +++ ppretty ws (docSection ws "G53")
+    -- +++ render (docSection ws "G53")
     -- +++ printG5 G53 val←Idx
-    -- +++ ppretty ws (docSection ws "G54")
+    -- +++ render (docSection ws "G54")
     -- +++ printG5 G54 val←Idx
-    -- +++ ppretty ws (docSection ws "G5100")
+    -- +++ render (docSection ws "G5100")
     -- +++ printG5 G5100 val←Idx
-    -- +++ ppretty ws (docSection ws "G5200")
+    -- +++ render (docSection ws "G5200")
     -- +++ printG5 G5200 val←Idx
 
-    -- +++ (pprint 110 G5)
+    -- +++ (pprint G5)
 
-    +++ ppretty ws (docSection ws "G6 orig")
-    +++ printG6 G6 val←Idx
-    +++ ppretty ws (docSection ws "G6 computed")
-    +++ printG6 G6 val
-    +++ ppretty ws (docSection ws "G60")
-    +++ printG6 G60 val←Idx
-    +++ ppretty ws (docSection ws "G61")
-    +++ printG6 G61 val←Idx
-    +++ ppretty ws (docSection ws "G62")
-    +++ printG6 G62 val←Idx
-    +++ ppretty ws (docSection ws "G63")
-    +++ printG6 G63 val←Idx
-    +++ ppretty ws (docSection ws "G64")
-    +++ printG6 G64 val←Idx
-    +++ ppretty ws (docSection ws "G6100")
-    +++ printG6 G6100 val←Idx
-    +++ ppretty ws (docSection ws "G6200")
-    +++ printG6 G6200 val←Idx
+    -- +++ render (docSection ws "G6 orig")
+    -- +++ printG6 G6 val←Idx
+    -- +++ render (docSection ws "G6 computed")
+    -- +++ printG6 G6 val
+    -- +++ render (docSection ws "G60")
+    -- +++ printG6 G60 val←Idx
+    -- +++ render (docSection ws "G61")
+    -- +++ printG6 G61 val←Idx
+    -- +++ render (docSection ws "G62")
+    -- +++ printG6 G62 val←Idx
+    -- +++ render (docSection ws "G63")
+    -- +++ printG6 G63 val←Idx
+    -- +++ render (docSection ws "G64")
+    -- +++ printG6 G64 val←Idx
+    -- +++ render (docSection ws "G6100")
+    -- +++ printG6 G6100 val←Idx
+    -- +++ render (docSection ws "G6200")
+    -- +++ printG6 G6200 val←Idx
 
-    -- +++ (pprint 110 G6)
+    -- +++ (pprint G6)
 
-    -- +++ "\nN1+N2 = " +++ pprint w (val←Ctx G2 (# 5) ⟪ _⊕_ Pref ⟫ val←Ctx G2 (# 4))
-    -- +++ "\nN4+N6 = " +++ pprint w (val←Ctx G2 (# 3) ⟪ _⊕_ Pref ⟫ val←Ctx G2 (# 1))
-    -- +++ "\nN1+N5 = " +++ pprint w (val←Ctx G2 (# 5) ⟪ _⊕_ Pref ⟫ val←Ctx G2 (# 2))
-    -- +++ "\nN1.N2 = " +++ pprint w (val←Ctx G2 (# 5) ⟪ _⊙_ Pref ⟫ val←Ctx G2 (# 4))
-    -- +++ "\nN4.N6 = " +++ pprint w (val←Ctx G2 (# 3) ⟪ _⊙_ Pref ⟫ val←Ctx G2 (# 1))
-    -- +++ "\nN1.N5 = " +++ pprint w (val←Ctx G2 (# 5) ⟪ _⊙_ Pref ⟫ val←Ctx G2 (# 2))
-    -- -- +++ "\nNConflicts 0: " +++ "" +++ pprint w (NConflicts G5 (# 0))
-    -- -- +++ "\nNConflicts 1: " +++ "" +++ pprint w (NConflicts G5 (# 1))
-    -- -- +++ "\nNConflicts 2: " +++ "" +++ pprint w (NConflicts G5 (# 2))
-    -- -- +++ "\nNConflicts 3: " +++ "" +++ pprint w (NConflicts G5 (# 3))
-    -- -- +++ "\nNConflicts 4: " +++ "" +++ pprint w (NConflicts G5 (# 4))
+    +++ render (docSection ws "G7 orig")
+    +++ printG7 G7 val←Idx
+    +++ render (docSection ws "G7 computed")
+    +++ printG7 G7 val
+    +++ render (docSection ws "G70")
+    +++ printG7 G70 val←Idx
+    +++ render (docSection ws "G71")
+    +++ printG7 G71 val←Idx
+    +++ render (docSection ws "G72")
+    +++ printG7 G72 val←Idx
+    +++ render (docSection ws "G73")
+    +++ printG7 G73 val←Idx
+    +++ render (docSection ws "G74")
+    +++ printG7 G74 val←Idx
+    +++ render (docSection ws "G7100")
+    +++ printG7 G7100 val←Idx
+    +++ render (docSection ws "G7200")
+    +++ printG7 G7200 val←Idx
+
+    +++ (pprint G7)
+
+    -- +++ "\nN1+N2 = " +++ pprint (val←Ctx G2 (# 5) ⟪ _⊕_ Pref ⟫ val←Ctx G2 (# 4))
+    -- +++ "\nN4+N6 = " +++ pprint (val←Ctx G2 (# 3) ⟪ _⊕_ Pref ⟫ val←Ctx G2 (# 1))
+    -- +++ "\nN1+N5 = " +++ pprint (val←Ctx G2 (# 5) ⟪ _⊕_ Pref ⟫ val←Ctx G2 (# 2))
+    -- +++ "\nN1.N2 = " +++ pprint (val←Ctx G2 (# 5) ⟪ _⊙_ Pref ⟫ val←Ctx G2 (# 4))
+    -- +++ "\nN4.N6 = " +++ pprint (val←Ctx G2 (# 3) ⟪ _⊙_ Pref ⟫ val←Ctx G2 (# 1))
+    -- +++ "\nN1.N5 = " +++ pprint (val←Ctx G2 (# 5) ⟪ _⊙_ Pref ⟫ val←Ctx G2 (# 2))
+    -- -- +++ "\nNConflicts 0: " +++ "" +++ pprint (NConflicts G5 (# 0))
+    -- -- +++ "\nNConflicts 1: " +++ "" +++ pprint (NConflicts G5 (# 1))
+    -- -- +++ "\nNConflicts 2: " +++ "" +++ pprint (NConflicts G5 (# 2))
+    -- -- +++ "\nNConflicts 3: " +++ "" +++ pprint (NConflicts G5 (# 3))
+    -- -- +++ "\nNConflicts 4: " +++ "" +++ pprint (NConflicts G5 (# 4))
     -- +++ "\nG5repl0  ======================="
-    -- +++ "\nN1 = " +++ pprint w (val←Idx (replaceInGraph G5 (# 0) (just (LA⊤ Pref))) (# 7))
-    -- +++ "\nN2 = " +++ pprint w (val←Idx (replaceInGraph G5 (# 0) (just (LA⊤ Pref))) (# 6))
-    -- +++ "\nN3 = " +++ pprint w (val←Idx (replaceInGraph G5 (# 0) (just (LA⊤ Pref))) (# 0))
-    -- +++ "\nN4 = " +++ pprint w (val←Idx (replaceInGraph G5 (# 0) (just (LA⊤ Pref))) (# 5))
-    -- +++ "\nN5 = " +++ pprint w (val←Idx (replaceInGraph G5 (# 0) (just (LA⊤ Pref))) (# 4))
-    -- +++ "\nN6 = " +++ pprint w (val←Idx (replaceInGraph G5 (# 0) (just (LA⊤ Pref))) (# 3))
-    -- +++ "\nN7 = " +++ pprint w (val←Idx (replaceInGraph G5 (# 0) (just (LA⊤ Pref))) (# 2))
-    -- +++ "\nN8 = " +++ pprint w (val←Idx (replaceInGraph G5 (# 0) (just (LA⊤ Pref))) (# 1))
-    -- +++ "\nG5repl2  ======================="
-    -- +++ "\nN1 = " +++ pprint w (val←Idx (replaceInGraph G5 (# 2) (just (LA⊤ Pref))) (# 7))
-    -- +++ "\nN2 = " +++ pprint w (val←Idx (replaceInGraph G5 (# 2) (just (LA⊤ Pref))) (# 6))
-    -- +++ "\nN3 = " +++ pprint w (val←Idx (replaceInGraph G5 (# 2) (just (LA⊤ Pref))) (# 0))
-    -- +++ "\nN4 = " +++ pprint w (val←Idx (replaceInGraph G5 (# 2) (just (LA⊤ Pref))) (# 5))
-    -- +++ "\nN5 = " +++ pprint w (val←Idx (replaceInGraph G5 (# 2) (just (LA⊤ Pref))) (# 4))
-    -- +++ "\nN6 = " +++ pprint w (val←Idx (replaceInGraph G5 (# 2) (just (LA⊤ Pref))) (# 3))
-    -- +++ "\nN7 = " +++ pprint w (val←Idx (replaceInGraph G5 (# 2) (just (LA⊤ Pref))) (# 2))
-    -- +++ "\nN8 = " +++ pprint w (val←Idx (replaceInGraph G5 (# 2) (just (LA⊤ Pref))) (# 1))
-    -- +++ "\nG5repl7  ======================="
-    -- +++ "\nN1 = "
+    -- +++ "\nN1 = " +++ pprint (val←Idx (replaceInGraph G5 (# 0) (just (LA⊤ Pref))) (# 7))
+    -- +++ "\nN2 = " +++ pprint (val←Idx (replaceInGraph G5 (# 0) (just (LA⊤ Pref))) (# 6))
+    -- +++ "\nN3 = " +++ pprint (val←Idx (replaceInGraph G5 (# 0) (just (LA⊤ Pref))) (# 0))
+    -- +++ "\nN4 = " +++ pprint (val←Idx (r

@@ -11,7 +11,7 @@ open import Data.Maybe
 open import Data.Nat as Nat using (suc; ℕ)
 open import Data.Nat.Show renaming (show to ℕshow)
 open import Data.Product using (_×_; _,_; proj₁; proj₂)
-open import Data.String renaming (_++_ to _+++_)
+open import Data.String as S renaming (_++_ to _+++_)
 open import Data.Vec as Vec using (Vec; []; _∷_)
 open import Data.Unit
 open import Relation.Binary.PropositionalEquality using (_≡_; _≢_; refl)
@@ -20,7 +20,6 @@ open import ArgPrelude
 open import AIF
 open import LabelAlgebras
 open import ArgSchemes
-open import WLPretty
 
 open import DAG la
 
@@ -30,7 +29,7 @@ docRole (role s) = text s
 docRoles : List Role → Doc
 docRoles [] = empty
 docRoles (x ∷ []) = docRole x
-docRoles (x ∷ xs) = docRole x <> text ", " <> line <> docRoles xs
+docRoles (x ∷ xs) = docRole x <> text ", " <> newline <> docRoles xs
 
 docProp : Proposition → Doc
 docProp (mkProp s) = string s
@@ -41,7 +40,7 @@ docProp (x OR  y) = docProp x <> text " OR " <> docProp y
 docStmt : Statement → Doc
 docStmt (st nothing p) = text "PROP = " <> nest 7 (docProp p)
 docStmt (st (just tx) p) = text "TEXT = " <> nest 7 (string tx)
-                                  <> line <> nest 7 (ppp p)
+                                  <> newline <> nest 7 (ppp p)
   where
   ppp : Proposition → Doc
   ppp (mkProp t) with tx == t
@@ -55,14 +54,14 @@ docLabel (just x) = (doc la) x
 
 docNode : LNode → Doc
 docNode (Ln (Lni s) v) = text "I: " <> nest 3 (docStmt s)
-  <> line <> group (text "вес   = " <> docLabel v)
+  <> newline <> (text "вес   = " <> docLabel v)
 docNode (Ln (Lnr (mkRA p c)) v) = text "SR: "
-  <> nest 4 (group (docRoles p <> line <> text "=> " <> docRole c))
-  <> line <> group (text "вес   = " <> docLabel v)
+  <> nest 4 ((docRoles p <> newline <> text "=> " <> docRole c))
+  <> newline <> (text "вес   = " <> docLabel v)
 docNode (Ln (Lnc (mkCA c1 c2)) v) = text "CONFLICT"
-  <> line <> group (text "вес   = " <> docLabel v)
+  <> newline <> (text "вес   = " <> docLabel v)
 docNode (Ln (Lnp (mkPA p1 p2)) v) = text "PREF"
-  <> line <> group (text "вес   = " <> docLabel v)
+  <> newline <> (text "вес   = " <> docLabel v)
 
 docNodes : ∀ {n} → List (Fin n × LNode) → Doc
 docNodes [] = empty
@@ -71,19 +70,24 @@ docNodes ((i , nd) ∷ xs) = text ((ℕshow (toℕ i)) +++ " : ")
 
 docSucs : ∀ {n} → List (Role × Fin n) → Doc
 docSucs [] = empty
-docSucs ((r , i) ∷ []) = group (docRole r <> text (":" +++ ℕshow (toℕ i)))
-docSucs ((r , i) ∷ xs) = group (docRole r <> text (":" +++ ℕshow (toℕ i) +++ ", ")
-                                <> line <> docSucs xs)
+docSucs ((r , i) ∷ []) = (docRole r <> text (":" +++ ℕshow (toℕ i)))
+docSucs ((r , i) ∷ xs) = (docRole r <> text (":" +++ ℕshow (toℕ i) +++ ", ")
+                                <> newline <> docSucs xs)
 
 docCtx : ∀ {n} → AContext n → Doc
 docCtx (context nd [])   = nest 2 (docNode nd)
 docCtx (context nd sucs) = nest 2 (docNode nd)
-  <> nest 2 (line <> text "связи = ( " <> nest 10 (docSucs sucs) <> text " )")
+  <> nest 2 (newline <> text "связи = ( " <> nest 10 (docSucs sucs) <> text " )")
 
 docGraph : ∀ {n} → AGraph n → Doc
 docGraph ∅ = empty 
-docGraph (ctx & g) = line <> text "& " <> docCtx ctx <> docGraph g
+docGraph (ctx & g) = newline <> text "& " <> docCtx ctx <> docGraph g
 
+docMC : MC → Doc
+docMC nothing  = text (" - ") <> spaces 7
+docMC (just x) = text s <> spaces (0 Nat.⊔ (10 Nat.∸ S.length s))
+  where
+  s = render ((doc la) x)
 
 instance
   ppRole : Pretty Role
@@ -106,3 +110,8 @@ instance
   pppGraph : ∀ {n} → PPrint (AGraph n)
   prettytype {{pppGraph}} = ppGraph
   
+  ppMC : Pretty MC
+  pretty {{ppMC}} = docMC
+  pppMC : PPrint MC
+  prettytype {{pppMC}} = ppMC
+

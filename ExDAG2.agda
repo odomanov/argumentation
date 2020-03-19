@@ -127,47 +127,43 @@ w = 110
 ws = 50 -- "section" title width
 
 printABC : AGraph 6 → (AGraph 6 → Fin 6 → MC) → String
-printABC g f = "\nA = " +++ pprint w (f g (# 5))
-           +++ "  B = " +++ pprint w (f g (# 4))
-           +++ "  C = " +++ pprint w (f g (# 3))
+printABC g f = "\nA = " +++ pprint (f g (# 5))
+           +++ "  B = " +++ pprint (f g (# 4))
+           +++ "  C = " +++ pprint (f g (# 3))
 
 main = run (putStrLn stringToPrint)
   where
-  stringToPrint = "--------------------------------------------"
-    +++ ppretty ws (docSection ws "\nG orig")
+  stringToPrint = replicate ws '-'
+    +++ render (docSection ws "G orig")
     +++ printABC G val←Idx
-    +++ ppretty ws (docSection ws "G computed")
+    +++ render (docSection ws "G computed")
     +++ printABC G val
-    +++ ppretty ws (docSection ws "G0")
+    +++ render (docSection ws "G0")
     +++ printABC G0 val←Idx
-    +++ ppretty ws (docSection ws "G1")
+    +++ render (docSection ws "G1")
     +++ printABC G1 val←Idx
-    +++ ppretty ws (docSection ws "G2")
+    +++ render (docSection ws "G2")
     +++ printABC G2 val←Idx
-    +++ ppretty ws (docSection ws "G3")
+    +++ render (docSection ws "G3")
     +++ printABC G3 val←Idx
-    +++ ppretty ws (docSection ws "G4")
+    +++ render (docSection ws "G4")
     +++ printABC G4 val←Idx
-    +++ ppretty ws (docSection ws "G5")
+    +++ render (docSection ws "G5")
     +++ printABC G5 val←Idx
-    +++ ppretty ws (docSection ws "G6")
+    +++ render (docSection ws "G6")
     +++ printABC G6 val←Idx
-    +++ ppretty ws (docSection ws "G7")
+    +++ render (docSection ws "G7")
     +++ printABC G7 val←Idx
-    +++ ppretty ws (docSection ws "G100")
+    +++ render (docSection ws "G100")
     +++ printABC G100 val←Idx
-    +++ ppretty ws (docSection ws "G200")
+    +++ render (docSection ws "G200")
     +++ printABC G200 val←Idx
 
-    -- +++ ppretty ws (docSection ws "foldConflicts:G")
+    -- +++ render (docSection ws "foldConflicts:G")
     -- +++ printABC G foldConflicts
-    -- +++ ppretty ws (docSection ws "foldConflicts:G5")
+    -- +++ render (docSection ws "foldConflicts:G5")
     -- +++ printABC G5 foldConflicts
-    -- +++ ppretty ws (docSection ws "¬foldConflicts:G5")
+    -- +++ render (docSection ws "¬foldConflicts:G5")
     -- +++ printABC G5 ¬foldConflicts
-    -- +++ ppretty ws (docSection ws "val+conflicts:G5")
-    -- +++ printABC G5 (val+conflicts G0)
-    -- +++ ppretty ws (docSection ws "iterationVal:G5")
-    -- +++ printABC G5 (iterationVal G0)
-
-    +++ (pprint 110 G)
+    -- +++ render (docSection ws "val+conflicts:G5")
+    -- +++ printABC

@@ -1,23 +1,25 @@
 module ArgPrelude where
 
 open import Agda.Builtin.Float
-open import Data.Bool using (Bool; true; false; _∧_; _∨_)
+open import Data.Bool using (Bool; true; false; _∧_; _∨_; if_then_else_)
+open import Data.Char renaming (Char to BChar) 
 open import Data.Empty
 open import Data.Float public hiding (_==_; _-_; _+_)
 open import Data.Integer hiding (_*_)
-open import Data.List
+open import Data.List as L
 open import Data.Maybe
 open import Data.Nat as ℕ using (suc; ℕ; _∸_; _⊔_)
+open import Data.Nat.Show renaming (show to ℕshow)
 open import Data.Product 
 open import Data.String as S using (String) renaming (_++_ to _+++_)
 open import Data.Unit
-open import Function using (id)
+open import Function using (id; _∘_)
 open import Level public renaming (zero to lzero; suc to lsuc)
 open import Relation.Binary
 open import Relation.Binary.PropositionalEquality public using (_≡_; _≢_; refl)
 open import Relation.Nullary
 
-open import WLPretty public
+open import Pretty public
 
 -- boolean equality
 
@@ -146,9 +148,10 @@ x [≤] y = primFloatLess x y ∨ primFloatEquality x y
 
 -- Some Docs
 
-docSection : ℕ → String → Doc
-docSection n s = line <> text (s +++ "  ")
-                 <> text (S.replicate (0 ℕ.⊔ ((n ∸ 2) ∸ S.length s)) '=')
+docSection : ℕ → String → Doc 
+docSection n s = newline <> text hd <> text (S.replicate (0 ℕ.⊔ (n ∸ S.length hd)) '=')
+  where
+  hd = "  " +++ s +++ " "
 
 docFloat : Float → Doc
 docFloat x = text (Data.Float.show x)

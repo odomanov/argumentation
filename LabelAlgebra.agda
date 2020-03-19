@@ -9,7 +9,7 @@ open import Relation.Binary.Lattice using (Supremum; Infimum)
 open import Relation.Binary.PropositionalEquality using (_≡_; _≢_; refl)
 open import Relation.Nullary
 
-open import WLPretty
+open import ArgPrelude using (Doc)
 
 record IsLabelAlgebra {c ℓ₁ ℓ₂} {A : Set c}
                          (_≈_ : Rel A ℓ₁)

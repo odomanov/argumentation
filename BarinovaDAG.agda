@@ -145,3 +145,14 @@ G =
   --   let instance
   --        aa : A-от-альтернативы
   --        
+
+------------------------------------------------------------------------
+
+open import ShowDAG la
+
+open import IO
+
+main = run (putStr stringToPrint)
+  where
+    stringToPrint = ""
+      +++ pprint G
