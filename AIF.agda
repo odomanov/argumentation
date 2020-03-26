@@ -79,9 +79,17 @@ data Role    : Set where
 все-признают = role "все-признают"
 поддержка    = role "поддержка"
 атака        = role "атака"
+причина      = role "причина"
+причинная-связь = role "причинная-связь"
+следствие    = role "следствие"
 -- CA-nodes
 conflicting  = role "conflicting"
 conflicted   = role "conflicted"
+-- Logic schemes
+AND1         = role "AND1"
+AND2         = role "AND2"
+OR1          = role "OR1"
+OR2          = role "OR2"
 
 Roles : List Role
 Roles = 
@@ -97,6 +105,10 @@ Roles =
   атака      ∷
   conflicting ∷
   conflicted  ∷
+  AND1 ∷
+  AND2 ∷
+  OR1 ∷
+  OR2 ∷
   []
 
 _≡R_ : Role → Role → Set
@@ -124,6 +136,18 @@ _≡LR_ : List Role → List Role → Set
 [] ≡LR (_ ∷ _)  = ⊥
 x ≡LR y = (∀ z → (z ∈ x → z ∈ y)) × (∀ z → (z ∈ y → z ∈ x))
 
+-- _≟LR_ : Decidable _≡LR_
+-- x ≟LR y = _≡?_  ? --_≟R_ x y -- ≡-dec ? --? --x y
+-- [] ≟LR [] = yes tt
+-- (_ ∷ _) ≟LR [] = no λ()
+-- [] ≟LR (_ ∷ _) = no λ()
+-- (x ∷ xs) ≟LR (y ∷ ys) with x ≟R y | xs ≟LR ys
+-- ... | yes p | yes ps = true because (ofʸ ((λ z x₁ → {!p!}) , {!!})) --yes (p , ps)
+-- ... | yes _ | no ps = {!!}
+-- -- ... | (role )p = yes {!p!}
+-- -- x ≟LR y = ∀ (z : Role) → (z ∈? x ⇔ z ∈? y)
+-- -- x ≟LR y = (∀ z → ((z ∈? x) → (_∈?_ z y))) × (∀ z → ((z ∈? y) → (_∈?_ z x)))
+-- -- x ≟LR y = (All (λ z → z ∈? y) x) × (All (λ z → z ∈? x) y)
 
 instance
   LREq : BEq (List Role) (List Role)
