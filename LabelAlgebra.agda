@@ -32,12 +32,12 @@ record IsLabelAlgebra {c ℓ₁ ℓ₂} {A : Set c}
     ⊙-comm    : Commutative _≈_ _⊙_
     ⊙-mono    : ∀ p q r → p ≤ q → (p ⊙ r) ≤ (q ⊙ r) --  Monotone 
     ⊙-assoc   : Associative _≈_ _⊙_
-    ⊙-neut    : ∀ (a) → (a ⊙ ⊤) ≈ a
+    ⊙-neut    : ∀ a → (a ⊙ ⊤) ≈ a
     -- aggregation    
     ⊕-comm    : Commutative _≈_ _⊕_
     ⊕-mono    : ∀ p q r → p ≤ q → (p ⊕ r) ≤ (q ⊕ r) --  Monotone 
     ⊕-assoc   : Associative _≈_ _⊕_
-    ⊕-neut    : ∀ (a) → (a ⊕ ⊥) ≈ a
+    ⊕-neut    : ∀ a → (a ⊕ ⊥) ≈ a
     -- conflict
     -- ⊖-1       : ∀ (a b) → b ≤ a → ¬ a ≈ b → (a ⊖ b) ≤ a
     -- ⊖-2       : ∀ (a b) → a ≤ b → (a ⊖ b) ≈ ⊥
