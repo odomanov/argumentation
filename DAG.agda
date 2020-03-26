@@ -16,7 +16,7 @@ open import Data.Nat as ℕ renaming (zero to ℕzero; suc to ℕsuc)
 open import Data.Nat.Properties
 open import Data.Product using (_×_; _,_; proj₁; proj₂)
 open import Data.String as S renaming (_++_ to _+++_)
-open import Data.Vec as Vec using (Vec; []; _∷_)
+open import Data.Vec as V renaming ([] to []v; _∷_ to _∷v_) hiding ([_]; foldr) 
 open import Data.Unit using (⊤)
 open import Function using (_∘_; _$_; id)
 open import Relation.Binary.PropositionalEquality using (_≡_; _≢_; refl; cong)
@@ -29,11 +29,14 @@ open import Relation.Nullary using (yes; no)
 open import ArgPrelude 
 open import AIF
 
-LNode = Node {la = la}
-AContext = Context LNode Role   -- argumentation context
-AGraph = Graph LNode Role       -- argumentation graph     
+ANode = LNode {la = la}
+AContext = Context ANode Role   -- argumentation context
+AGraph = Graph ANode Role       -- argumentation graph     
+AArg = Argument {la = la}
 
 MC = Maybe (Carrier la)
+MC⊥ = just (LA⊥ la)
+MC⊤ = just (LA⊤ la)
 
 -- applying a binary operation to the Maybe label (TODO: rewrite with >>=)
 _⟪_⟫_ : MC → ((Carrier la) → (Carrier la) → (Carrier la)) → MC → MC
@@ -48,8 +51,10 @@ _ ⟪ _ ⟫ _ = nothing
 
 
 -- δi-th graph relative to i  
-_[_>_] : ∀ {n} → AGraph (ℕsuc n) → (i : Fin (ℕsuc n)) → (δi : Fin (n - i))
-         → AGraph _
+_[_>_] : ∀ {n} → AGraph (ℕsuc n)
+               → (i : Fin (ℕsuc n))
+               → (δi : Fin (n - i))
+               → AGraph _
 g [ i > δi ] = Ac.tail (g [ i ]) [ δi ]
 
 -- i-th context
@@ -57,9 +62,11 @@ _!_ : ∀ {n} → AGraph n → (i : Fin n) → AContext (n - suc i)
 g ! i = Ac.head (g [ i ])
 
 -- δi-th context relative to i  
-_![_>_] : ∀ {n} → AGraph (ℕsuc n) → (i : Fin (ℕsuc n)) → (δi : Fin (n - i))
-          → AContext _ 
-_![_>_] g i δi = Ac.head (Ac.tail (g [ i ]) [ δi ])
+_![_>_] : ∀ {n} → AGraph (ℕsuc n)
+                → (i : Fin (ℕsuc n))
+                → (δi : Fin (n - i))
+                → AContext _ 
+g ![ i > δi ] = Ac.head (Ac.tail (g [ i ]) [ δi ])
 
 
 
@@ -97,7 +104,7 @@ theSame : ∀ {n} → Fin n → (i₂ : Fin n) → Fin (n - suc i₂) → Bool
 theSame {ℕsuc (ℕsuc _)} i₁ i₂ δi₂ with (toℕ i₁) ℕ.≟ ℕsuc ((toℕ i₂) ℕ.+ (toℕ δi₂))
 ... | yes _ = true
 ... | no _  = false
-theSame {_} _ _ _ = false  -- for n = 0, 1
+theSame _ _ _ = false  -- for n = 0, 1
 
 -- i, δi → i
 realIdx : ∀ {n} → (i : Fin n) → Fin (n - suc i) → Fin n
@@ -112,97 +119,144 @@ realIdx (suc (suc i)) δi = Fin.inject≤ (suc ((suc (suc i)) Fin.+ δi)) p3
 
 -- extracting info from the i-th context
 
-isInode : LNode → Bool
+isInode : ANode → Bool
 isInode (Ln (Lni _) _) = true
 isInode _ = false
 
-isRAnode : LNode → Bool
+isRAnode : ANode → Bool
 isRAnode (Ln (Lnr _) _) = true
 isRAnode _ = false
 
-isCAnode : LNode → Bool
+isCAnode : ANode → Bool
 isCAnode (Ln (Lnc _) _) = true
 isCAnode _ = false
 
-isPAnode : LNode → Bool
+isPAnode : ANode → Bool
 isPAnode (Ln (Lnp _) _) = true
 isPAnode _ = false
 
-Nvalue : LNode → MC
-Nvalue (Ln _ v) = v
+tryRAnode : ANode → Maybe ANode
+tryRAnode n@(Ln (Lnr _) _) = just n
+tryRAnode _ = nothing
 
--- LNode of the i-th context
-LNode←Idx : ∀ {n} → AGraph n → Fin n → LNode
-LNode←Idx g i = label (g ! i)
+-- ANode of the i-th context
+ANode←i : ∀ {n} → AGraph n → Fin n → ANode
+ANode←i g i = label (g ! i)
+
+ANode←δi : ∀ {n} → AGraph (ℕsuc n) → (i : Fin (ℕsuc n)) → Fin (n - i) → ANode
+ANode←δi g i δi = label (g ![ i > δi ])
 
 -- Algebra label from the node of the i-th context
-val←Idx : ∀ {n} → AGraph n → Fin n → MC
-val←Idx g i = Nvalue (LNode←Idx g i)
+val←i : ∀ {n} → AGraph n → Fin n → MC
+val←i g i = LNode.value (ANode←i g i)
+
+
+-- successors
+
+Sucs : ℕ → Set
+Sucs n = List (Role × Fin n)
 
 -- successors data of the i-th context
-sucs←Idx : ∀ {n} → AGraph n → (i : Fin n) → List (Role × Fin (n - suc i))
-sucs←Idx g i = successors (g ! i )
+sucs←i : ∀ {n} → AGraph n
+               → (i : Fin n)
+               → Sucs (n - suc i)
+sucs←i g i = successors (g ! i )
+
+-- successors data for i, δi
+sucs←δi : ∀ {n} → AGraph (ℕsuc n)
+                → (i : Fin (ℕsuc n))
+                → (δi : Fin (n - i))
+                → Sucs (n - i - suc δi)
+sucs←δi g i δi = successors (g ![ i > δi ])
 
 
 -- extract δi-th role from the successors list, if exists
-Role←sucs : ∀ {n} → List (Role × Fin n) → Fin n → Maybe Role
+Role←sucs : ∀ {n} → Sucs n → Fin n → Maybe Role
 Role←sucs [] _ = nothing
 Role←sucs (x ∷ xs) δi with (δi Fin.≟ proj₂ x)
 ... | yes _ = just (proj₁ x)
 ... | no _  = Role←sucs xs δi
 
 -- the role of the δi-th edge of the i-th context, if exists
-Role←Idx : ∀ {n} → AGraph n → (i : Fin n) → (δi : Fin (n - suc i)) → Maybe Role
-Role←Idx g i δi = Role←sucs (sucs←Idx g i) δi
+Role←i : ∀ {n} → AGraph n → (i : Fin n) → (δi : Fin (n - suc i)) → Maybe Role
+Role←i g i δi = Role←sucs (sucs←i g i) δi
 
 -- extract the Role's index from the successors list, if exists
-RoleIdx←sucs : ∀ {n} → List (Role × Fin n) → Role → Maybe (Fin n)
+RoleIdx←sucs : ∀ {n} → Sucs n → Role → Maybe (Fin n)
 RoleIdx←sucs [] _ = nothing
-RoleIdx←sucs ((r' , δi) ∷ xs) r with (r === r')
+RoleIdx←sucs ((r' , δi) ∷ xs) r with (r =ᵇ r')
 ... | true  = just δi
 ... | false = RoleIdx←sucs xs r
 
 -- the role index of the 'Role' edge of the i-th context
-RoleIdx←Idx : ∀ {n} → AGraph n → (i : Fin n) → Role → Maybe (Fin (n - suc i))
-RoleIdx←Idx g i r = RoleIdx←sucs (sucs←Idx g i) r
-  
+RoleIdx←i : ∀ {n} → AGraph n → (i : Fin n) → Role → Maybe (Fin (n - suc i))
+RoleIdx←i g i r = RoleIdx←sucs (sucs←i g i) r
+
+
+-- I don't use these two
 isSupport : ∀ {n} → AGraph n → (i : Fin n) → (δi : Fin (n - suc i)) → Bool
-isSupport g i δi with Role←Idx g i δi
+isSupport g i δi with Role←i g i δi
 ... | nothing = false
-... | just r = isRAnode (LNode←Idx (g [ i ]) (suc δi)) ∧ (r === поддержка)
+... | just r = isRAnode (ANode←i (g [ i ]) (suc δi)) ∧ (r =ᵇ поддержка)
 
 isAttack : ∀ {n} → AGraph n → (i : Fin n) → (δi : Fin (n - suc i)) → Bool
-isAttack g i δi with Role←Idx g i δi
+isAttack g i δi with Role←i g i δi
 ... | nothing = false
-... | just r = isRAnode (LNode←Idx (g [ i ]) (suc δi)) ∧ (r === атака)
+... | just r = isRAnode (ANode←i (g [ i ]) (suc δi)) ∧ (r =ᵇ атака)
+
+
+-- argument for δi-th of the i-th context, if exists
+Arg : ∀ {n} → AGraph (ℕsuc n) → (i : Fin (ℕsuc n)) → (δi : Fin (n - i)) → Maybe AArg
+Arg {n} g i δi with ANode←δi g i δi
+... | Ln (Lnr s) v = just (mkArg s (premises s) (just (ANode←i g i)))
+  where
+  extr : Role → Sucs (n - i - suc δi) → Maybe ANode
+  extr r [] = nothing
+  extr r ((r1 , δδi) ∷ xs) with r =ᵇ r1
+  ... | true  = just (ANode←δi (g [ i ]) (suc δi) δδi)
+  ... | false = extr r xs
+
+  premises' : ∀ {m} → Vec Role m → Vec (Maybe ANode) m
+  premises' []v = []v
+  premises' (r ∷v rs) = extr r (sucs←δi g i δi) ∷v premises' rs
+
+  premises : (s : RA-Scheme) → Vec (Maybe ANode) (RA-Scheme.ℕprem s)
+  premises (mkRA p c) = premises' p
+... | _ = nothing
+
 
 -- the list of arguments (RA-nodes) of the i-th context
-NArgs : ∀ {n} → AGraph n → (i : Fin n) → List (Role × Fin (n - suc i))
-NArgs {n} g i = filterb P (sucs←Idx g i)
+NArgs : ∀ {n} → AGraph (ℕsuc n) → (i : Fin (ℕsuc n)) → List AArg
+NArgs {ℕzero} _ _ = []
+NArgs {n} g i = nargs (sucs←i g i)
   where
-  P : (Role × Fin (n - suc i)) → Bool
-  P (_ , δi) = isRAnode (LNode←Idx (g [ i ]) (suc δi))
+  -- list of RA-nodes from sucs
+  nargs : Sucs (n - i) → List AArg
+  nargs [] = []
+  nargs (x ∷ xs) with Arg g i (proj₂ x)
+  ... | nothing  = nargs xs
+  ... | just arg = arg ∷ nargs xs
 
 -- the list of supports (supporting RA-nodes) of the i-th context
-NArgs+ : ∀ {n} → AGraph n → (i : Fin n) → List (Role × Fin (n - suc i))
-NArgs+ {n} g i = filterb (λ s → isSupport g i (proj₂ s)) (sucs←Idx g i)
+NArgs+ : ∀ {n} → AGraph n → (i : Fin n) → Sucs (n - suc i)
+NArgs+ {n} g i = filterb (λ s → isSupport g i (proj₂ s)) (sucs←i g i)
 
 -- the list of attacks (attacking RA-nodes) of the i-th context
-NArgs- : ∀ {n} → AGraph n → (i : Fin n) → List (Role × Fin (n - suc i))
-NArgs- {n} g i = filterb (λ s → isAttack g i (proj₂ s)) (sucs←Idx g i)
+NArgs- : ∀ {n} → AGraph n → (i : Fin n) → Sucs (n - suc i)
+NArgs- {n} g i = filterb (λ s → isAttack g i (proj₂ s)) (sucs←i g i)
 
 -- the list of premises of the i-th context (empty if not RA-node)
-NPremises : ∀ {n} → AGraph n → (i : Fin n) → List (Role × Fin (n - suc i))
-NPremises {n} g i with isRAnode (LNode←Idx g i)
-... | true  = sucs←Idx g i
+NPremises : ∀ {n} → AGraph n → (i : Fin n) → Sucs (n - suc i)
+NPremises {n} g i with isRAnode (ANode←i g i)
+... | true  = sucs←i g i
 ... | false = []
 
 -- nodes on which nothing depends (no predecessors)
-roots : ∀ {n} → AGraph n → List (Fin n × LNode)
+roots : ∀ {n} → AGraph n → List (Fin n × ANode)
 roots ∅ = []
-roots {n} g = filterb (P g) (Vec.toList (nodes g))
+roots {n} g = filterb (P g) (V.toList (nodes g))
   where
-  P : ∀ {n} → AGraph n → Fin n × LNode → Bool
+  P : ∀ {n} → AGraph n → Fin n × ANode → Bool
   P g (i , _) with (preds g i)
   ... | [] = true
   ... | _  = false
@@ -222,11 +276,11 @@ preds¬CA ((context nd sucs) & g) (suc i) with (isCAnode nd)
 
 -- nodes on which nothing depends (no predecessors)
 -- skipping conflicts
-roots¬CA : ∀ {n} → AGraph n → List (Fin n × LNode)
+roots¬CA : ∀ {n} → AGraph n → List (Fin n × ANode)
 roots¬CA ∅ = []
-roots¬CA {n} g = filterb (P g) (Vec.toList (nodes g))
+roots¬CA {n} g = filterb (P g) (V.toList (nodes g))
   where
-  P : ∀ {n} → AGraph n → Fin n × LNode → Bool
+  P : ∀ {n} → AGraph n → Fin n × ANode → Bool
   P g (i , nd) with isCAnode nd | (preds¬CA g i)
   ... | true  | _  = false  -- skip CA nodes
   ... | false | [] = true
@@ -276,51 +330,53 @@ fold↑ {n = ℕsuc n} f init = fold' f init (zero)
 
 --  calculating algebra values  --------------------------------------------
 
--- fold the list of the i-th successors with functions fex and op.
--- fex extracts MC from the sucs' elements,
--- op comibines the extracted value with the fold's accumulator
-foldsucs : ∀ {n} → AGraph n → (i : Fin n)
-           → (Role × Fin (n - suc i) → MC)  -- extract MC from sucs
-           → (MC → MC → MC)                 -- combine with accumulator
-           → MC                             -- starting value
-           → List (Role × Fin (n - suc i))
-           → MC
-foldsucs g i _ _ v [] = v 
-foldsucs g i fex op v (x ∷ xs) = (op ∘ fex) x (foldsucs g i fex op v xs)
+-- from premises to conclusion
+
+valRA : AArg → MC
+valRA (mkArg _ prems concl) = valRA' prems concl
+  where
+  valRA' : ∀ {n} → Vec (Maybe ANode) n → Maybe ANode → MC
+  valRA' []v (just (Ln _ (just v))) = just v   -- ok
+  valRA' []v (just (Ln _ nothing))  = MC⊤      -- missed conclusion value
+  valRA' []v nothing                = nothing  -- missed conclusion itself
+  valRA' (nothing  ∷v _) _          = nothing  -- missed premise
+  valRA' ((just x) ∷v xs) c = LNode.value x ⟪ _⊙_ la ⟫ valRA' xs c
 
 
+private
+  op : MC → MC → MC
+  op (just v1) (just v2) = just ((_⊕_ la) v1 v2)
+  op (just v1) nothing   = just v1
+  op nothing   (just v2) = just v2
+  op nothing   nothing   = nothing
+  
+  valargs : List AArg → MC
+  valargs [] = MC⊥   -- impossible case, actually
+  valargs (x ∷ []) with valRA x
+  ... | nothing = nothing
+  ... | just v  = just v
+  valargs (x ∷ xs) with valRA x
+  ... | nothing = valargs xs
+  ... | just v  = op (just v) (valargs xs)
 
 -- the value of the i-th node computed recursively
 
-{-# TERMINATING #-}    -- because the termination check fails :(
 val : ∀ {n} → AGraph n → (i : Fin n) → MC
-val {n} g i with NArgs g i
-... | [] = val←Idx g i
-... | _  = foldsucs g i fex (_⟪ _⊕_ la ⟫_) (just (LA⊥ la)) (NArgs+ g i)
-                    -- Taking Attacks into account
-                    -- ⟪ _⊕_ la ⟫
-                    -- (⟪ ⊘ la ⟫ (foldsucs g i fex (_⟪ _⊕_ la ⟫_) (just (LA⊥ la)) (NArgs- g i)))
-  where
-  gg  = Ac.tail (g [ i ])
-  ggg = λ δi → Ac.tail (gg [ δi ])
+val {ℕzero} _ _ = nothing
+val {ℕsuc n} g i with NArgs g i | val←i g i
+... | []   | v       = v  
+... | args | nothing = valargs args 
+... | args | v       = v ⟪ _⊙_ la ⟫ valargs args 
 
-  -- extracts values from sucs
-  fex : Role × Fin (n - suc i) → MC
-  fex (_ , δi) = foldsucs gg δi
-                          (λ x → val (ggg δi) (proj₂ x))  -- extracting values from sucs
-                          (_⟪ _⊙_ la ⟫_)
-                          (val←Idx gg δi)
-                          (NPremises gg δi)
-  
+
 
 -- computing the values of the whole graph (recursively)
 
 compute : ∀ {n} → AGraph n → AGraph n
 compute {n} g = compute' {n} {_} {≤-reflexive refl} g g
   where
-  compute' : ∀ {n k} → {_ : k ℕ.≤ n} → AGraph n → AGraph k → AGraph k
-  compute' {ℕzero} _ ∅ = ∅
-  compute' {ℕsuc _} _ ∅ = ∅
+  compute' : ∀ {n k} → {k ℕ.≤ n} → AGraph n → AGraph k → AGraph k
+  compute' _ ∅ = ∅
   compute' {ℕsuc n} {ℕsuc k} {p} g0 ((context (Ln nd _) sucs) & g) =
     (context (Ln nd (val g0 (Fin.inject≤ (Fin.fromℕ (ℕsuc n ∸ ℕsuc k)) (s≤s (m∸n≤m n k))))) sucs)
     & compute' {ℕsuc n} {k} {≤⇒pred≤ p} g0 g
@@ -332,10 +388,10 @@ compute {n} g = compute' {n} {_} {≤-reflexive refl} g g
 
 -- 'conflicting' and 'conflicted' indexes
 c-ing : ∀ {n} → AGraph n → (ic : Fin n) → Maybe (Fin (n - suc ic))
-c-ing g ic = RoleIdx←Idx g ic conflicting
+c-ing g ic = RoleIdx←i g ic conflicting
 
 c-ed : ∀ {n} → AGraph n → (ic : Fin n) → Maybe (Fin (n - suc ic))
-c-ed g ic = RoleIdx←Idx g ic conflicted
+c-ed g ic = RoleIdx←i g ic conflicted
 
 
 -- extract the 'conflicted' index for the 'conflicting' i from the (ic-th) CA-node
@@ -384,7 +440,7 @@ replaceVal (context (Ln nd _) sucs) v = context (Ln nd v) sucs
 
 -- the cumulative value of all conflicts of the i-th context
 foldConflicts : ∀ {n} → AGraph n → Fin n → MC
-foldConflicts {n} g i = List.foldr f (just (LA⊥ la)) (NConflicts g i)
+foldConflicts {n} g i = List.foldr f MC⊥ (NConflicts g i)
   where
   f : Fin n → MC → MC
   f i v = v ⟪ _LA∨_ la ⟫ (val g i)
@@ -401,8 +457,8 @@ val+conflicts {n} g0 g i = (val g0 i) ⟪ _⊙_ la ⟫ ¬foldConflicts g i
 
 -- the value of the next iteration
 iterationVal : ∀ {n} → AGraph n → AGraph n → Fin n → MC
--- iterationVal i = (val←Idx gin i)
-iterationVal g0 gin i = (⟪ ½ la ⟫ (val←Idx gin i))
+-- iterationVal i = (val←i gin i)
+iterationVal g0 gin i = (⟪ ½ la ⟫ (val←i gin i))
                         ⟪ _⊕_ la ⟫
                         (⟪ ½ la ⟫ val+conflicts g0 gin i)
 

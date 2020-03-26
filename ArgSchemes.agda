@@ -7,6 +7,7 @@ open import Data.List
 open import Data.Maybe
 open import Data.String renaming (_++_ to _+++_)
 open import Data.Unit
+open import Data.Vec renaming ([] to []v;  _∷_ to _∷v_)
 open import Function using (id)
 open import Relation.Binary
 open import Relation.Binary.PropositionalEquality using (_≡_; _≢_; refl)
@@ -23,19 +24,33 @@ open import AIF
 
 instance
   A-от-эксперта : RA-Scheme
-  Premises {{A-от-эксперта}} = эксперт ∷ говорит ∷ область ∷ []
+  ℕprem {{A-от-эксперта}} = 3
+  Premises {{A-от-эксперта}} = эксперт ∷v говорит ∷v область ∷v []v
   Conclusion {{A-от-эксперта}} = вывод
 
   A-от-примера : RA-Scheme
-  Premises {{A-от-примера}} = пример ∷ []
+  ℕprem {{A-от-примера}} = 1
+  Premises {{A-от-примера}} = пример ∷v []v
   Conclusion {{A-от-примера}} = вывод
 
   A-абдукция : RA-Scheme
-  Premises {{A-абдукция}} = факт ∷ объяснение ∷ []
+  ℕprem {{A-абдукция}} = 2
+  Premises {{A-абдукция}} = факт ∷v объяснение ∷v []v
   Conclusion {{A-абдукция}} = вывод
 
   A-ad-populum : RA-Scheme
-  Premises {{A-ad-populum}} = все-признают ∷ []
+  ℕprem {{A-ad-populum}} = 1
+  Premises {{A-ad-populum}} = все-признают ∷v []v
   Conclusion {{A-ad-populum}} = вывод
+
+  A-от-причины-к-следствию : RA-Scheme
+  ℕprem {{A-от-причины-к-следствию}} = 2
+  Premises {{A-от-причины-к-следствию}} = причина ∷v причинная-связь ∷v []v
+  Conclusion {{A-от-причины-к-следствию}} = следствие
+
+  A-LOG-AND : RA-Scheme
+  ℕprem {{A-LOG-AND}} = 2
+  Premises {{A-LOG-AND}} = AND1 ∷v AND2 ∷v []v
+  Conclusion {{A-LOG-AND}} = вывод
   
 

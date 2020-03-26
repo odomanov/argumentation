@@ -27,7 +27,7 @@ open import DAG la
 docRole : Role → Doc
 docRole (role s) = text s
 
-docRoles : List Role → Doc
+docRoles : ∀ {n} → Vec Role n → Doc
 docRoles [] = empty
 docRoles (x ∷ []) = docRole x
 docRoles (x ∷ xs) = docRole x <> text ", " <> line <> docRoles xs
@@ -53,7 +53,7 @@ docLabel : MC → Doc
 docLabel nothing = text "NOTHING"
 docLabel (just x) = (doc la) x 
 
-docNode : LNode → Doc
+docNode : ANode → Doc
 docNode (Ln (Lni s) v) = text "I: " <> nest 3 (docStmt s)
   <> line <> group (text "вес   = " <> docLabel v)
 docNode (Ln (Lnr (mkRA p c)) v) = text "SR: "
@@ -64,7 +64,7 @@ docNode (Ln (Lnc (mkCA c1 c2)) v) = text "CONFLICT"
 docNode (Ln (Lnp (mkPA p1 p2)) v) = text "PREF"
   <> line <> group (text "вес   = " <> docLabel v)
 
-docNodes : ∀ {n} → List (Fin n × LNode) → Doc
+docNodes : ∀ {n} → List (Fin n × ANode) → Doc
 docNodes [] = empty
 docNodes ((i , nd) ∷ xs) = text ((ℕshow (toℕ i)) +++ " : ")
                            <> docNode nd <> docNodes xs
@@ -96,9 +96,9 @@ instance
   pppProp : PPrint Proposition
   prettytype {{pppProp}} = ppProp
 
-  ppNode : Pretty LNode
+  ppNode : Pretty ANode
   pretty {{ppNode}} nd = (docNode nd)
-  pppNode : PPrint LNode
+  pppNode : PPrint ANode
   prettytype {{pppNode}} = ppNode
 
   ppGraph : ∀ {n} → Pretty (AGraph n)

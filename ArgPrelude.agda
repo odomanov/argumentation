@@ -12,7 +12,7 @@ open import Data.Product
 open import Data.String as S using (String) renaming (_++_ to _+++_)
 open import Data.Unit
 open import Function using (id)
-open import Level public renaming (zero to lzero; suc to lsuc)
+open import Level public renaming (zero to lzero; suc to lsuc; _⊔_ to _l⊔_)
 open import Relation.Binary
 open import Relation.Binary.PropositionalEquality public using (_≡_; _≢_; refl)
 open import Relation.Nullary
@@ -21,10 +21,10 @@ open import WLPretty public
 
 -- boolean equality
 
-record BEq {ℓ} (A : Set ℓ): Set (lsuc ℓ) where
+record BEq {ℓ} (A B : Set ℓ): Set (lsuc ℓ) where
   field
-    _===_ : A → A → Bool
-    -- isEquivalence = IsEquivalence _===_
+    _=ᵇ_ : A → B → Bool
+    -- isEquivalence = IsEquivalence _=ᵇ_
 
 open BEq {{...}} public
 
@@ -90,8 +90,8 @@ NOT x      ≟P NOT y      = x ≟P y
 (_ OR _) ≟P _ AND _ = no id
 
 instance
-  PEq : BEq Proposition
-  _===_ {{PEq}} x y = x =P y
+  PEq : BEq Proposition Proposition
+  _=ᵇ_ {{PEq}} x y = x =P y
 
 
 -- Statement consists of Proposition and a particular text this proposition is stated in.
@@ -116,8 +116,8 @@ private
   (st _ x) =S (st _ y) = x =P y
 
 instance
-  SEq : BEq Statement
-  _===_ {{SEq}} x y = x =S y
+  SEq : BEq Statement Statement
+  _=ᵇ_ {{SEq}} x y = x =S y
 
 
 
