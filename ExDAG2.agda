@@ -3,21 +3,13 @@
 
 module ExDAG2 where
 
-open import Agda.Builtin.Float
-open import Data.Bool
-open import Data.Empty
 open import Data.Fin as Fin
   using (Fin; Fin′; zero; suc; #_; toℕ; _≟_)
-open import Data.Float
 open import Data.List as List using (List; []; _∷_)
 open import Data.Maybe
-open import Data.Nat as Nat using (suc; ℕ)
-open import Data.Nat.Show renaming (show to ℕshow)
-open import Data.Product using (_×_; _,_; proj₁; proj₂)
+open import Data.Product using (_,_)
 open import Data.String renaming (_++_ to _+++_)
-open import Data.Vec as Vec using (Vec; []; _∷_)
-open import Data.Unit
-open import Relation.Binary.PropositionalEquality using (_≡_; _≢_; refl)
+open import Data.Vec as V using (Vec) renaming ([] to []v; _∷_ to _∷v_)
 
 open import ArgPrelude 
 open import AIF
@@ -26,7 +18,7 @@ open import ArgSchemes
 
 la = Pref
 -- la = Luk
-open import DAG la
+import DAG; module DAGla = DAG la; open DAGla
 
 St1  = let t = "St1"
        in record { sttext = just t; stprop = mkProp t}
@@ -35,24 +27,24 @@ St2  = let t = "St2"
 St3  = let t = "St3"
        in record { sttext = just t; stprop = mkProp t}
 
-A : LNode
+A : ANode
 A = Ln (Lni St1) (just (V 1.0 {refl} {refl}))
 
-B : LNode
+B : ANode
 B = Ln (Lni St2) (just (V 0.4 {refl} {refl}))
 
-C : LNode
+C : ANode
 C = Ln (Lni St3) (just (V 0.2 {refl} {refl}))
 
-CA→B : LNode
+CA→B : ANode
 CA→B = Ln (Lnc record {Conflicting = conflicting; Conflicted = conflicted})
           (just (V 1.0 {refl} {refl}))
 
-CB→C : LNode
+CB→C : ANode
 CB→C = Ln (Lnc record {Conflicting = conflicting; Conflicted = conflicted})
           (just (V 1.0 {refl} {refl}))
 
-CC→A : LNode
+CC→A : ANode
 CC→A = Ln (Lnc record {Conflicting = conflicting; Conflicted = conflicted})
           (just (V 1.0 {refl} {refl}))
 
@@ -69,8 +61,8 @@ G =
      ∅
 
 
-_ : nodes G ≡ (# 0 , CC→A) ∷ (# 1 , CB→C) ∷ (# 2 , CA→B)
-             ∷ (# 3 , C)    ∷ (# 4 , B)    ∷ (# 5 , A)    ∷ []
+_ : nodes G ≡ (# 0 , CC→A) ∷v (# 1 , CB→C) ∷v (# 2 , CA→B)
+           ∷v (# 3 , C)    ∷v (# 4 , B)    ∷v (# 5 , A)    ∷v []v
 _ = refl
 
 _ : roots G ≡ (# 0 , CC→A) ∷ (# 1 , CB→C) ∷ (# 2 , CA→B) ∷ []
@@ -135,29 +127,29 @@ main = run (putStrLn stringToPrint)
   where
   stringToPrint = "--------------------------------------------"
     +++ ppretty ws (docSection ws "\nG orig")
-    +++ printABC G val←Idx
+    +++ printABC G val←i
     +++ ppretty ws (docSection ws "G computed")
     +++ printABC G val
     +++ ppretty ws (docSection ws "G0")
-    +++ printABC G0 val←Idx
+    +++ printABC G0 val←i
     +++ ppretty ws (docSection ws "G1")
-    +++ printABC G1 val←Idx
+    +++ printABC G1 val←i
     +++ ppretty ws (docSection ws "G2")
-    +++ printABC G2 val←Idx
+    +++ printABC G2 val←i
     +++ ppretty ws (docSection ws "G3")
-    +++ printABC G3 val←Idx
+    +++ printABC G3 val←i
     +++ ppretty ws (docSection ws "G4")
-    +++ printABC G4 val←Idx
+    +++ printABC G4 val←i
     +++ ppretty ws (docSection ws "G5")
-    +++ printABC G5 val←Idx
+    +++ printABC G5 val←i
     +++ ppretty ws (docSection ws "G6")
-    +++ printABC G6 val←Idx
+    +++ printABC G6 val←i
     +++ ppretty ws (docSection ws "G7")
-    +++ printABC G7 val←Idx
+    +++ printABC G7 val←i
     +++ ppretty ws (docSection ws "G100")
-    +++ printABC G100 val←Idx
+    +++ printABC G100 val←i
     +++ ppretty ws (docSection ws "G200")
-    +++ printABC G200 val←Idx
+    +++ printABC G200 val←i
 
     -- +++ ppretty ws (docSection ws "foldConflicts:G")
     -- +++ printABC G foldConflicts
@@ -170,4 +162,4 @@ main = run (putStrLn stringToPrint)
     -- +++ ppretty ws (docSection ws "iterationVal:G5")
     -- +++ printABC G5 (iterationVal G0)
 
-    +++ (pprint 110 G)
+    -- +++ (pprint 110 G)
