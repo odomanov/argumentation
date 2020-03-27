@@ -8,10 +8,10 @@ open import Data.Fin as Fin
   using (Fin; Fin′; zero; suc; #_; toℕ; _≟_) 
 open import Data.List as List using (List; []; _∷_)
 open import Data.Maybe
-open import Data.Nat as Nat using (suc; ℕ)
+open import Data.Nat as ℕ using (suc; ℕ; _⊔_; _∸_)
 open import Data.Nat.Show renaming (show to ℕshow)
 open import Data.Product using (_×_; _,_; proj₁; proj₂)
-open import Data.String renaming (_++_ to _+++_)
+open import Data.String as S renaming (_++_ to _+++_)
 open import Data.Vec as Vec using (Vec; []; _∷_)
 open import Data.Unit
 open import Relation.Binary.PropositionalEquality using (_≡_; _≢_; refl)
@@ -48,6 +48,12 @@ docStmt (st (just tx) p) = text "TEXT = " <> nest 7 (string tx)
   ... | true  = text "PROP = TEXT"
   ... | false = text "PROP = " <> docProp p
   ppp _ = text "PROP = " <> docProp p
+
+docMC : MC → Doc
+docMC nothing = text (" - " +++ spaces 7)
+docMC (just x) = text s <> text (spaces (0 ⊔ (10 ∸ S.length s)))
+  where
+  s = layout (renderPretty 1.0 8 ((doc la) x))
 
 docLabel : MC → Doc
 docLabel nothing = text "NOTHING"
@@ -96,6 +102,11 @@ instance
   pppProp : PPrint Proposition
   prettytype {{pppProp}} = ppProp
 
+  ppMC : Pretty MC
+  pretty {{ppMC}} = docMC
+  pppMC : PPrint MC
+  prettytype {{pppMC}} = ppMC
+
   ppNode : Pretty ANode
   pretty {{ppNode}} nd = (docNode nd)
   pppNode : PPrint ANode
@@ -105,4 +116,5 @@ instance
   pretty {{ppGraph}} g = (docGraph g)
   pppGraph : ∀ {n} → PPrint (AGraph n)
   prettytype {{pppGraph}} = ppGraph
-  
+
+

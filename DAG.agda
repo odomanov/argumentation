@@ -480,17 +480,3 @@ steps : ∀ {n}
         → AGraph n  -- final iteration
 steps  ℕzero   g = compute g
 steps (ℕsuc i) g = step' g (steps i g)
-
-
-
-docMC : MC → Doc
-docMC nothing = text (" - " +++ spaces 7)
-docMC (just x) = text s <> text (spaces (0 ℕ.⊔ (10 ∸ S.length s)))
-  where
-  s = layout (renderPretty 1.0 8 ((doc la) x))
-
-instance
-  ppMC : Pretty MC
-  pretty {{ppMC}} = docMC
-  pppMC : PPrint MC
-  prettytype {{pppMC}} = ppMC
