@@ -9,7 +9,7 @@ open import Data.Empty using (⊥)
 open import Data.Fin as Fin
   using (Fin; Fin′; zero; suc; #_; toℕ; _≟_) renaming (_ℕ-ℕ_ to _-_)
 open import Data.Fin.Patterns as FinP 
-open import Data.Graph.Acyclic as Ac public
+open import Data.Graph.Acyclic as Ac hiding (node) public
 open import Data.List as List using (List; []; _∷_)
 open import Data.Maybe
 open import Data.Nat as ℕ renaming (zero to ℕzero; suc to ℕsuc)

@@ -85,6 +85,9 @@ data Role    : Set where
 знак         = role "знак"
 связь-со-знаком = role "связь-со-знаком"
 цель         = role "цель"
+альтернатива = role "альтернатива"
+неверно      = role "неверно"
+верно        = role "верно"
 -- CA-nodes
 conflicting  = role "conflicting"
 conflicted   = role "conflicted"
