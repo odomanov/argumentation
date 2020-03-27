@@ -82,6 +82,9 @@ data Role    : Set where
 причина      = role "причина"
 причинная-связь = role "причинная-связь"
 следствие    = role "следствие"
+знак         = role "знак"
+связь-со-знаком = role "связь-со-знаком"
+цель         = role "цель"
 -- CA-nodes
 conflicting  = role "conflicting"
 conflicted   = role "conflicted"
