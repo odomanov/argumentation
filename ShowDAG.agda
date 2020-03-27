@@ -38,13 +38,16 @@ docProp (NOT x) = text "NOT " <> docProp x
 docProp (x AND y) = docProp x <> text " AND " <> docProp y
 docProp (x OR  y) = docProp x <> text " OR " <> docProp y
 
+docFragment : Fragment → Doc
+docFragment (mkFrag tx) = string tx
+
 docStmt : Statement → Doc
 docStmt (st nothing p) = text "PROP = " <> nest 7 (docProp p)
-docStmt (st (just tx) p) = text "TEXT = " <> nest 7 (string tx)
+docStmt (st (just tx) p) = text "TEXT = " <> nest 7 (docFragment tx)
                                   <> line <> nest 7 (ppp p)
   where
   ppp : Proposition → Doc
-  ppp (mkProp t) with tx == t
+  ppp (mkProp t) with (Fragment.ftext tx) == t
   ... | true  = text "PROP = TEXT"
   ... | false = text "PROP = " <> docProp p
   ppp _ = text "PROP = " <> docProp p

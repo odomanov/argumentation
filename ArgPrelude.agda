@@ -1,7 +1,7 @@
 module ArgPrelude where
 
 open import Agda.Builtin.Float
-open import Data.Bool using (Bool; true; false; _∧_; _∨_)
+open import Data.Bool 
 open import Data.Empty
 open import Data.Float public hiding (_==_; _-_; _+_)
 open import Data.Integer hiding (_*_)
@@ -94,12 +94,18 @@ instance
   _=ᵇ_ {{PEq}} x y = x =P y
 
 
+-- Text fragments
+record Fragment : Set where
+  constructor mkFrag
+  field
+    ftext : String 
+  
 -- Statement consists of Proposition and a particular text this proposition is stated in.
 record Statement : Set where
   constructor st
   field
-    sttext : Maybe String  -- the statement text
-    stprop : Proposition   -- it's meaning (proposition)
+    sttext : Maybe Fragment  -- the statement text
+    stprop : Proposition     -- it's meaning (proposition)
 
 infix 4 _≡S_ _≟S_
 
