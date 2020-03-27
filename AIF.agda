@@ -289,7 +289,10 @@ module _ {c ℓ₁ ℓ₂} {la : LabelAlgebra c ℓ₁ ℓ₂} where
     instance 
       LRNEq : BEq (List (Role × LNode)) (List (Role × LNode))
       _=ᵇ_ {{LRNEq}} x y = x =LRN y
-  
+
+    Prop←N : Node → Proposition
+    Prop←N (Lni s) = Statement.stprop s
+    Prop←N _ = mkProp ""                  -- should I use Maybe?
 
   record Argument : Set (c l⊔ ℓ₁ l⊔ ℓ₂) where
     constructor mkArg
