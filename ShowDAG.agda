@@ -59,7 +59,7 @@ docLabel : MC → Doc
 docLabel nothing = text "NOTHING"
 docLabel (just x) = (doc la) x 
 
-docNode : ANode → Doc
+docNode : ALNode → Doc
 docNode (Ln (Lni s) v) = text "I: " <> nest 3 (docStmt s)
   <> line <> group (text "вес   = " <> docLabel v)
 docNode (Ln (Lnr (mkRA p c)) v) = text "SR: "
@@ -70,7 +70,7 @@ docNode (Ln (Lnc (mkCA c1 c2)) v) = text "CONFLICT"
 docNode (Ln (Lnp (mkPA p1 p2)) v) = text "PREF"
   <> line <> group (text "вес   = " <> docLabel v)
 
-docNodes : ∀ {n} → List (Fin n × ANode) → Doc
+docNodes : ∀ {n} → List (Fin n × ALNode) → Doc
 docNodes [] = empty
 docNodes ((i , nd) ∷ xs) = text ((ℕshow (toℕ i)) +++ " : ")
                            <> docNode nd <> docNodes xs
@@ -107,9 +107,9 @@ instance
   pppMC : PPrint MC
   prettytype {{pppMC}} = ppMC
 
-  ppNode : Pretty ANode
+  ppNode : Pretty ALNode
   pretty {{ppNode}} nd = (docNode nd)
-  pppNode : PPrint ANode
+  pppNode : PPrint ALNode
   prettytype {{pppNode}} = ppNode
 
   ppGraph : ∀ {n} → Pretty (AGraph n)

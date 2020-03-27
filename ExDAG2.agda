@@ -27,24 +27,24 @@ St2  = let t = "St2"
 St3  = let t = "St3"
        in record { sttext = just t; stprop = mkProp t}
 
-A : ANode
+A : ALNode
 A = Ln (Lni St1) (just (V 1.0 {refl} {refl}))
 
-B : ANode
+B : ALNode
 B = Ln (Lni St2) (just (V 0.4 {refl} {refl}))
 
-C : ANode
+C : ALNode
 C = Ln (Lni St3) (just (V 0.2 {refl} {refl}))
 
-CA→B : ANode
+CA→B : ALNode
 CA→B = Ln (Lnc record {Conflicting = conflicting; Conflicted = conflicted})
           (just (V 1.0 {refl} {refl}))
 
-CB→C : ANode
+CB→C : ALNode
 CB→C = Ln (Lnc record {Conflicting = conflicting; Conflicted = conflicted})
           (just (V 1.0 {refl} {refl}))
 
-CC→A : ANode
+CC→A : ALNode
 CC→A = Ln (Lnc record {Conflicting = conflicting; Conflicted = conflicted})
           (just (V 1.0 {refl} {refl}))
 

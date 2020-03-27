@@ -29,14 +29,18 @@ open import Relation.Nullary using (yes; no)
 open import ArgPrelude 
 open import AIF
 
-ANode = LNode {la = la}
-AContext = Context ANode Role   -- argumentation context
-AGraph = Graph ANode Role       -- argumentation graph     
+ANode = Node {la = la}
+ALNode = LNode {la = la}
+AContext = Context ALNode Role   -- argumentation context
+AGraph = Graph ALNode Role       -- argumentation graph     
 AArg = Argument {la = la}
 
 MC = Maybe (Carrier la)
 MC⊥ = just (LA⊥ la)
 MC⊤ = just (LA⊤ la)
+
+Sucs : ℕ → Set
+Sucs n = List (Role × Fin n)
 
 -- applying a binary operation to the Maybe label (TODO: rewrite with >>=)
 _⟪_⟫_ : MC → ((Carrier la) → (Carrier la) → (Carrier la)) → MC → MC
@@ -119,42 +123,39 @@ realIdx (suc (suc i)) δi = Fin.inject≤ (suc ((suc (suc i)) Fin.+ δi)) p3
 
 -- extracting info from the i-th context
 
-isInode : ANode → Bool
+isInode : ALNode → Bool
 isInode (Ln (Lni _) _) = true
 isInode _ = false
 
-isRAnode : ANode → Bool
+isRAnode : ALNode → Bool
 isRAnode (Ln (Lnr _) _) = true
 isRAnode _ = false
 
-isCAnode : ANode → Bool
+isCAnode : ALNode → Bool
 isCAnode (Ln (Lnc _) _) = true
 isCAnode _ = false
 
-isPAnode : ANode → Bool
+isPAnode : ALNode → Bool
 isPAnode (Ln (Lnp _) _) = true
 isPAnode _ = false
 
-tryRAnode : ANode → Maybe ANode
+tryRAnode : ALNode → Maybe ALNode
 tryRAnode n@(Ln (Lnr _) _) = just n
 tryRAnode _ = nothing
 
--- ANode of the i-th context
-ANode←i : ∀ {n} → AGraph n → Fin n → ANode
-ANode←i g i = label (g ! i)
+-- ALNode of the i-th context
+ALNode←i : ∀ {n} → AGraph n → Fin n → ALNode
+ALNode←i g i = label (g ! i)
 
-ANode←δi : ∀ {n} → AGraph (ℕsuc n) → (i : Fin (ℕsuc n)) → Fin (n - i) → ANode
-ANode←δi g i δi = label (g ![ i > δi ])
+ALNode←δi : ∀ {n} → AGraph (ℕsuc n) → (i : Fin (ℕsuc n)) → Fin (n - i) → ALNode
+ALNode←δi g i δi = label (g ![ i > δi ])
 
 -- Algebra label from the node of the i-th context
 val←i : ∀ {n} → AGraph n → Fin n → MC
-val←i g i = LNode.value (ANode←i g i)
+val←i g i = LNode.value (ALNode←i g i)
 
 
 -- successors
-
-Sucs : ℕ → Set
-Sucs n = List (Role × Fin n)
 
 -- successors data of the i-th context
 sucs←i : ∀ {n} → AGraph n
@@ -197,30 +198,30 @@ RoleIdx←i g i r = RoleIdx←sucs (sucs←i g i) r
 isSupport : ∀ {n} → AGraph n → (i : Fin n) → (δi : Fin (n - suc i)) → Bool
 isSupport g i δi with Role←i g i δi
 ... | nothing = false
-... | just r = isRAnode (ANode←i (g [ i ]) (suc δi)) ∧ (r =ᵇ поддержка)
+... | just r = isRAnode (ALNode←i (g [ i ]) (suc δi)) ∧ (r =ᵇ поддержка)
 
 isAttack : ∀ {n} → AGraph n → (i : Fin n) → (δi : Fin (n - suc i)) → Bool
 isAttack g i δi with Role←i g i δi
 ... | nothing = false
-... | just r = isRAnode (ANode←i (g [ i ]) (suc δi)) ∧ (r =ᵇ атака)
+... | just r = isRAnode (ALNode←i (g [ i ]) (suc δi)) ∧ (r =ᵇ атака)
 
 
 -- argument for δi-th of the i-th context, if exists
 Arg : ∀ {n} → AGraph (ℕsuc n) → (i : Fin (ℕsuc n)) → (δi : Fin (n - i)) → Maybe AArg
-Arg {n} g i δi with ANode←δi g i δi
-... | Ln (Lnr s) v = just (mkArg s (premises s) (just (ANode←i g i)))
+Arg {n} g i δi with ALNode←δi g i δi
+... | Ln (Lnr s) v = just (mkArg s (premises s) (just (ALNode←i g i)))
   where
-  extr : Role → Sucs (n - i - suc δi) → Maybe ANode
+  extr : Role → Sucs (n - i - suc δi) → Maybe ALNode
   extr r [] = nothing
   extr r ((r1 , δδi) ∷ xs) with r =ᵇ r1
-  ... | true  = just (ANode←δi (g [ i ]) (suc δi) δδi)
+  ... | true  = just (ALNode←δi (g [ i ]) (suc δi) δδi)
   ... | false = extr r xs
 
-  premises' : ∀ {m} → Vec Role m → Vec (Maybe ANode) m
+  premises' : ∀ {m} → Vec Role m → Vec (Maybe ALNode) m
   premises' []v = []v
   premises' (r ∷v rs) = extr r (sucs←δi g i δi) ∷v premises' rs
 
-  premises : (s : RA-Scheme) → Vec (Maybe ANode) (RA-Scheme.ℕprem s)
+  premises : (s : RA-Scheme) → Vec (Maybe ALNode) (RA-Scheme.ℕprem s)
   premises (mkRA p c) = premises' p
 ... | _ = nothing
 
@@ -247,16 +248,16 @@ NArgs- {n} g i = filterb (λ s → isAttack g i (proj₂ s)) (sucs←i g i)
 
 -- the list of premises of the i-th context (empty if not RA-node)
 NPremises : ∀ {n} → AGraph n → (i : Fin n) → Sucs (n - suc i)
-NPremises {n} g i with isRAnode (ANode←i g i)
+NPremises {n} g i with isRAnode (ALNode←i g i)
 ... | true  = sucs←i g i
 ... | false = []
 
 -- nodes on which nothing depends (no predecessors)
-roots : ∀ {n} → AGraph n → List (Fin n × ANode)
+roots : ∀ {n} → AGraph n → List (Fin n × ALNode)
 roots ∅ = []
 roots {n} g = filterb (P g) (V.toList (nodes g))
   where
-  P : ∀ {n} → AGraph n → Fin n × ANode → Bool
+  P : ∀ {n} → AGraph n → Fin n × ALNode → Bool
   P g (i , _) with (preds g i)
   ... | [] = true
   ... | _  = false
@@ -276,11 +277,11 @@ preds¬CA ((context nd sucs) & g) (suc i) with (isCAnode nd)
 
 -- nodes on which nothing depends (no predecessors)
 -- skipping conflicts
-roots¬CA : ∀ {n} → AGraph n → List (Fin n × ANode)
+roots¬CA : ∀ {n} → AGraph n → List (Fin n × ALNode)
 roots¬CA ∅ = []
 roots¬CA {n} g = filterb (P g) (V.toList (nodes g))
   where
-  P : ∀ {n} → AGraph n → Fin n × ANode → Bool
+  P : ∀ {n} → AGraph n → Fin n × ALNode → Bool
   P g (i , nd) with isCAnode nd | (preds¬CA g i)
   ... | true  | _  = false  -- skip CA nodes
   ... | false | [] = true
@@ -335,7 +336,7 @@ fold↑ {n = ℕsuc n} f init = fold' f init (zero)
 valRA : AArg → MC
 valRA (mkArg _ prems concl) = valRA' prems concl
   where
-  valRA' : ∀ {n} → Vec (Maybe ANode) n → Maybe ANode → MC
+  valRA' : ∀ {n} → Vec (Maybe ALNode) n → Maybe ALNode → MC
   valRA' []v (just (Ln _ (just v))) = just v   -- ok
   valRA' []v (just (Ln _ nothing))  = MC⊤      -- missed conclusion value
   valRA' []v nothing                = nothing  -- missed conclusion itself

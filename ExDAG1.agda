@@ -38,38 +38,38 @@ St5  = let t = "St5"
 St7  = let t = "St7"
        in record { sttext = just t; stprop = mkProp t}
 
-N1 : ANode
+N1 : ALNode
 N1 = Ln (Lni St1) (just (V 0.7 {refl} {refl}))
 
-N2 : ANode
+N2 : ALNode
 N2 = Ln (Lni St2) (just (V 1.0 {refl} {refl}))
 
-N3 : ANode
+N3 : ALNode
 N3 = Ln (Lni St3) nothing -- (just (V 1.3 {refl} {refl}))
 
-¬N3 : ANode
+¬N3 : ALNode
 ¬N3 = Ln (Lni ¬St3) nothing -- (just (V 0.3 {refl} {refl}))
 
-N4 : ANode
+N4 : ALNode
 N4 = Ln (Lnr A-от-эксперта) (just (V 0.5 {refl} {refl}))
 
-N5 : ANode
+N5 : ALNode
 N5 = Ln (Lni St5) (just (V 0.6 {refl} {refl}))
 
-N6 : ANode
+N6 : ALNode
 N6 = Ln (Lnr A-абдукция) (just (V 0.4 {refl} {refl}))
 
-N7 : ANode
+N7 : ALNode
 N7 = Ln (Lni St7) (just (V 0.9 {refl} {refl}))
 
-N8 : ANode
+N8 : ALNode
 N8 = Ln (Lnr A-ad-populum) (just (V 0.9 {refl} {refl}))
 
-CN1 : ANode
+CN1 : ALNode
 CN1 = Ln (Lnc record {Conflicting = conflicting; Conflicted = conflicted})
          (just (V 0.8 {refl} {refl}))
 
-CN2 : ANode
+CN2 : ALNode
 CN2 = Ln (Lnc record {Conflicting = conflicting; Conflicted = conflicted})
          (just (V 0.8 {refl} {refl}))
 
