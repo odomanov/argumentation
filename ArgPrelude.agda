@@ -21,7 +21,7 @@ open import WLPretty public
 
 -- boolean equality
 
-record BEq {ℓ} (A B : Set ℓ): Set (lsuc ℓ) where
+record BEq {ℓ} (A B : Set ℓ): Set ℓ where
   field
     _=ᵇ_ : A → B → Bool
     -- isEquivalence = IsEquivalence _=ᵇ_
