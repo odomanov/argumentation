@@ -25,18 +25,18 @@ la = Pref
 -- la = Luk
 import DAG; module DAGla = DAG la; open DAGla
 
+T1 = mkFrag "St1"
+T2 = mkFrag "St2"
+T3 = mkFrag "St3"
+T5 = mkFrag "St5"
+T7 = mkFrag "St7"
 
-St1  = let t = "St1"
-       in record { sttext = just t; stprop = mkProp t}
-St2  = let t = "St2"
-       in record { sttext = just t; stprop = mkProp t}
-P3   = mkProp "St3"       
-St3  = record { sttext = nothing; stprop = P3}
-¬St3 = record { sttext = nothing; stprop = NOT P3}
-St5  = let t = "St5"
-       in record { sttext = just t; stprop = mkProp t}
-St7  = let t = "St7"
-       in record { sttext = just t; stprop = mkProp t}
+St1  = record { sttext = just T1; stprop = mkProp (Fragment.ftext T1)}
+St2  = record { sttext = just T2; stprop = mkProp (Fragment.ftext T2)}
+St3  = record { sttext = nothing; stprop = mkProp (Fragment.ftext T3)}
+¬St3 = record { sttext = nothing; stprop = NOT (mkProp (Fragment.ftext T3))}
+St5  = record { sttext = just T5; stprop = mkProp (Fragment.ftext T5)}
+St7  = record { sttext = just T7; stprop = mkProp (Fragment.ftext T7)}
 
 N1 : ALNode
 N1 = Ln (Lni St1) (just (V 0.7 {refl} {refl}))
@@ -143,12 +143,12 @@ G1lim = steps 100 G1
 -- N2 ---- <N4> ---∙ 
 --         /        \
 -- N1 ----∙          N3
---         \        /
+--                  /
 -- N5 ---- <N6> ---∙ 
 G2 : AGraph _
 G2 =
-     context N3 ((атака , # 0) ∷ (поддержка  , # 2) ∷ []) &
-     context N6 ((факт  , # 3) ∷ (объяснение , # 0) ∷ []) &
+     context N3 ((объяснение , # 0) ∷ (поддержка  , # 2) ∷ []) &
+     context N6 ((факт  , # 0) ∷ []) &
      context N5 [] &
      context N4 ((эксперт  , # 1) ∷ (говорит , # 0) ∷ []) & -- missed: область
      context N2 [] &
@@ -164,11 +164,11 @@ G3 =
      ∅
 
 _ : nodes G2 ≡ (# 0 , N3) ∷v (# 1 , N6) ∷v (# 2 , N5) ∷v (# 3 , N4)
-             ∷v (# 4 , N2) ∷v (# 5 , N1) ∷v []v
+            ∷v (# 4 , N2) ∷v (# 5 , N1) ∷v []v
 _ = refl
 
-_ : edges G2 ≡ (# 0 , атака , # 0) ∷ (# 0 , поддержка , # 2)
-             ∷ (# 1 , факт , # 3) ∷ (# 1 , объяснение , # 0)
+_ : edges G2 ≡ (# 0 , объяснение , # 0) ∷ (# 0 , поддержка , # 2)
+             ∷ (# 1 , факт , # 0) 
              ∷ (# 3 , эксперт , # 1) ∷ (# 3 , говорит , # 0)
              ∷ []
 _ = refl
@@ -180,12 +180,12 @@ _ = refl
 _ : preds G2 (# 3) ≡ (# 0 , поддержка) ∷ []
 _ = refl
 
-_ : preds G2 (# 5) ≡ (# 1 , факт) ∷ (# 3 , эксперт) ∷ []
+_ : preds G2 (# 5) ≡ (# 3 , эксперт) ∷ []
 _ = refl
 
 
 _ : NArgs G2 (# 0) ≡ record { Scheme = A-абдукция
-                            ; NPremises = just N1 ∷v just N5 ∷v []v
+                            ; NPremises = just N5 ∷v []v
                             ; NConclusion = just N3
                             } ∷
                      record { Scheme = A-от-эксперта
@@ -197,7 +197,7 @@ _ = refl
 _ : NArgs+ G2 (# 0) ≡ (поддержка , # 2) ∷ []
 _ = refl
 
-_ : NArgs- G2 (# 0) ≡ (атака , # 0) ∷ []
+_ : NArgs- G2 (# 0) ≡ []
 _ = refl
 
 _ : NArgs G2 (# 4) ≡ []
@@ -232,13 +232,13 @@ _ = refl
 
 -- indexes
 
-_ : G2 ! (# 0) ≡ context N3 ((атака , # 0) ∷ (поддержка , # 2) ∷ [])
+_ : G2 ! (# 0) ≡ context N3 ((объяснение , # 0) ∷ (поддержка , # 2) ∷ [])
 _ = refl
 
-_ : G2 ! (# 1) ≡ context N6 ((факт     , # 3) ∷ (объяснение , # 0) ∷ [])
+_ : G2 ! (# 1) ≡ context N6 ((факт     , # 0) ∷ [])
 _ = refl
 
-_ : G2 ![ (# 0) > (# 0) ] ≡ context N6 ((факт     , # 3) ∷ (объяснение , # 0) ∷ [])
+_ : G2 ![ (# 0) > (# 0) ] ≡ context N6 ((факт     , # 0) ∷ [])
 _ = refl
 
 _ : G2 ![ (# 1) > (# 2) ] ≡ context N2 []
@@ -262,16 +262,16 @@ G2lim = steps 100 G2
 -- N2 ---- <N4> ---∙ 
 --         /        \
 -- N1 ----∙          N3
---         \        /|
+--                  /|
 -- N5 ---- <N6> ---∙ |
 --                   |
 -- N7 ---- <N8> -----∙
 G4 : AGraph _
 G4 =
-     context N3 ((атака , # 0) ∷ (поддержка , # 2) ∷ (поддержка , # 4) ∷ []) &
+     context N3 ((объяснение , # 0) ∷ (поддержка , # 2) ∷ (поддержка , # 4) ∷ []) &
      context N8 ((все-признают , # 0) ∷ []) &
      context N7 [] &
-     context N6 ((факт     , # 3) ∷ (объяснение , # 0) ∷ []) &
+     context N6 ((факт     , # 0) ∷ []) &
      context N5 [] &
      context N4 ((эксперт  , # 1) ∷ (говорит , # 0) ∷ []) &
      context N2 [] &
@@ -279,14 +279,14 @@ G4 =
      ∅
 
 _ : nodes G4 ≡ (# 0 , N3) ∷v (# 1 , N8) ∷v (# 2 , N7)
-             ∷v (# 3 , N6) ∷v (# 4 , N5) ∷v (# 5 , N4)
-             ∷v (# 6 , N2) ∷v (# 7 , N1) ∷v []v
+            ∷v (# 3 , N6) ∷v (# 4 , N5) ∷v (# 5 , N4)
+            ∷v (# 6 , N2) ∷v (# 7 , N1) ∷v []v
 _ = refl
 
-_ : edges G4 ≡ (# 0 , атака , # 0)
+_ : edges G4 ≡ (# 0 , объяснение , # 0)
              ∷ (# 0 , поддержка , # 2) ∷ (# 0 , поддержка , # 4)
              ∷ (# 1 , все-признают , _)
-             ∷ (# 3 , факт , # 3) ∷ (# 3 , объяснение , # 0)
+             ∷ (# 3 , факт , # 0) 
              ∷ (# 5 , эксперт , # 1) ∷ (# 5 , говорит , # 0)
              ∷ []
 _ = refl
@@ -298,10 +298,10 @@ _ = refl
 _ : preds G4 (# 3) ≡ (# 0 , поддержка) ∷ []
 _ = refl
 
-_ : preds G4 (# 1) ≡ (# 0 , атака) ∷ []
+_ : preds G4 (# 1) ≡ (# 0 , объяснение) ∷ []
 _ = refl
 
-_ : preds G4 (# 7) ≡ (# 3 , факт) ∷ (# 5 , эксперт) ∷ []
+_ : preds G4 (# 7) ≡ (# 5 , эксперт) ∷ []
 _ = refl
 
 
@@ -317,7 +317,7 @@ _ : NArgs G4 (# 0) ≡ record { Scheme = A-ad-populum
                             ; NConclusion = just N3
                             } ∷
                      record { Scheme = A-абдукция
-                            ; NPremises = just N1 ∷v just N5 ∷v []v
+                            ; NPremises = just N5 ∷v []v
                             ; NConclusion = just N3
                             } ∷
                      record { Scheme = A-от-эксперта
@@ -327,7 +327,7 @@ _ : NArgs G4 (# 0) ≡ record { Scheme = A-ad-populum
 _ = refl
 
 -- only attacks
-_ : NArgs- G4 (# 0) ≡ (атака , # 0) ∷ []
+_ : NArgs- G4 (# 0) ≡ []
 _ = refl
 
 -- only supports
@@ -350,13 +350,13 @@ _ = refl
 
 -- indexes
 
-_ : G4 ! (# 0) ≡ context N3 ((атака , _) ∷ (поддержка , _) ∷ (поддержка , _) ∷ [])
+_ : G4 ! (# 0) ≡ context N3 ((объяснение , _) ∷ (поддержка , _) ∷ (поддержка , _) ∷ [])
 _ = refl
 
-_ : G4 ! (# 3) ≡ context N6 ((факт     , _) ∷ (объяснение , _) ∷ [])
+_ : G4 ! (# 3) ≡ context N6 ((факт     , _) ∷ [])
 _ = refl
 
-_ : G4 ![ (# 0) > (# 2) ] ≡ context N6 ((факт     , # 3) ∷ (объяснение , # 0) ∷ [])
+_ : G4 ![ (# 0) > (# 2) ] ≡ context N6 ((факт     , _) ∷ [])
 _ = refl
 
 _ : G4 ![ (# 3) > (# 2) ] ≡ context N2 []
@@ -396,8 +396,8 @@ G6 =
 
 
 _ : nodes G5 ≡ (# 0 , CN1) ∷v (# 1 , ¬N3) ∷v (# 2 , N8) ∷v (# 3 , N7)
-             ∷v (# 4 , N3)  ∷v (# 5 , N6)  ∷v (# 6 , N5) ∷v (# 7 , N4)
-             ∷v (# 8 , N2)  ∷v (# 9 , N1)  ∷v []v
+            ∷v (# 4 , N3)  ∷v (# 5 , N6)  ∷v (# 6 , N5) ∷v (# 7 , N4)
+            ∷v (# 8 , N2)  ∷v (# 9 , N1)  ∷v []v
 _ = refl
 
 _ : roots G5 ≡ (# 0 , CN1) ∷ []

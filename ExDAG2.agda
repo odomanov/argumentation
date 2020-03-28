@@ -20,12 +20,13 @@ la = Pref
 -- la = Luk
 import DAG; module DAGla = DAG la; open DAGla
 
-St1  = let t = "St1"
-       in record { sttext = just t; stprop = mkProp t}
-St2  = let t = "St2"
-       in record { sttext = just t; stprop = mkProp t}
-St3  = let t = "St3"
-       in record { sttext = just t; stprop = mkProp t}
+T1 = mkFrag "St1"
+T2 = mkFrag "St2"
+T3 = mkFrag "St3"
+
+St1  = record { sttext = just T1; stprop = mkProp (Fragment.ftext T1)}
+St2  = record { sttext = just T2; stprop = mkProp (Fragment.ftext T2)}
+St3  = record { sttext = just T3; stprop = mkProp (Fragment.ftext T3)}
 
 A : ALNode
 A = Ln (Lni St1) (just (V 1.0 {refl} {refl}))
