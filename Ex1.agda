@@ -1,6 +1,6 @@
 -- Examples: Direct Acyclic Graph
 
-module ExDAG1 where
+module Ex1 where
 
 open import Data.Bool
 open import Data.Char renaming (Char to BChar)
