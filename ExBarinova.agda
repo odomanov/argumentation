@@ -1,4 +1,4 @@
-module Barinova where
+module ExBarinova where
 
 open import Data.Bool
 open import Data.Fin

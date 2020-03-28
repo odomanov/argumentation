@@ -1,7 +1,7 @@
 -- Examples: Direct Acyclic Graph
 -- Example from Pereira et al. Changing One's Mind...
 
-module ExDAG2 where
+module ExABC where
 
 open import Data.Fin as Fin
   using (Fin; Fin′; zero; suc; #_; toℕ; _≟_)
