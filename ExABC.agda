@@ -16,8 +16,8 @@ open import AIF
 open import LabelAlgebras
 open import ArgSchemes
 
-la = Pref
--- la = Luk
+-- la = Pref
+la = Łuk
 import DAG; module DAGla = DAG la; open DAGla
 
 T1 = mkFrag "St1"

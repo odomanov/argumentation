@@ -267,14 +267,14 @@ Pref = record
 
 
 -------------------------------------------------------
--- Lukasiewicz Algebra
+-- Łukasiewicz Algebra
 
 postulate
   luk0≤v⊙ : ∀ x y → 0.0 [≤] (fmax 0.0 ((value x) [+] (value y) [-] 1.0)) ≡ true
   lukv≤1⊙ : ∀ x y → (fmax 0.0 ((value x) [+] (value y) [-] 1.0)) [≤] 1.0 ≡ true
 
-Luk⊙ : FUnit → FUnit → FUnit
-Luk⊙ a b = record
+Łuk⊙ : FUnit → FUnit → FUnit
+Łuk⊙ a b = record
   { value = fmax 0.0 ((value a) [+] (value b) [-] 1.0)
   ; 0≤v = luk0≤v⊙ a b 
   ; v≤1 = lukv≤1⊙ a b 
@@ -284,65 +284,65 @@ postulate
   luk0≤v⊕ : ∀ x y → 0.0 [≤] (fmin (value x [+] value y) 1.0) ≡ true
   lukv≤1⊕ : ∀ x y → (fmin (value x [+] value y) 1.0) [≤] 1.0 ≡ true
 
-Luk⊕ : FUnit → FUnit → FUnit
-Luk⊕ a b = record
+Łuk⊕ : FUnit → FUnit → FUnit
+Łuk⊕ a b = record
   { value = fmin (value a [+] value b) 1.0
   ; 0≤v = luk0≤v⊕ a b 
   ; v≤1 = lukv≤1⊕ a b 
   }
 
-Luk⊘ : FUnit → FUnit
-Luk⊘ a = record
+Łuk⊘ : FUnit → FUnit
+Łuk⊘ a = record
   { value = (value FU1) [-] (value a)
   ; 0≤v = 0≤v⊘ a 
   ; v≤1 = v≤1⊘ a 
   }
 
-Luk∧ : FUnit → FUnit → FUnit
-Luk∧ a b = record
+Łuk∧ : FUnit → FUnit → FUnit
+Łuk∧ a b = record
   { value = fmin (value a) (value b)
   ; 0≤v = min0≤v a b
   ; v≤1 = minv≤1 a b
   }
 
-Luk∨ : FUnit → FUnit → FUnit
-Luk∨ a b = record
+Łuk∨ : FUnit → FUnit → FUnit
+Łuk∨ a b = record
   { value = fmax (value a) (value b)
   ; 0≤v = max0≤v a b
   ; v≤1 = maxv≤1 a b
   }
 
-Luk½ : FUnit → FUnit
-Luk½ x = record
+Łuk½ : FUnit → FUnit
+Łuk½ x = record
   { value = 0.5 [*] (value x)
   ; 0≤v = 0≤½v x
   ; v≤1 = ½v≤1 x
   }
 
 postulate
-  Luk-isLabelAlgebra : IsLabelAlgebra
-    FU= FU≤ Luk⊙ Luk⊕ -- Luk⊖
-      Luk⊘ Luk∧ Luk∨ Luk½ FU1 FU0
+  Łuk-isLabelAlgebra : IsLabelAlgebra
+    FU= FU≤ Łuk⊙ Łuk⊕ -- Łuk⊖
+      Łuk⊘ Łuk∧ Łuk∨ Łuk½ FU1 FU0
 
-docLuk : FUnit → Doc
-docLuk (mkFUnit x _ _) = docFloatRounded x 
+docŁuk : FUnit → Doc
+docŁuk (mkFUnit x _ _) = docFloatRounded x 
 
-Luk : LabelAlgebra _ _ _
-Luk = record
+Łuk : LabelAlgebra _ _ _
+Łuk = record
   { Carrier = FUnit
   ; _≈_ = FU=
   ; _≤_ = FU≤
-  ; _⊙_ = Luk⊙
-  ; _⊕_ = Luk⊕
-  -- ; _⊖_ = Luk⊖
-  ; ⊘   = Luk⊘
-  ; _∧_ = Luk∧
-  ; _∨_ = Luk∨
-  ; ½   = Luk½
+  ; _⊙_ = Łuk⊙
+  ; _⊕_ = Łuk⊕
+  -- ; _⊖_ = Łuk⊖
+  ; ⊘   = Łuk⊘
+  ; _∧_ = Łuk∧
+  ; _∨_ = Łuk∨
+  ; ½   = Łuk½
   ; ⊤ = FU1
   ; ⊥ = FU0
-  ; isLabelAlgebra = Luk-isLabelAlgebra
-  ; doc = docLuk
+  ; isLabelAlgebra = Łuk-isLabelAlgebra
+  ; doc = docŁuk
   }
 
 
