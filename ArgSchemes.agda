@@ -67,7 +67,12 @@ instance
   ℕprem {{A-LOG-OR}} = 2
   Premises {{A-LOG-OR}} = OR1 ∷v OR2 ∷v []v
   Conclusion {{A-LOG-OR}} = вывод
-  
+
+  -- отрицание = тезис → ⊥
+  A-LOG-NOT : RA-Scheme
+  ℕprem {{A-LOG-NOT}} = 2
+  Premises {{A-LOG-NOT}} = тезис ∷v отрицание ∷v []v
+  Conclusion {{A-LOG-NOT}} = вывод
     
 -- record A-ad-hominem : Set where
 --   field

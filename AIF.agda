@@ -96,6 +96,8 @@ AND1         = role "AND1"
 AND2         = role "AND2"
 OR1          = role "OR1"
 OR2          = role "OR2"
+тезис        = role "тезис"
+отрицание    = role "отрицание"
 
 Roles : List Role
 Roles = 
