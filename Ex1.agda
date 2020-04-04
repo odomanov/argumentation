@@ -25,6 +25,15 @@ open import ArgSchemes
 la = Łuk
 import DAG; module DAGla = DAG la; open DAGla
 
+node : ∀ {n} → ANode
+             → (v : Float) → {0.0 [≤] v ≡ true} → {v [≤] 1.0 ≡ true}
+             → Sucs n
+             → AContext n
+node nd v {p0} {p1} sucs = context (Ln nd (just (V v {p0} {p1}))) sucs
+
+node0 : ∀ {n} → ANode → Sucs n → AContext n
+node0 nd sucs = context (Ln nd nothing) sucs
+
 T1 = mkFrag "St1"
 T2 = mkFrag "St2"
 T3 = mkFrag "St3"
@@ -38,40 +47,22 @@ St3  = record { sttext = nothing; stprop = mkProp (Fragment.ftext T3)}
 St5  = record { sttext = just T5; stprop = mkProp (Fragment.ftext T5)}
 St7  = record { sttext = just T7; stprop = mkProp (Fragment.ftext T7)}
 
-N1 : ALNode
-N1 = Ln (Lni St1) (just (V 0.7 {refl} {refl}))
+SC = record {Conflicting = conflicting; Conflicted = conflicted}
 
-N2 : ALNode
-N2 = Ln (Lni St2) (just (V 1.0 {refl} {refl}))
+-- Statements
+NS1  : ANode;  NS1 = Lni St1
+NS2  : ANode;  NS2 = Lni St2
+NS3  : ANode;  NS3 = Lni St3
+¬NS3 : ANode; ¬NS3 = Lni ¬St3
+NS5  : ANode;  NS5 = Lni St5
+NS7  : ANode;  NS7 = Lni St7
 
-N3 : ALNode
-N3 = Ln (Lni St3) nothing -- (just (V 1.3 {refl} {refl}))
-
-¬N3 : ALNode
-¬N3 = Ln (Lni ¬St3) nothing -- (just (V 0.3 {refl} {refl}))
-
-N4 : ALNode
-N4 = Ln (Lnr A-от-эксперта) (just (V 0.5 {refl} {refl}))
-
-N5 : ALNode
-N5 = Ln (Lni St5) (just (V 0.6 {refl} {refl}))
-
-N6 : ALNode
-N6 = Ln (Lnr A-абдукция) (just (V 0.4 {refl} {refl}))
-
-N7 : ALNode
-N7 = Ln (Lni St7) (just (V 0.9 {refl} {refl}))
-
-N8 : ALNode
-N8 = Ln (Lnr A-ad-populum) (just (V 0.9 {refl} {refl}))
-
-CN1 : ALNode
-CN1 = Ln (Lnc record {Conflicting = conflicting; Conflicted = conflicted})
-         (just (V 0.8 {refl} {refl}))
-
-CN2 : ALNode
-CN2 = Ln (Lnc record {Conflicting = conflicting; Conflicted = conflicted})
-         (just (V 0.8 {refl} {refl}))
+-- Schemes
+NA4 : ANode; NA4 = Lnr A-от-эксперта
+NA6 : ANode; NA6 = Lnr A-абдукция
+NA8 : ANode; NA8 = Lnr A-ad-populum
+NC1 : ANode; NC1 = Lnc SC
+NC2 : ANode; NC2 = Lnc SC
 
 
 
@@ -82,31 +73,31 @@ CN2 = Ln (Lnc record {Conflicting = conflicting; Conflicted = conflicted})
 -- N2 ---+
 G1 : AGraph _
 G1 =
-     context N3 ((поддержка , # 0) ∷ []) &
-     context N4 ((эксперт , # 1) ∷ (говорит , # 0) ∷ []) & -- missed: область
-     context N2 [] &
-     context N1 [] &
+     node0 NS3 ((поддержка , # 0) ∷ []) &
+     node NA4 0.5 {refl} {refl} ((эксперт , # 1) ∷ (говорит , # 0) ∷ []) & -- missed: область
+     node NS2 1.0 {refl} {refl} [] &
+     node NS1 0.7 {refl} {refl} [] &
      ∅
 
-_ : nodes G1 ≡ (# 0 , N3) ∷v (# 1 , N4) ∷v (# 2 , N2) ∷v (# 3 , N1) ∷v []v
+_ : nodes G1 ≡ (# 0 , (Ln NS3 _)) ∷v (# 1 , (Ln NA4 _)) ∷v (# 2 , (Ln NS2 _)) ∷v (# 3 , (Ln NS1 _)) ∷v []v
 _ = refl
 
 _ : edges G1 ≡ (# 0 , поддержка , # 0) ∷ (# 1 , эксперт , # 1) ∷ (# 1 , говорит , # 0) ∷ []
 _ = refl
 
-_ : G1 [ # 3 ] ≡ (context N1 [] & ∅)
+_ : G1 [ # 3 ] ≡ (node NS1 0.7 {refl} {refl} [] & ∅)
 _ = refl
 
-_ : G1 [ # 2 ] ≡ (context N2 [] & context N1 [] & ∅)
+_ : G1 [ # 2 ] ≡ (node NS2 1.0 {refl} {refl} [] & node NS1 0.7 {refl} {refl} [] & ∅)
 _ = refl
 
-_ : G1 [ # 1 ] ≡ ( context N4 ((эксперт , # 1) ∷ (говорит , # 0) ∷ []) &
-                   context N2 [] & context N1 [] &
+_ : G1 [ # 1 ] ≡ ( node NA4 0.5 {refl} {refl} ((эксперт , # 1) ∷ (говорит , # 0) ∷ []) &
+                   node NS2 1.0 {refl} {refl} [] & node NS1 0.7 {refl} {refl} [] &
                    ∅
                  )
 _ = refl
 
-_ : roots G1 ≡ (_ , N3) ∷ []
+_ : roots G1 ≡ (_ , (Ln NS3 _)) ∷ []
 _ = refl
 
 _ : sucs G1 (# 1) ≡ (эксперт , # 1) ∷ (говорит , # 0) ∷ []
@@ -147,24 +138,24 @@ G1lim = steps 100 G1
 -- N5 ---- <N6> ---∙ 
 G2 : AGraph _
 G2 =
-     context N3 ((объяснение , # 0) ∷ (поддержка  , # 2) ∷ []) &
-     context N6 ((факт  , # 0) ∷ []) &
-     context N5 [] &
-     context N4 ((эксперт  , # 1) ∷ (говорит , # 0) ∷ []) & -- missed: область
-     context N2 [] &
-     context N1 [] &
+     node0 NS3 ((объяснение , # 0) ∷ (поддержка  , # 2) ∷ []) &
+     node NA6 0.4 {refl} {refl} ((факт  , # 0) ∷ []) &
+     node NS5 0.6 {refl} {refl} [] &
+     node NA4 0.5 {refl} {refl} ((эксперт  , # 1) ∷ (говорит , # 0) ∷ []) & -- missed: область
+     node NS2 1.0 {refl} {refl} [] &
+     node NS1 0.7 {refl} {refl} [] &
      ∅
 
 -- part of G2, actually
 G3 : AGraph _
 G3 =
-     context N4 ((эксперт  , # 1) ∷ (говорит , # 0) ∷ []) &
-     context N2 [] &
-     context N1 [] &
+     node NA4 0.5 {refl} {refl} ((эксперт  , # 1) ∷ (говорит , # 0) ∷ []) &
+     node NS2 1.0 {refl} {refl} [] &
+     node NS1 0.7 {refl} {refl} [] &
      ∅
 
-_ : nodes G2 ≡ (# 0 , N3) ∷v (# 1 , N6) ∷v (# 2 , N5) ∷v (# 3 , N4)
-            ∷v (# 4 , N2) ∷v (# 5 , N1) ∷v []v
+_ : nodes G2 ≡ (# 0 , (Ln NS3 _)) ∷v (# 1 , (Ln NA6 _)) ∷v (# 2 , (Ln NS5 _)) ∷v (# 3 , (Ln NA4 _))
+            ∷v (# 4 , (Ln NS2 _)) ∷v (# 5 , (Ln NS1 _)) ∷v []v
 _ = refl
 
 _ : edges G2 ≡ (# 0 , объяснение , # 0) ∷ (# 0 , поддержка , # 2)
@@ -185,12 +176,12 @@ _ = refl
 
 
 _ : NArgs G2 (# 0) ≡ record { Scheme = A-абдукция
-                            ; NPremises = just N5 ∷v []v
-                            ; NConclusion = just N3
+                            ; NPremises = just (Ln NS5 _) ∷v []v
+                            ; NConclusion = just (Ln NS3 _)
                             } ∷
                      record { Scheme = A-от-эксперта
-                            ; NPremises = just N1 ∷v just N2 ∷v nothing ∷v []v
-                            ; NConclusion = just N3
+                            ; NPremises = just (Ln NS1 _) ∷v just (Ln NS2 _) ∷v nothing ∷v []v
+                            ; NConclusion = just (Ln NS3 _)
                             } ∷ []
 _ = refl
 
@@ -203,7 +194,7 @@ _ = refl
 _ : NArgs G2 (# 4) ≡ []
 _ = refl
 
-_ : roots G2 ≡ (# 0 , N3) ∷ []
+_ : roots G2 ≡ (# 0 , (Ln NS3 _)) ∷ []
 _ = refl
 
 _ : G2 [ (# 0) ] ≡ G2
@@ -232,16 +223,16 @@ _ = refl
 
 -- indexes
 
-_ : G2 ! (# 0) ≡ context N3 ((объяснение , # 0) ∷ (поддержка , # 2) ∷ [])
+_ : G2 ! (# 0) ≡ context (Ln NS3 nothing) ((объяснение , # 0) ∷ (поддержка , # 2) ∷ [])
 _ = refl
 
-_ : G2 ! (# 1) ≡ context N6 ((факт     , # 0) ∷ [])
+_ : G2 ! (# 1) ≡ node NA6 0.4 {refl} {refl} ((факт     , # 0) ∷ [])
 _ = refl
 
-_ : G2 ![ (# 0) > (# 0) ] ≡ context N6 ((факт     , # 0) ∷ [])
+_ : G2 ![ (# 0) > (# 0) ] ≡ node NA6 0.4 {refl} {refl} ((факт     , # 0) ∷ [])
 _ = refl
 
-_ : G2 ![ (# 1) > (# 2) ] ≡ context N2 []
+_ : G2 ![ (# 1) > (# 2) ] ≡ node NS2 1.0 {refl} {refl} []
 _ = refl
 
 
@@ -268,19 +259,19 @@ G2lim = steps 100 G2
 -- N7 ---- <N8> -----∙
 G4 : AGraph _
 G4 =
-     context N3 ((объяснение , # 0) ∷ (поддержка , # 2) ∷ (поддержка , # 4) ∷ []) &
-     context N8 ((все-признают , # 0) ∷ []) &
-     context N7 [] &
-     context N6 ((факт     , # 0) ∷ []) &
-     context N5 [] &
-     context N4 ((эксперт  , # 1) ∷ (говорит , # 0) ∷ []) &
-     context N2 [] &
-     context N1 [] &
+     node0 NS3 ((объяснение , # 0) ∷ (поддержка , # 2) ∷ (поддержка , # 4) ∷ []) &
+     node NA8 0.9 {refl} {refl} ((все-признают , # 0) ∷ []) &
+     node NS7 0.9 {refl} {refl} [] &
+     node NA6 0.4 {refl} {refl} ((факт     , # 0) ∷ []) &
+     node NS5 0.6 {refl} {refl} [] &
+     node NA4 0.5 {refl} {refl} ((эксперт  , # 1) ∷ (говорит , # 0) ∷ []) &
+     node NS2 1.0 {refl} {refl} [] &
+     node NS1 0.7 {refl} {refl} [] &
      ∅
 
-_ : nodes G4 ≡ (# 0 , N3) ∷v (# 1 , N8) ∷v (# 2 , N7)
-            ∷v (# 3 , N6) ∷v (# 4 , N5) ∷v (# 5 , N4)
-            ∷v (# 6 , N2) ∷v (# 7 , N1) ∷v []v
+_ : nodes G4 ≡ (# 0 , (Ln NS3 _)) ∷v (# 1 , (Ln NA8 _)) ∷v (# 2 , (Ln NS7 _))
+            ∷v (# 3 , (Ln NA6 _)) ∷v (# 4 , (Ln NS5 _)) ∷v (# 5 , (Ln NA4 _))
+            ∷v (# 6 , (Ln NS2 _)) ∷v (# 7 , (Ln NS1 _)) ∷v []v
 _ = refl
 
 _ : edges G4 ≡ (# 0 , объяснение , # 0)
@@ -307,22 +298,22 @@ _ = refl
 
 -- all inputs
 _ : Arg G4 (# 0) (# 4) ≡ just record { Scheme = A-от-эксперта
-                                     ; NPremises = just N1 ∷v just N2 ∷v nothing ∷v []v
-                                     ; NConclusion = just N3
+                                     ; NPremises = just (Ln NS1 _) ∷v just (Ln NS2 _) ∷v nothing ∷v []v
+                                     ; NConclusion = just (Ln NS3 _)
                                      }
 _ = refl
 
 _ : NArgs G4 (# 0) ≡ record { Scheme = A-ad-populum
-                            ; NPremises = just N7 ∷v []v
-                            ; NConclusion = just N3
+                            ; NPremises = just (Ln NS7 _) ∷v []v
+                            ; NConclusion = just (Ln NS3 _)
                             } ∷
                      record { Scheme = A-абдукция
-                            ; NPremises = just N5 ∷v []v
-                            ; NConclusion = just N3
+                            ; NPremises = just (Ln NS5 _) ∷v []v
+                            ; NConclusion = just (Ln NS3 _)
                             } ∷
                      record { Scheme = A-от-эксперта
-                            ; NPremises = just N1 ∷v just N2 ∷v nothing ∷v []v
-                            ; NConclusion = just N3
+                            ; NPremises = just (Ln NS1 _) ∷v just (Ln NS2 _) ∷v nothing ∷v []v
+                            ; NConclusion = just (Ln NS3 _)
                             } ∷ []
 _ = refl
 
@@ -344,22 +335,22 @@ _ = refl
 _ : NArgs- G4 (# 4) ≡ []
 _ = refl
 
-_ : roots G4 ≡ (# 0 , N3) ∷ []
+_ : roots G4 ≡ (# 0 , (Ln NS3 _)) ∷ []
 _ = refl
 
 
 -- indexes
 
-_ : G4 ! (# 0) ≡ context N3 ((объяснение , _) ∷ (поддержка , _) ∷ (поддержка , _) ∷ [])
+_ : G4 ! (# 0) ≡ context (Ln NS3 nothing) ((объяснение , _) ∷ (поддержка , _) ∷ (поддержка , _) ∷ [])
 _ = refl
 
-_ : G4 ! (# 3) ≡ context N6 ((факт     , _) ∷ [])
+_ : G4 ! (# 3) ≡ node NA6 0.4 ((факт     , _) ∷ [])
 _ = refl
 
-_ : G4 ![ (# 0) > (# 2) ] ≡ context N6 ((факт     , _) ∷ [])
+_ : G4 ![ (# 0) > (# 2) ] ≡ node NA6 0.4 ((факт     , _) ∷ [])
 _ = refl
 
-_ : G4 ![ (# 3) > (# 2) ] ≡ context N2 []
+_ : G4 ![ (# 3) > (# 2) ] ≡ node NS2 1.0 {refl} {refl} []
 _ = refl
 
 
@@ -383,27 +374,27 @@ G4lim = steps 100 G4
 -- N7 ---- <N8> ----¬N3 -∙ 
 G5 : AGraph _
 G5 =
-     context CN1 ((conflicted , # 0) ∷ (conflicting , # 3) ∷ []) &
-     context ¬N3 ((поддержка , # 0) ∷ []) &
-     context N8 ((все-признают , # 0) ∷ []) &
-     context N7 [] &
+     node NC1 1.0 {refl} {refl} ((conflicted , # 0) ∷ (conflicting , # 3) ∷ []) &
+     node0 ¬NS3 ((поддержка , # 0) ∷ []) &
+     node NA8 0.9 {refl} {refl} ((все-признают , # 0) ∷ []) &
+     node NS7 0.9 {refl} {refl} [] &
      G2                -- missed область in A-от-эксперта !
 
 G6 : AGraph _
 G6 =
-     context CN2 ((conflicted , # 4) ∷ (conflicting , # 1) ∷ []) &
+     node NC2 1.0 {refl} {refl} ((conflicted , # 4) ∷ (conflicting , # 1) ∷ []) &
      G5
 
 
-_ : nodes G5 ≡ (# 0 , CN1) ∷v (# 1 , ¬N3) ∷v (# 2 , N8) ∷v (# 3 , N7)
-            ∷v (# 4 , N3)  ∷v (# 5 , N6)  ∷v (# 6 , N5) ∷v (# 7 , N4)
-            ∷v (# 8 , N2)  ∷v (# 9 , N1)  ∷v []v
+_ : nodes G5 ≡ (# 0 , (Ln NC1 _)) ∷v (# 1 , (Ln ¬NS3 _)) ∷v (# 2 , (Ln NA8 _)) ∷v (# 3 , (Ln NS7 _))
+            ∷v (# 4 , (Ln NS3 _)) ∷v (# 5 , (Ln NA6 _))  ∷v (# 6 , (Ln NS5 _)) ∷v (# 7 , (Ln NA4 _))
+            ∷v (# 8 , (Ln NS2 _)) ∷v (# 9 , (Ln NS1 _))  ∷v []v
 _ = refl
 
-_ : roots G5 ≡ (# 0 , CN1) ∷ []
+_ : roots G5 ≡ (# 0 , (Ln NC1 _)) ∷ []
 _ = refl
 
-_ : roots¬CA G5 ≡ (# 1 , ¬N3) ∷ (# 4 , N3) ∷ []
+_ : roots¬CA G5 ≡ (# 1 , (Ln ¬NS3 _)) ∷ (# 4 , (Ln NS3 _)) ∷ []
 _ = refl
 
 _ : theSame {10} (# 1) (# 0) (# 0) ≡ true
@@ -489,10 +480,10 @@ G6200 = steps 200 G6
 
 G7 : AGraph _
 G7 =
-     context CN2 ((conflicted , # 2) ∷ (conflicting , # 1) ∷ []) &
-     context CN1 ((conflicted , # 0) ∷ (conflicting , # 1) ∷ []) &
-     context N2 [] &
-     context N1 [] &
+     node NC2 1.0 {refl} {refl} ((conflicted , # 2) ∷ (conflicting , # 1) ∷ []) &
+     node NC1 1.0 {refl} {refl} ((conflicted , # 0) ∷ (conflicting , # 1) ∷ []) &
+     node NS2 1.0 {refl} {refl} [] &
+     node NS1 1.0 {refl} {refl} [] &
      ∅
 
 G70 = compute G7
@@ -565,6 +556,11 @@ printG6 g f = "\nN1  = " +++ pprint w (f g (# 10))
           +++ "\n-N3 = " +++ pprint w (f g (# 2))
           +++ "  CN1 = " +++ pprint w (f g (# 1))
           +++ "  CN2 = " +++ pprint w (f g (# 0))
+printG7 : AGraph 4 → (∀ {n} → AGraph n → Fin n → MC) → String
+printG7 g f = "\nN1  = " +++ pprint w (f g (# 3))
+          +++ "  N2  = " +++ pprint w (f g (# 2))
+          +++ "  CN1 = " +++ pprint w (f g (# 1))
+          +++ "  CN2 = " +++ pprint w (f g (# 0))
 
 main = run (putStrLn stringToPrint)
   where
@@ -616,47 +612,68 @@ main = run (putStrLn stringToPrint)
     -- +++ ppretty ws (docSection ws "G4lim")
     -- +++ printG4 G4lim val←i
 
-    +++ ppretty ws (docSection ws "G5 orig")
-    +++ printG5 G5 val←i
-    +++ ppretty ws (docSection ws "G5 computed")
-    +++ printG5 G5 val
-    +++ ppretty ws (docSection ws "G50")
-    +++ printG5 G50 val←i
-    +++ ppretty ws (docSection ws "G51")
-    +++ printG5 G51 val←i
-    +++ ppretty ws (docSection ws "G52")
-    +++ printG5 G52 val←i
-    +++ ppretty ws (docSection ws "G53")
-    +++ printG5 G53 val←i
-    +++ ppretty ws (docSection ws "G54")
-    +++ printG5 G54 val←i
-    +++ ppretty ws (docSection ws "G5100")
-    +++ printG5 G5100 val←i
-    +++ ppretty ws (docSection ws "G5200")
-    +++ printG5 G5200 val←i
+    -- +++ ppretty ws (docSection ws "G5 orig")
+    -- +++ printG5 G5 val←i
+    -- +++ ppretty ws (docSection ws "G5 computed")
+    -- +++ printG5 G5 val
+    -- +++ ppretty ws (docSection ws "G50")
+    -- +++ printG5 G50 val←i
+    -- +++ ppretty ws (docSection ws "G51")
+    -- +++ printG5 G51 val←i
+    -- +++ ppretty ws (docSection ws "G52")
+    -- +++ printG5 G52 val←i
+    -- +++ ppretty ws (docSection ws "G53")
+    -- +++ printG5 G53 val←i
+    -- +++ ppretty ws (docSection ws "G54")
+    -- +++ printG5 G54 val←i
+    -- +++ ppretty ws (docSection ws "G5100")
+    -- +++ printG5 G5100 val←i
+    -- +++ ppretty ws (docSection ws "G5200")
+    -- +++ printG5 G5200 val←i
 
     -- +++ (pprint 110 G5)
 
-    -- +++ ppretty ws (docSection ws "G6 orig")
-    -- +++ printG6 G6 val←i
-    -- +++ ppretty ws (docSection ws "G6 computed")
-    -- +++ printG6 G6 val
-    -- +++ ppretty ws (docSection ws "G60")
-    -- +++ printG6 G60 val←i
-    -- +++ ppretty ws (docSection ws "G61")
-    -- +++ printG6 G61 val←i
-    -- +++ ppretty ws (docSection ws "G62")
-    -- +++ printG6 G62 val←i
-    -- +++ ppretty ws (docSection ws "G63")
-    -- +++ printG6 G63 val←i
-    -- +++ ppretty ws (docSection ws "G64")
-    -- +++ printG6 G64 val←i
-    -- +++ ppretty ws (docSection ws "G6100")
-    -- +++ printG6 G6100 val←i
-    -- +++ ppretty ws (docSection ws "G6200")
-    -- +++ printG6 G6200 val←i
+    +++ ppretty ws (docSection ws "G6 orig")
+    +++ printG6 G6 val←i
+    +++ ppretty ws (docSection ws "G6 computed")
+    +++ printG6 G6 val
+    +++ ppretty ws (docSection ws "G60")
+    +++ printG6 G60 val←i
+    +++ ppretty ws (docSection ws "G61")
+    +++ printG6 G61 val←i
+    +++ ppretty ws (docSection ws "G62")
+    +++ printG6 G62 val←i
+    +++ ppretty ws (docSection ws "G63")
+    +++ printG6 G63 val←i
+    +++ ppretty ws (docSection ws "G64")
+    +++ printG6 G64 val←i
+    +++ ppretty ws (docSection ws "G6100")
+    +++ printG6 G6100 val←i
+    +++ ppretty ws (docSection ws "G6200")
+    +++ printG6 G6200 val←i
 
     -- +++ (pprint 110 G6)
+
+    +++ ppretty ws (docSection ws "G7 orig")
+    +++ printG7 G7 val←i
+    +++ ppretty ws (docSection ws "G7 computed")
+    +++ printG7 G7 val
+    +++ ppretty ws (docSection ws "G70")
+    +++ printG7 G70 val←i
+    +++ ppretty ws (docSection ws "G71")
+    +++ printG7 G71 val←i
+    +++ ppretty ws (docSection ws "G72")
+    +++ printG7 G72 val←i
+    +++ ppretty ws (docSection ws "G73")
+    +++ printG7 G73 val←i
+    +++ ppretty ws (docSection ws "G74")
+    +++ printG7 G74 val←i
+    +++ ppretty ws (docSection ws "G7100")
+    +++ printG7 G7100 val←i
+    +++ ppretty ws (docSection ws "G7200")
+    +++ printG7 G7200 val←i
+
+    +++ (pprint 110 G7)
 
     -- +++ "\nN1+N2 = " +++ pprint w (val←Ctx G2 (# 5) ⟪ _⊕_ Pref ⟫ val←Ctx G2 (# 4))
     -- +++ "\nN4+N6 = " +++ pprint w (val←Ctx G2 (# 3) ⟪ _⊕_ Pref ⟫ val←Ctx G2 (# 1))
