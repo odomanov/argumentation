@@ -29,11 +29,11 @@ open import Relation.Nullary using (yes; no)
 open import ArgPrelude 
 open import AIF
 
-ANode = Node {la = la}
-ALNode = LNode {la = la}
+ANode = Node {la = la}           -- node
+ALNode = LNode {la = la}         -- labeled node
 AContext = Context ALNode Role   -- argumentation context
 AGraph = Graph ALNode Role       -- argumentation graph     
-AArg = Argument {la = la}
+AArg = Argument {la = la}        -- argument
 
 MC = Maybe (Carrier la)
 MC⊥ = just (LA⊥ la)
@@ -331,7 +331,7 @@ fold↑ {n = ℕsuc n} f init = fold' f init (zero)
 
 --  calculating algebra values  --------------------------------------------
 
--- from premises to conclusion
+-- Deduction: from premises to conclusion
 
 valRA : AArg → MC
 valRA (mkArg _ prems concl) = valRA' prems concl
@@ -458,7 +458,6 @@ val+conflicts {n} g0 g i = (val g0 i) ⟪ _⊙_ la ⟫ ¬foldConflicts g i
 
 -- the value of the next iteration
 iterationVal : ∀ {n} → AGraph n → AGraph n → Fin n → MC
--- iterationVal i = (val←i gin i)
 iterationVal g0 gin i = (⟪ ½ la ⟫ (val←i gin i))
                         ⟪ _⊕_ la ⟫
                         (⟪ ½ la ⟫ val+conflicts g0 gin i)
