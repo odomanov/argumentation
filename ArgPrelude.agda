@@ -153,8 +153,8 @@ x [≤] y = primFloatLess x y ∨ primFloatEquality x y
 -- Some Docs
 
 docSection : ℕ → String → Doc
-docSection n s = line <> text (s +++ "  ")
-                 <> text (S.replicate (0 ℕ.⊔ ((n ∸ 2) ∸ S.length s)) '=')
+docSection n s = line <> text (s +++ " ")
+                 <> text (S.replicate (0 ℕ.⊔ ((n ∸ 1) ∸ S.length s)) '.')
 
 docFloat : Float → Doc
 docFloat x = text (Data.Float.show x)
