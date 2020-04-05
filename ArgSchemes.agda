@@ -72,7 +72,7 @@ instance
   A-LOG-NOT : RA-Scheme
   ℕprem {{A-LOG-NOT}} = 2
   Premises {{A-LOG-NOT}} = тезис ∷v отрицание ∷v []v
-  Conclusion {{A-LOG-NOT}} = вывод
+  Conclusion {{A-LOG-NOT}} = противоречие
     
 -- record A-ad-hominem : Set where
 --   field
