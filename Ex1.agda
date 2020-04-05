@@ -474,32 +474,6 @@ G6200 = steps 200 G6
 
 
 
--- Graph with 2 opposite conflicts  --------------------------------------------
-
--- N1 ---CN1, CN2--- N2
-
-G7 : AGraph _
-G7 =
-     node NC2 1.0 {refl} {refl} ((conflicted , # 2) ∷ (conflicting , # 1) ∷ []) &
-     node NC1 1.0 {refl} {refl} ((conflicted , # 0) ∷ (conflicting , # 1) ∷ []) &
-     node NS2 1.0 {refl} {refl} [] &
-     node NS1 1.0 {refl} {refl} [] &
-     ∅
-
-G70 = compute G7
-
-G71 = steps 1 G7
-
-G72 = steps 2 G7
-
-G73 = steps 3 G7
-
-G74 = steps 4 G7
-
-G7100 = steps 100 G7
-
-G7200 = steps 200 G7
-
 
 
 
@@ -554,11 +528,6 @@ printG6 g f = "\nN1  = " +++ pprint w (f g (# 10))
           +++ "  N7  = " +++ pprint w (f g (# 4))
           +++ "  N8  = " +++ pprint w (f g (# 3))
           +++ "\n-N3 = " +++ pprint w (f g (# 2))
-          +++ "  CN1 = " +++ pprint w (f g (# 1))
-          +++ "  CN2 = " +++ pprint w (f g (# 0))
-printG7 : AGraph 4 → (∀ {n} → AGraph n → Fin n → MC) → String
-printG7 g f = "\nN1  = " +++ pprint w (f g (# 3))
-          +++ "  N2  = " +++ pprint w (f g (# 2))
           +++ "  CN1 = " +++ pprint w (f g (# 1))
           +++ "  CN2 = " +++ pprint w (f g (# 0))
 
@@ -653,27 +622,6 @@ main = run (putStrLn stringToPrint)
     +++ printG6 G6200 val←i
 
     -- +++ (pprint 110 G6)
-
-    +++ ppretty ws (docSection ws "G7 orig")
-    +++ printG7 G7 val←i
-    +++ ppretty ws (docSection ws "G7 computed")
-    +++ printG7 G7 val
-    +++ ppretty ws (docSection ws "G70")
-    +++ printG7 G70 val←i
-    +++ ppretty ws (docSection ws "G71")
-    +++ printG7 G71 val←i
-    +++ ppretty ws (docSection ws "G72")
-    +++ printG7 G72 val←i
-    +++ ppretty ws (docSection ws "G73")
-    +++ printG7 G73 val←i
-    +++ ppretty ws (docSection ws "G74")
-    +++ printG7 G74 val←i
-    +++ ppretty ws (docSection ws "G7100")
-    +++ printG7 G7100 val←i
-    +++ ppretty ws (docSection ws "G7200")
-    +++ printG7 G7200 val←i
-
-    +++ (pprint 110 G7)
 
     -- +++ "\nN1+N2 = " +++ pprint w (val←Ctx G2 (# 5) ⟪ _⊕_ Pref ⟫ val←Ctx G2 (# 4))
     -- +++ "\nN4+N6 = " +++ pprint w (val←Ctx G2 (# 3) ⟪ _⊕_ Pref ⟫ val←Ctx G2 (# 1))
