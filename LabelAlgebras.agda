@@ -346,3 +346,86 @@ docŁuk (mkFUnit x _ _) = docFloatRounded x
   }
 
 
+-------------------------------------------------------
+-- Gödel t-norm
+
+-- postulate
+--   göd0≤v⊙ : ∀ x y → 0.0 [≤] (fmin (value x) (value y)) ≡ true
+--   gödv≤1⊙ : ∀ x y → (fmax 0.0 ((value x) [+] (value y) [-] 1.0)) [≤] 1.0 ≡ true
+
+Göd⊙ : FUnit → FUnit → FUnit
+Göd⊙ a b = record
+  { value = fmin (value a) (value b)
+  ; 0≤v = min0≤v a b 
+  ; v≤1 = minv≤1 a b 
+  }
+
+-- postulate
+--   göd0≤v⊕ : ∀ x y → 0.0 [≤] (fmin (value x [+] value y) 1.0) ≡ true
+--   gödv≤1⊕ : ∀ x y → (fmin (value x [+] value y) 1.0) [≤] 1.0 ≡ true
+
+Göd⊕ : FUnit → FUnit → FUnit
+Göd⊕ a b = record
+  { value = fmax (value a) (value b)
+  ; 0≤v = max0≤v a b 
+  ; v≤1 = maxv≤1 a b 
+  }
+
+Göd⊘ : FUnit → FUnit
+Göd⊘ a = record
+  { value = (value FU1) [-] (value a)
+  ; 0≤v = 0≤v⊘ a 
+  ; v≤1 = v≤1⊘ a 
+  }
+
+Göd∧ = Göd⊙
+Göd∨ = Göd⊕
+
+-- Göd∧ : FUnit → FUnit → FUnit
+-- Göd∧ a b = record
+--   { value = fmin (value a) (value b)
+--   ; 0≤v = min0≤v a b
+--   ; v≤1 = minv≤1 a b
+--   }
+
+-- Göd∨ : FUnit → FUnit → FUnit
+-- Göd∨ a b = record
+--   { value = fmax (value a) (value b)
+--   ; 0≤v = max0≤v a b
+--   ; v≤1 = maxv≤1 a b
+--   }
+
+Göd½ : FUnit → FUnit
+Göd½ x = record
+  { value = 0.5 [*] (value x)
+  ; 0≤v = 0≤½v x
+  ; v≤1 = ½v≤1 x
+  }
+
+postulate
+  Gödel-isLabelAlgebra : IsLabelAlgebra
+    FU= FU≤ Göd⊙ Göd⊕ -- Göd⊖
+      Göd⊘ Göd∧ Göd∨ Göd½ FU1 FU0
+
+docGödel : FUnit → Doc
+docGödel (mkFUnit x _ _) = docFloatRounded x 
+
+Gödel : LabelAlgebra _ _ _
+Gödel = record
+  { Carrier = FUnit
+  ; _≈_ = FU=
+  ; _≤_ = FU≤
+  ; _⊙_ = Göd⊙
+  ; _⊕_ = Göd⊕
+  -- ; _⊖_ = Göd⊖
+  ; ⊘   = Göd⊘
+  ; _∧_ = Göd∧
+  ; _∨_ = Göd∨
+  ; ½   = Göd½
+  ; ⊤ = FU1
+  ; ⊥ = FU0
+  ; isLabelAlgebra = Gödel-isLabelAlgebra
+  ; doc = docGödel
+  }
+
+
