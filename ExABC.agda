@@ -8,7 +8,7 @@ open import Data.Fin as Fin
 open import Data.List as List using (List; []; _∷_)
 open import Data.Maybe
 open import Data.Product using (_,_)
-open import Data.String renaming (_++_ to _+++_)
+open import Data.String as S renaming (_++_ to _+++_)
 open import Data.Vec as V using (Vec) renaming ([] to []v; _∷_ to _∷v_)
 
 open import ArgPrelude 
@@ -16,8 +16,8 @@ open import AIF
 open import LabelAlgebras
 open import ArgSchemes
 
--- la = Pref
-la = Łuk
+la = Pref
+-- la = Łuk
 import DAG; module DAGla = DAG la; open DAGla
 
 T1 = mkFrag "St1"
@@ -126,8 +126,8 @@ printABC g f = "\nA = " +++ pprint w (f g (# 5))
 
 main = run (putStrLn stringToPrint)
   where
-  stringToPrint = "--------------------------------------------"
-    +++ ppretty ws (docSection ws "\nG orig")
+  stringToPrint = S.replicate ws '-'
+    +++ ppretty ws (docSection ws "G orig")
     +++ printABC G val←i
     +++ ppretty ws (docSection ws "G computed")
     +++ printABC G val
