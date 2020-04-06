@@ -64,10 +64,6 @@ FUmean a b = record
   }
 
 
-postulate
-  0≤½v : ∀ x → (0.0 [≤] (0.5 [*] (value x))) ≡ true  
-  ½v≤1 : ∀ x → (0.5 [*] (value x) [≤] 1.0) ≡ true   
-
 min0≤v : ∀ x y → (0.0 [≤] (fmin (value x) (value y)) ≡ true)
 min0≤v x y with (value x) [<] (value y)
 min0≤v (mkFUnit _ 0≤v₁ _) y | true = 0≤v₁
@@ -165,9 +161,6 @@ Trust∨ a b = record
   ; v≤1 = maxv≤1 a b
   }
 
-Trust½ : FUnit → FUnit
-Trust½ x = x                       -- dummy definition !!
-
 postulate
   Trust-isLabelAlgebra : IsLabelAlgebra
     FU= FU≤ Trust⊙ Trust⊕ -- Trust⊖
@@ -241,13 +234,6 @@ Pref∨ a b = record
   { value = fmax (value a) (value b)
   ; 0≤v = max0≤v a b
   ; v≤1 = maxv≤1 a b
-  }
-
-Pref½ : FUnit → FUnit
-Pref½ x = record
-  { value = 0.5 [*] (value x)
-  ; 0≤v = 0≤½v x
-  ; v≤1 = ½v≤1 x
   }
 
 postulate
@@ -324,13 +310,6 @@ postulate
   ; v≤1 = maxv≤1 a b
   }
 
-Łuk½ : FUnit → FUnit
-Łuk½ x = record
-  { value = 0.5 [*] (value x)
-  ; 0≤v = 0≤½v x
-  ; v≤1 = ½v≤1 x
-  }
-
 postulate
   Łuk-isLabelAlgebra : IsLabelAlgebra
     FU= FU≤ Łuk⊙ Łuk⊕ -- Łuk⊖
@@ -361,20 +340,12 @@ docŁuk (mkFUnit x _ _) = docFloatRounded x
 -------------------------------------------------------
 -- Gödel t-norm
 
--- postulate
---   göd0≤v⊙ : ∀ x y → 0.0 [≤] (fmin (value x) (value y)) ≡ true
---   gödv≤1⊙ : ∀ x y → (fmax 0.0 ((value x) [+] (value y) [-] 1.0)) [≤] 1.0 ≡ true
-
 Göd⊙ : FUnit → FUnit → FUnit
 Göd⊙ a b = record
   { value = fmin (value a) (value b)
   ; 0≤v = min0≤v a b 
   ; v≤1 = minv≤1 a b 
   }
-
--- postulate
---   göd0≤v⊕ : ∀ x y → 0.0 [≤] (fmin (value x [+] value y) 1.0) ≡ true
---   gödv≤1⊕ : ∀ x y → (fmin (value x [+] value y) 1.0) [≤] 1.0 ≡ true
 
 Göd⊕ : FUnit → FUnit → FUnit
 Göd⊕ a b = record
@@ -392,27 +363,6 @@ Göd⊘ a = record
 
 Göd∧ = Göd⊙
 Göd∨ = Göd⊕
-
--- Göd∧ : FUnit → FUnit → FUnit
--- Göd∧ a b = record
---   { value = fmin (value a) (value b)
---   ; 0≤v = min0≤v a b
---   ; v≤1 = minv≤1 a b
---   }
-
--- Göd∨ : FUnit → FUnit → FUnit
--- Göd∨ a b = record
---   { value = fmax (value a) (value b)
---   ; 0≤v = max0≤v a b
---   ; v≤1 = maxv≤1 a b
---   }
-
-Göd½ : FUnit → FUnit
-Göd½ x = record
-  { value = 0.5 [*] (value x)
-  ; 0≤v = 0≤½v x
-  ; v≤1 = ½v≤1 x
-  }
 
 postulate
   Gödel-isLabelAlgebra : IsLabelAlgebra
