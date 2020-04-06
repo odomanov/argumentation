@@ -20,7 +20,7 @@ record IsLabelAlgebra {c ℓ₁ ℓ₂} {A : Set c}
                          (⊘   : Op₁ A)
                          (_∧_ : Op₂ A)
                          (_∨_ : Op₂ A)
-                         (½   : Op₁ A)
+                         (mean : Op₂ A)
                          (⊤ : A)
                          (⊥ : A)
                          : Set (suc (c ⊔ ℓ₁ ⊔ ℓ₂)) where
@@ -66,11 +66,11 @@ record LabelAlgebra c ℓ₁ ℓ₂ : Set (suc (c ⊔ ℓ₁ ⊔ ℓ₂)) where
     ⊘       : Op₁ Carrier     -- The negation operation.
     _∧_     : Op₂ Carrier     -- The minimum operation.
     _∨_     : Op₂ Carrier     -- The maximum operation.
-    ½       : Op₁ Carrier     -- The half operation.
+    mean    : Op₂ Carrier     -- The half-sum
     ⊤       : Carrier         -- The maximum.
     ⊥       : Carrier         -- The minimum.
     isLabelAlgebra : IsLabelAlgebra _≈_ _≤_ _⊙_ _⊕_ -- _⊖_
-                                    ⊘ _∧_ _∨_ ½ ⊤ ⊥ 
+                                    ⊘ _∧_ _∨_ mean ⊤ ⊥ 
     doc : Carrier → Doc
     
   open IsLabelAlgebra isLabelAlgebra public

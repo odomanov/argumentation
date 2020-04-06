@@ -458,9 +458,9 @@ val+conflicts {n} g0 g i = (val g0 i) ⟪ _⊙_ la ⟫ ¬foldConflicts g i
 
 -- the value of the next iteration
 iterationVal : ∀ {n} → AGraph n → AGraph n → Fin n → MC
-iterationVal g0 gin i = (⟪ ½ la ⟫ (val←i gin i))
-                        ⟪ _⊕_ la ⟫
-                        (⟪ ½ la ⟫ val+conflicts g0 gin i)
+iterationVal g0 gin i = (val←i gin i)
+                        ⟪ mean la ⟫
+                        (val+conflicts g0 gin i)
 
 private
   step' : ∀ {n}

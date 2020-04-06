@@ -53,6 +53,18 @@ fmax : Float → Float → Float
 fmax x y = if x [<] y then y else x 
 
 postulate
+  0≤vmean : ∀ x y → 0.0 [≤] (0.5 [*] (value x [+] value y)) ≡ true
+  v≤1mean : ∀ x y → (0.5 [*] (value x [+] value y)) [≤] 1.0 ≡ true
+
+FUmean : FUnit → FUnit → FUnit 
+FUmean a b = record
+  { value = 0.5 [*] (value a [+] value b) 
+  ; 0≤v = 0≤vmean a b 
+  ; v≤1 = v≤1mean a b 
+  }
+
+
+postulate
   0≤½v : ∀ x → (0.0 [≤] (0.5 [*] (value x))) ≡ true  
   ½v≤1 : ∀ x → (0.5 [*] (value x) [≤] 1.0) ≡ true   
 
@@ -159,7 +171,7 @@ Trust½ x = x                       -- dummy definition !!
 postulate
   Trust-isLabelAlgebra : IsLabelAlgebra
     FU= FU≤ Trust⊙ Trust⊕ -- Trust⊖
-      Trust⊘ Trust∧ Trust∨ Trust½ FU1 FU0
+    Trust⊘ Trust∧ Trust∨ FUmean FU1 FU0
 
 docTrust : FUnit → Doc
 docTrust (mkFUnit x _ _) = docFloatRounded x
@@ -175,7 +187,7 @@ Trust = record
   ; ⊘   = Trust⊘
   ; _∧_ = Trust∧
   ; _∨_ = Trust∨
-  ; ½   = Trust½
+  ; mean = FUmean
   ; ⊤ = FU1
   ; ⊥ = FU0
   ; isLabelAlgebra = Trust-isLabelAlgebra
@@ -241,7 +253,7 @@ Pref½ x = record
 postulate
   Pref-isLabelAlgebra : IsLabelAlgebra
     FU= FU≤ Pref⊙ Pref⊕ -- Pref⊖
-      Pref⊘ Pref⊙ Pref∨ Pref½ FU1 FU0
+    Pref⊘ Pref⊙ Pref∨ FUmean FU1 FU0
 
 docPref : FUnit → Doc
 docPref (mkFUnit x _ _) = docFloatRounded x 
@@ -257,7 +269,7 @@ Pref = record
   ; ⊘   = Pref⊘
   ; _∧_ = Pref⊙
   ; _∨_ = Pref∨
-  ; ½   = Pref½
+  ; mean = FUmean
   ; ⊤ = FU1
   ; ⊥ = FU0
   ; isLabelAlgebra = Pref-isLabelAlgebra
@@ -322,7 +334,7 @@ postulate
 postulate
   Łuk-isLabelAlgebra : IsLabelAlgebra
     FU= FU≤ Łuk⊙ Łuk⊕ -- Łuk⊖
-      Łuk⊘ Łuk∧ Łuk∨ Łuk½ FU1 FU0
+    Łuk⊘ Łuk∧ Łuk∨ FUmean FU1 FU0
 
 docŁuk : FUnit → Doc
 docŁuk (mkFUnit x _ _) = docFloatRounded x 
@@ -338,7 +350,7 @@ docŁuk (mkFUnit x _ _) = docFloatRounded x
   ; ⊘   = Łuk⊘
   ; _∧_ = Łuk∧
   ; _∨_ = Łuk∨
-  ; ½   = Łuk½
+  ; mean = FUmean
   ; ⊤ = FU1
   ; ⊥ = FU0
   ; isLabelAlgebra = Łuk-isLabelAlgebra
@@ -405,7 +417,7 @@ Göd½ x = record
 postulate
   Gödel-isLabelAlgebra : IsLabelAlgebra
     FU= FU≤ Göd⊙ Göd⊕ -- Göd⊖
-      Göd⊘ Göd∧ Göd∨ Göd½ FU1 FU0
+    Göd⊘ Göd∧ Göd∨ FUmean FU1 FU0
 
 docGödel : FUnit → Doc
 docGödel (mkFUnit x _ _) = docFloatRounded x 
@@ -421,7 +433,7 @@ Gödel = record
   ; ⊘   = Göd⊘
   ; _∧_ = Göd∧
   ; _∨_ = Göd∨
-  ; ½   = Göd½
+  ; mean = FUmean
   ; ⊤ = FU1
   ; ⊥ = FU0
   ; isLabelAlgebra = Gödel-isLabelAlgebra
