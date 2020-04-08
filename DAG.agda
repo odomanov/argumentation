@@ -367,7 +367,7 @@ val {ℕzero} _ _ = nothing
 val {ℕsuc n} g i with NArgs g i | val←i g i
 ... | []   | v       = v  
 ... | args | nothing = valargs args 
-... | args | v       = v ⟪ _⊙_ la ⟫ valargs args 
+... | args | v       = v ⟪ _⊕_ la ⟫ valargs args 
 
 
 
