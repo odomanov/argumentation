@@ -7,6 +7,7 @@ open import Data.Fin as Fin
   using (Fin; Fin′; zero; suc; #_; toℕ; _≟_)
 open import Data.List as List using (List; []; _∷_)
 open import Data.Maybe
+open import Data.Nat
 open import Data.Product using (_,_)
 open import Data.String as S renaming (_++_ to _+++_)
 open import Data.Vec as V using (Vec) renaming ([] to []v; _∷_ to _∷v_)
@@ -119,48 +120,33 @@ open import IO
 w = 110
 ws = 50 -- "section" title width
 
-printABC : AGraph 6 → (AGraph 6 → Fin 6 → MC) → String
-printABC g f = "\nA = " +++ pprint w (f g (# 5))
-           +++ "  B = " +++ pprint w (f g (# 4))
-           +++ "  C = " +++ pprint w (f g (# 3))
+printABC : ℕ → String → AGraph 6 → (AGraph 6 → Fin 6 → MC) → String
+printABC n s g f = "\n" +++ (spaces (0 ⊔ (n ∸ S.length s))) +++ s +++ ": "
+           +++ " A = " +++ pprint w (f g (# 5))
+           +++ " B = " +++ pprint w (f g (# 4))
+           +++ " C = " +++ pprint w (f g (# 3))
 
 main = run (putStrLn stringToPrint)
   where
+  wh = 10
   stringToPrint = S.replicate ws '-'
-    +++ ppretty ws (docSection ws "G orig")
-    +++ printABC G val←i
-    +++ ppretty ws (docSection ws "G computed")
-    +++ printABC G val
-    +++ ppretty ws (docSection ws "G0")
-    +++ printABC G0 val←i
-    +++ ppretty ws (docSection ws "G1")
-    +++ printABC G1 val←i
-    +++ ppretty ws (docSection ws "G2")
-    +++ printABC G2 val←i
-    +++ ppretty ws (docSection ws "G3")
-    +++ printABC G3 val←i
-    +++ ppretty ws (docSection ws "G4")
-    +++ printABC G4 val←i
-    +++ ppretty ws (docSection ws "G5")
-    +++ printABC G5 val←i
-    +++ ppretty ws (docSection ws "G6")
-    +++ printABC G6 val←i
-    +++ ppretty ws (docSection ws "G7")
-    +++ printABC G7 val←i
-    +++ ppretty ws (docSection ws "G100")
-    +++ printABC G100 val←i
-    +++ ppretty ws (docSection ws "G200")
-    +++ printABC G200 val←i
+    +++ printABC wh "G orig" G val←i
+    +++ printABC wh "G computed" G val
+    +++ printABC wh "G0" G0 val←i
+    +++ printABC wh "G1" G1 val←i
+    +++ printABC wh "G2" G2 val←i
+    +++ printABC wh "G3" G3 val←i
+    +++ printABC wh "G4" G4 val←i
+    +++ printABC wh "G5" G5 val←i
+    +++ printABC wh "G6" G6 val←i
+    +++ printABC wh "G7" G7 val←i
+    +++ printABC wh "G100" G100 val←i
+    +++ printABC wh "G200" G200 val←i
 
-    -- +++ ppretty ws (docSection ws "foldConflicts:G")
-    -- +++ printABC G foldConflicts
-    -- +++ ppretty ws (docSection ws "foldConflicts:G5")
-    -- +++ printABC G5 foldConflicts
-    -- +++ ppretty ws (docSection ws "¬foldConflicts:G5")
-    -- +++ printABC G5 ¬foldConflicts
-    -- +++ ppretty ws (docSection ws "val+conflicts:G5")
-    -- +++ printABC G5 (val+conflicts G0)
-    -- +++ ppretty ws (docSection ws "iterationVal:G5")
-    -- +++ printABC G5 (iterationVal G0)
+    +++ printABC 17 "foldConflicts:G "  G foldConflicts
+    +++ printABC 17 "foldConflicts:G5"  G5 foldConflicts
+    +++ printABC 17 "-foldConflicts:G5" G5 ¬foldConflicts
+    +++ printABC 17 "val+conflicts:G5"  G5 (val+conflicts G0)
+    +++ printABC 17 "iterationVal:G5"   G5 (iterationVal G0)
 
     -- +++ (pprint 110 G)

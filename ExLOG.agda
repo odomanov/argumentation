@@ -9,7 +9,7 @@ open import Data.Fin as Fin
   using (Fin; Fin′; zero; suc; #_; toℕ; _≟_)
 open import Data.List as List using (List; []; _∷_)
 open import Data.Maybe
-open import Data.Nat as ℕ using (suc; ℕ; _∸_)
+open import Data.Nat as ℕ using (suc; ℕ; _∸_; _⊔_)
 open import Data.Nat.Show renaming (show to ℕshow)
 open import Data.Product using (_×_; _,_; proj₁; proj₂)
 open import Data.String as S renaming (_++_ to _+++_)
@@ -57,13 +57,9 @@ NS1  : ANode;  NS1 = Lni St1
 NS2  : ANode;  NS2 = Lni St2
 NS3  : ANode;  NS3 = Lni St3
 ¬NS3 : ANode; ¬NS3 = Lni ¬St3
--- NS5  : ANode;  NS5 = Lni St5
--- NS7  : ANode;  NS7 = Lni St7
 
 -- Schemes
 NA1 : ANode; NA1 = Lnr A-LOG-NOT
--- NA6 : ANode; NA6 = Lnr A-абдукция
--- NA8 : ANode; NA8 = Lnr A-ad-populum
 NC1 : ANode; NC1 = Lnc SC
 NC2 : ANode; NC2 = Lnc SC
 
@@ -71,7 +67,7 @@ NC2 : ANode; NC2 = Lnc SC
 
 -- N3  ---+
 --         \
---         N1 ---> N2
+--         NA1 ---> N2
 --         /
 -- ¬N3 ---+
 G1 : AGraph _
@@ -94,7 +90,7 @@ G13 = steps 3 G1
 
 G14 = steps 4 G1
 
-G1lim = steps 100 G1
+G1100 = steps 100 G1
 
 
 
@@ -143,69 +139,51 @@ w = 110
 ws = 90 -- "section" title width
 
 printG1 : AGraph 4 → (∀ {n} → AGraph n → Fin n → MC) → String
-printG1 g f = "\nN3  = " +++ pprint w (f g (# 3))
-          +++ "  -N3 = " +++ pprint w (f g (# 2))
-          +++ "  N2  = " +++ pprint w (f g (# 0))
-          +++ "  NA  = " +++ pprint w (f g (# 1))
-printG7 : AGraph 4 → (∀ {n} → AGraph n → Fin n → MC) → String
-printG7 g f = "\nN = "   +++ pprint w (f g (# 3))
-          +++ "  -N = "  +++ pprint w (f g (# 2))
-          +++ "  CN1 = " +++ pprint w (f g (# 1))
-          +++ "  CN2 = " +++ pprint w (f g (# 0))
+printG1 g f = "\nN3  = "  +++ pprint w (f g (# 3))
+          +++ " -N3 = "   +++ pprint w (f g (# 2))
+          +++ " Concl = " +++ pprint w (f g (# 0))
+          +++ " NA  = "   +++ pprint w (f g (# 1))
+printG7 : ℕ → String → AGraph 4 → (AGraph 4 → Fin 4 → MC) → String
+printG7 n s g f = "\n" +++ (spaces (0 ⊔ (n ∸ S.length s))) +++ s +++ ": "
+          +++ " N = "   +++ pprint w (f g (# 3))
+          +++ " -N = "  +++ pprint w (f g (# 2))
+          +++ " CN1 = " +++ pprint w (f g (# 1))
+          +++ " CN2 = " +++ pprint w (f g (# 0))
 
 main = run (putStrLn stringToPrint)
   where
+  wh = 12
   stringToPrint = S.replicate ws '-'
-    -- +++ ppretty ws (docSection ws "G1 orig")
-    -- +++ printG1 G1 val←i
-    -- +++ ppretty ws (docSection ws "G1 computed")
-    -- +++ printG1 G1 val
-    -- +++ ppretty ws (docSection ws "G10")
-    -- +++ printG1 G10 val←i
-    -- +++ ppretty ws (docSection ws "G11")
-    -- +++ printG1 G11 val←i
-    -- +++ ppretty ws (docSection ws "G12")
-    -- +++ printG1 G12 val←i
-    -- +++ ppretty ws (docSection ws "G13")
-    -- +++ printG1 G13 val←i
-    -- +++ ppretty ws (docSection ws "G14")
-    -- +++ printG1 G14 val←i
-    -- +++ ppretty ws (docSection ws "G1lim")
-    -- +++ printG1 G1lim val←i
+    +++ ppretty ws (docSection ws "G1 orig")
+    +++ printG1 G1 val←i
+    +++ ppretty ws (docSection ws "G1 computed")
+    +++ printG1 G1 val
+    +++ ppretty ws (docSection ws "G10")
+    +++ printG1 G10 val←i
+    +++ ppretty ws (docSection ws "G11")
+    +++ printG1 G11 val←i
+    +++ ppretty ws (docSection ws "G12")
+    +++ printG1 G12 val←i
+    +++ ppretty ws (docSection ws "G13")
+    +++ printG1 G13 val←i
+    +++ ppretty ws (docSection ws "G14")
+    +++ printG1 G14 val←i
+    +++ ppretty ws (docSection ws "G1100")
+    +++ printG1 G1100 val←i
 
-    +++ ppretty ws (docSection ws "G7 orig")
-    +++ printG7 G7 val←i
-    +++ ppretty ws (docSection ws "G7 computed")
-    +++ printG7 G7 val
-    +++ ppretty ws (docSection ws "G70")
-    +++ printG7 G70 val←i
-    +++ ppretty ws (docSection ws "G71")
-    +++ printG7 G71 val←i
-    +++ ppretty ws (docSection ws "G72")
-    +++ printG7 G72 val←i
-    +++ ppretty ws (docSection ws "G73")
-    +++ printG7 G73 val←i
-    +++ ppretty ws (docSection ws "G74")
-    +++ printG7 G74 val←i
-    +++ ppretty ws (docSection ws "G7100")
-    +++ printG7 G7100 val←i
-    +++ ppretty ws (docSection ws "G7200")
-    +++ printG7 G7200 val←i
+    -- +++ printG7 wh "G7 orig" G7 val←i
+    -- +++ printG7 wh "G7 computed" G7 val
+    -- -- +++ printG7 wh "G70" G70 val←i
+    -- -- +++ printG7 wh "G71" G71 val←i
+    -- -- +++ printG7 wh "G72" G72 val←i
+    -- -- +++ printG7 wh "G73" G73 val←i
+    -- -- +++ printG7 wh "G74" G74 val←i
+    -- -- +++ printG7 wh "G7100" G7100 val←i
+    -- +++ printG7 wh "G7200" G7200 val←i
+
+    -- +++ printG7 17 "NEG foldConflicts" G7 ¬foldConflicts
+    -- +++ printG7 17 "val+conflicts" G7 (val+conflicts G7)
+    -- +++ printG7 17 "iterationVal"  G7 (iterationVal G7)
 
     -- +++ (pprint 110 G7)
 
-    +++ ppretty ws (docSection ws "NEG foldConflicts")
-    +++ "\nN: " +++ pprint w (¬foldConflicts G7 (# 3))
-    +++ "  -N: " +++ pprint w (¬foldConflicts G7 (# 2))
-    +++ " CN1: " +++ pprint w (¬foldConflicts G7 (# 1))
-    +++ " CN2: " +++ pprint w (¬foldConflicts G7 (# 0))
-    +++ ppretty ws (docSection ws "val+conflicts")
-    +++ "\nN: " +++ pprint w (val+conflicts G7 G7 (# 3))
-    +++ "  -N: " +++ pprint w (val+conflicts G7 G7 (# 2))
-    +++ " CN1: " +++ pprint w (val+conflicts G7 G7 (# 1))
-    +++ " CN2: " +++ pprint w (val+conflicts G7 G7 (# 0))
-    +++ ppretty ws (docSection ws "iterationVal")
-    +++ "\nN: " +++ pprint w (iterationVal G7 G7 (# 3))
-    +++ "  -N: " +++ pprint w (iterationVal G7 G7 (# 2))
-    +++ " CN1: " +++ pprint w (iterationVal G7 G7 (# 1))
-    +++ " CN2: " +++ pprint w (iterationVal G7 G7 (# 0))
