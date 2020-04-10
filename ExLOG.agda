@@ -50,8 +50,6 @@ St3  = record { sttext = nothing; stprop = mkProp (Fragment.ftext T3)}
 St5  = record { sttext = just T5; stprop = mkProp (Fragment.ftext T5)}
 St7  = record { sttext = just T7; stprop = mkProp (Fragment.ftext T7)}
 
-SC = record {Conflicting = conflicting; Conflicted = conflicted}
-
 -- Statements / I-nodes
 I1  : ANode;  I1 = Lni St1
 I2  : ANode;  I2 = Lni St2
@@ -60,8 +58,7 @@ I3  : ANode;  I3 = Lni St3
 
 -- Schemes / S-nodes
 SR1 : ANode; SR1 = Lnr A-LOG-NOT
-SC1 : ANode; SC1 = Lnc SC
-SC2 : ANode; SC2 = Lnc SC
+SC  : ANode; SC  = Lnc record {Conflicting = conflicting; Conflicted = conflicted}
 
 
 
@@ -104,8 +101,8 @@ G1100 = steps 100 G1
 
 G7 : AGraph _
 G7 =
-     node SC2 1.0 {refl} {refl} ((conflicted , # 2) ∷ (conflicting , # 1) ∷ []) &
-     node SC1 1.0 {refl} {refl} ((conflicted , # 0) ∷ (conflicting , # 1) ∷ []) &
+     node SC 1.0 {refl} {refl} ((conflicted , # 2) ∷ (conflicting , # 1) ∷ []) &
+     node SC 1.0 {refl} {refl} ((conflicted , # 0) ∷ (conflicting , # 1) ∷ []) &
      node I2  0.3 {refl} {refl} [] &
      node I1  0.1 {refl} {refl} [] &
      ∅
