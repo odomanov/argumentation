@@ -124,75 +124,92 @@ SR-от-эксперта = Lnr A-от-эксперта
 SC : ANode
 SC = Lnc record {Conflicting = conflicting; Conflicted = conflicted}
 
+S1 = I-хорошо-известно
+S2 = I-в-центре-практически-каждой-крупной-галактики-находится-массивная-чёрная-дыра
+S3 = I-самые-тяжёлые-галактики-окружены-самыми-массивными-гало-из-тёмной-материи
+S4 = I-тёмная-материя-играет-ключевую-роль-в-росте-чёрных-дыр
+S5 = I-учёные-из-Института-внеземной-физики
+S6 = I-исследования-учёных-показали-что-связи-не-существует
+S7 = I-исследования-учёных-показали-что-рост-определяется
+S8 = I-такой-прямой-связи-не-существует
+S9 = I-рост-чёрной-дыры-определяется-процессом-формирования-галактического-ядра
+A1 = SR-ad-populum
+A2 = SR-от-корреляции-к-причине
+A3 = SR-от-эксперта
+A4 = SR-от-эксперта
+C1 = SC
+C2 = SC
+C2' = SC
 
-G1 : AGraph _
-G1 =
-     node SC
+G : AGraph _
+G =
+     node C1
        0.5 {refl} {refl}
        ((conflicting , # 5) ∷ (conflicted , # 3) ∷ []) &
-     node SC
+     node C2
        1.0 {refl} {refl}
        ((conflicting , # 7) ∷ (conflicted , # 1) ∷ []) &
-     node SC
+     node C2'
        1.0 {refl} {refl}
        ((conflicting , # 0) ∷ (conflicted , # 6) ∷ []) &
-     node I-тёмная-материя-играет-ключевую-роль-в-росте-чёрных-дыр
-       1.0 {refl} {refl}
+     node0 S4
+       -- 1.0 {refl} {refl}
        ((причинная-связь , # 0) ∷ []) &
-     node SR-от-корреляции-к-причине
-       1.0 {refl} {refl}
+     node A2
+       0.8 {refl} {refl}
        ((событие1 , # 9) ∷ (событие2 , # 0) ∷ []) &
-     node I-самые-тяжёлые-галактики-окружены-самыми-массивными-гало-из-тёмной-материи
-       1.0 {refl} {refl}
+     node S3
+       0.9 {refl} {refl}
        [] &     
-     node0 I-такой-прямой-связи-не-существует
+     node0 S8
        -- 1.0 {refl} {refl}
        ((вывод , # 0) ∷ []) &
-     node SR-от-эксперта
+     node A3
        1.0 {refl} {refl}
        ((эксперт , # 5) ∷ (говорит , # 0) ∷ (область , # 4) ∷ []) &
-     node I-исследования-учёных-показали-что-связи-не-существует
-       1.0 {refl} {refl}
+     node S6
+       0.7 {refl} {refl}
        [] &
-     node0 I-рост-чёрной-дыры-определяется-процессом-формирования-галактического-ядра
+     node0 S9
        -- 1.0 {refl} {refl}
        ((вывод , # 0) ∷ []) &
-     node SR-от-эксперта
+     node A4
        1.0 {refl} {refl}
        ((эксперт , # 2) ∷ (говорит , # 0) ∷ (область , # 1) ∷ []) &
-     node I-исследования-учёных-показали-что-рост-определяется
-       1.0 {refl} {refl}
+     node S7
+       0.8 {refl} {refl}
        [] &
      node I-область-внеземная-физика
        1.0 {refl} {refl}
        [] &
-     node I-учёные-из-Института-внеземной-физики
-       1.0 {refl} {refl}
+     node S5
+       0.8 {refl} {refl}
        [] &
-     node I-в-центре-практически-каждой-крупной-галактики-находится-массивная-чёрная-дыра
-       1.0 {refl} {refl}
+     node0 S2
+       -- 1.0 {refl} {refl}
        ((вывод , # 0) ∷ []) &
-     node SR-ad-populum
-       1.0 {refl} {refl}
+     node A1
+       0.7 {refl} {refl}
        ((все-признают , # 0) ∷ []) &
-     node I-хорошо-известно
-       1.0 {refl} {refl}
+     node S1
+       0.9 {refl} {refl}
        [] &
      ∅
 
 
 
-G10 = compute G1
+G0 = compute G
 
-G11 = steps 1 G1
+G1 = steps 1 G
 
-G12 = steps 2 G1
+G2 = steps 2 G
 
-G13 = steps 3 G1
+G3 = steps 3 G
 
-G14 = steps 4 G1
+G4 = steps 4 G
 
-G1100 = steps 100 G1
+G100 = steps 100 G
+
 
 
 
@@ -207,31 +224,37 @@ open import IO
 w = 110
 ws = 90 -- "section" title width
 
-printG1 : AGraph 17 → (∀ {n} → AGraph n → Fin n → MC) → String
-printG1 g f = "\nI = "    +++ pprint w (f g (# 9))
-          +++ " -I = "    +++ pprint w (f g (# 3))
-          +++ " Concl = " +++ pprint w (f g (# 1))
-          +++ " SR  = "   +++ pprint w (f g (# 2))
+printG : AGraph 17 → (∀ {n} → AGraph n → Fin n → MC) → String
+printG g f = "\n S1 = " +++ pprint w (f g (# 16))
+          +++ " S2 = "  +++ pprint w (f g (# 14))
+          +++ " S3 = "  +++ pprint w (f g (# 5))
+          +++ " S4 = "  +++ pprint w (f g (# 3))
+          +++ " S5 = "  +++ pprint w (f g (# 13))
+          +++ "\n S6 = "  +++ pprint w (f g (# 8))
+          +++ " S7 = "  +++ pprint w (f g (# 11))
+          +++ " S8 = "  +++ pprint w (f g (# 6))
+          +++ " S9 = "  +++ pprint w (f g (# 9))
+          +++ " A2 = "  +++ pprint w (f g (# 4))
 
 main = run (putStrLn stringToPrint)
   where
   wh = 12
   stringToPrint = S.replicate ws '-'
-    +++ ppretty ws (docSection ws "G1 orig")
-    +++ printG1 G1 val←i
-    +++ ppretty ws (docSection ws "G1 computed")
-    +++ printG1 G1 val
-    +++ ppretty ws (docSection ws "G10")
-    +++ printG1 G10 val←i
-    +++ ppretty ws (docSection ws "G11")
-    +++ printG1 G11 val←i
-    +++ ppretty ws (docSection ws "G12")
-    +++ printG1 G12 val←i
-    +++ ppretty ws (docSection ws "G13")
-    +++ printG1 G13 val←i
-    +++ ppretty ws (docSection ws "G14")
-    +++ printG1 G14 val←i
-    +++ ppretty ws (docSection ws "G1100")
-    +++ printG1 G1100 val←i
+    +++ ppretty ws (docSection ws "original")
+    +++ printG G val←i
+    +++ ppretty ws (docSection ws "computed w/o conflicts")
+    +++ printG G val
+    -- +++ ppretty ws (docSection ws "step 0")
+    -- +++ printG G0 val←i
+    +++ ppretty ws (docSection ws "step 1")
+    +++ printG G1 val←i
+    +++ ppretty ws (docSection ws "step 2")
+    +++ printG G2 val←i
+    +++ ppretty ws (docSection ws "step 3")
+    +++ printG G3 val←i
+    +++ ppretty ws (docSection ws "step 4")
+    +++ printG G4 val←i
+    +++ ppretty ws (docSection ws "step 100")
+    +++ printG G100 val←i
 
-    -- +++ (pprint 110 G1)
+    -- +++ (pprint 110 G)
