@@ -52,11 +52,16 @@ docStmt (st (just tx) p) = text "TEXT = " <> nest 7 (docFragment tx)
   ... | false = text "PROP = " <> docProp p
   ppp _ = text "PROP = " <> docProp p
 
+private
+  textN : ℕ → String → Doc
+  textN n s = text s <> text (spaces (0 ⊔ (n ∸ S.length s)))
+
 docMC : MC → Doc
-docMC nothing = text (" - " +++ spaces 7)
-docMC (just x) = text s <> text (spaces (0 ⊔ (10 ∸ S.length s)))
+docMC nothing  = textN 10 "NOTHING"
+docMC (just x) = textN 10 s
   where
   s = layout (renderPretty 1.0 8 ((doc la) x))
+
 
 docLabel : MC → Doc
 docLabel nothing = text "NOTHING"
