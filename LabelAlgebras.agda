@@ -84,6 +84,20 @@ maxv≤1 x y with (value x) [<] (value y)
 maxv≤1 x (mkFUnit _ _ v≤2) | true = v≤2
 maxv≤1 (mkFUnit _ _ v≤2) y | false = v≤2
 
+FUmin : FUnit → FUnit → FUnit 
+FUmin a b = record
+  { value = fmin (value a) (value b) 
+  ; 0≤v = min0≤v a b 
+  ; v≤1 = minv≤1 a b 
+  }
+
+FUmax : FUnit → FUnit → FUnit 
+FUmax a b = record
+  { value = fmax (value a) (value b) 
+  ; 0≤v = max0≤v a b 
+  ; v≤1 = maxv≤1 a b 
+  }
+
 
 
 -------------------------------------------------------
@@ -388,6 +402,66 @@ Gödel = record
   ; ⊥ = FU0
   ; isLabelAlgebra = Gödel-isLabelAlgebra
   ; doc = docGödel
+  }
+
+
+-------------------------------------------------------
+-- Product t-norm (Shirtcliff coefficients)
+
+postulate
+  prod0≤v⊙ : ∀ x y → 0.0 [≤] ((value x) [*] (value y)) ≡ true
+  prodv≤1⊙ : ∀ x y → ((value x) [*] (value y)) [≤] 1.0 ≡ true
+  prod0≤v⊕ : ∀ x y → 0.0 [≤] (value x) [+] (value y) [-] ((value x) [*] (value y)) ≡ true
+  prodv≤1⊕ : ∀ x y → (value x) [+] (value y) [-] ((value x) [*] (value y)) [≤] 1.0 ≡ true
+
+prod⊙ : FUnit → FUnit → FUnit
+prod⊙ a b = record
+  { value = (value a) [*] (value b)
+  ; 0≤v = prod0≤v⊙ a b 
+  ; v≤1 = prodv≤1⊙ a b 
+  }
+
+prod⊕ : FUnit → FUnit → FUnit
+prod⊕ a b = record
+  { value = (value a) [+] (value b) [-] ((value a) [*] (value b))
+  ; 0≤v = prod0≤v⊕ a b 
+  ; v≤1 = prodv≤1⊕ a b 
+  }
+
+prod⊘ : FUnit → FUnit
+prod⊘ a = record
+  { value = (value FU1) [-] (value a)
+  ; 0≤v = 0≤v⊘ a 
+  ; v≤1 = v≤1⊘ a 
+  }
+
+prod∧ = FUmin
+prod∨ = FUmax
+
+postulate
+  Product-isLabelAlgebra : IsLabelAlgebra
+    FU= FU≤ prod⊙ prod⊕ -- prod⊖
+    prod⊘ prod∧ prod∨ FUmean FU1 FU0
+
+docProduct : FUnit → Doc
+docProduct (mkFUnit x _ _) = docFloatRounded x 
+
+Product : LabelAlgebra _ _ _
+Product = record
+  { Carrier = FUnit
+  ; _≈_ = FU=
+  ; _≤_ = FU≤
+  ; _⊙_ = prod⊙
+  ; _⊕_ = prod⊕
+  -- ; _⊖_ = prod⊖
+  ; ⊘   = prod⊘
+  ; _∧_ = prod∧
+  ; _∨_ = prod∨
+  ; mean = FUmean
+  ; ⊤ = FU1
+  ; ⊥ = FU0
+  ; isLabelAlgebra = Product-isLabelAlgebra
+  ; doc = docProduct
   }
 
 
