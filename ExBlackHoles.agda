@@ -20,9 +20,10 @@ open import LabelAlgebras
 open import ArgSchemes
 
 
-la = Pref
+-- la = Pref
 -- la = Łuk
 -- la = Gödel
+la = Product
 import DAG; module DAGla = DAG la; open DAGla
 
 node : ∀ {n} → ANode
