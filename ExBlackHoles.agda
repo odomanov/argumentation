@@ -197,7 +197,11 @@ G =
        [] &
      ∅
 
-
+_ : NArgs G (# 3) ≡ record { Scheme = A-от-корреляции-к-причине
+                           ; NPremises = just (Ln S2 _) ∷v just (Ln S3 _) ∷v []v
+                           ; NConclusion = just (Ln S4 _)
+                           } ∷ []
+_ = refl
 
 G0 = compute G
 
