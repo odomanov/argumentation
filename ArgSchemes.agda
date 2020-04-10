@@ -58,6 +58,11 @@ instance
   Premises {{A-от-альтернативы}} = альтернатива ∷v неверно ∷v []v
   Conclusion {{A-от-альтернативы}} = верно
 
+  A-от-корреляции-к-причине : RA-Scheme
+  ℕprem {{A-от-корреляции-к-причине}} = 2
+  Premises {{A-от-корреляции-к-причине}} = событие1 ∷v событие2 ∷v []v
+  Conclusion {{A-от-корреляции-к-причине}} = причинная-связь
+
   A-LOG-AND : RA-Scheme
   ℕprem {{A-LOG-AND}} = 2
   Premises {{A-LOG-AND}} = AND1 ∷v AND2 ∷v []v

@@ -88,6 +88,8 @@ data Role    : Set where
 альтернатива = role "альтернатива"
 неверно      = role "неверно"
 верно        = role "верно"
+событие1     = role "событие1"
+событие2     = role "событие2"
 -- CA-nodes
 conflicting  = role "conflicting"
 conflicted   = role "conflicted"
