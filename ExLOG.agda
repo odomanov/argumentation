@@ -52,30 +52,30 @@ St7  = record { sttext = just T7; stprop = mkProp (Fragment.ftext T7)}
 
 SC = record {Conflicting = conflicting; Conflicted = conflicted}
 
--- Statements
-NS1  : ANode;  NS1 = Lni St1
-NS2  : ANode;  NS2 = Lni St2
-NS3  : ANode;  NS3 = Lni St3
-¬NS3 : ANode; ¬NS3 = Lni ¬St3
+-- Statements / I-nodes
+I1  : ANode;  I1 = Lni St1
+I2  : ANode;  I2 = Lni St2
+I3  : ANode;  I3 = Lni St3
+¬I3 : ANode; ¬I3 = Lni ¬St3
 
--- Schemes
-NA1 : ANode; NA1 = Lnr A-LOG-NOT
-NC1 : ANode; NC1 = Lnc SC
-NC2 : ANode; NC2 = Lnc SC
+-- Schemes / S-nodes
+SR1 : ANode; SR1 = Lnr A-LOG-NOT
+SC1 : ANode; SC1 = Lnc SC
+SC2 : ANode; SC2 = Lnc SC
 
 
 
--- N3  ---+
+-- I3  ---+
 --         \
---         NA1 ---> N2
+--         SR1 ---> I2
 --         /
--- ¬N3 ---+
+-- ¬I3 ---+
 G1 : AGraph _
 G1 =
-     node0 NS2 ((противоречие , # 0) ∷ []) &
-     node  NA1 1.0 {refl} {refl} ((тезис , # 1) ∷ (отрицание , # 0) ∷ []) & 
-     node ¬NS3 1.0 {refl} {refl} [] &
-     node  NS3 0.7 {refl} {refl} [] &
+     node0 I2  ((противоречие , # 0) ∷ []) &
+     node  SR1 1.0 {refl} {refl} ((тезис , # 1) ∷ (отрицание , # 0) ∷ []) & 
+     node ¬I3  1.0 {refl} {refl} [] &
+     node  I3  0.7 {refl} {refl} [] &
      ∅
 
 
@@ -96,18 +96,18 @@ G1100 = steps 100 G1
 
 -- Graph with 2 opposite conflicts  --------------------------------------------
 
---   --CN1--
+--   --SC1--
 --  /       \
--- N1        N2
+-- I1        I2
 --  \       /
---   --CN2--
+--   --SC2--
 
 G7 : AGraph _
 G7 =
-     node NC2 1.0 {refl} {refl} ((conflicted , # 2) ∷ (conflicting , # 1) ∷ []) &
-     node NC1 1.0 {refl} {refl} ((conflicted , # 0) ∷ (conflicting , # 1) ∷ []) &
-     node NS2 0.3 {refl} {refl} [] &
-     node NS1 0.1 {refl} {refl} [] &
+     node SC2 1.0 {refl} {refl} ((conflicted , # 2) ∷ (conflicting , # 1) ∷ []) &
+     node SC1 1.0 {refl} {refl} ((conflicted , # 0) ∷ (conflicting , # 1) ∷ []) &
+     node I2  0.3 {refl} {refl} [] &
+     node I1  0.1 {refl} {refl} [] &
      ∅
 
 G70 = compute G7
@@ -139,16 +139,16 @@ w = 110
 ws = 90 -- "section" title width
 
 printG1 : AGraph 4 → (∀ {n} → AGraph n → Fin n → MC) → String
-printG1 g f = "\nN3  = "  +++ pprint w (f g (# 3))
-          +++ " -N3 = "   +++ pprint w (f g (# 2))
+printG1 g f = "\nI = "    +++ pprint w (f g (# 3))
+          +++ " -I = "    +++ pprint w (f g (# 2))
           +++ " Concl = " +++ pprint w (f g (# 0))
-          +++ " NA  = "   +++ pprint w (f g (# 1))
+          +++ " SR  = "   +++ pprint w (f g (# 1))
 printG7 : ℕ → String → AGraph 4 → (AGraph 4 → Fin 4 → MC) → String
 printG7 n s g f = "\n" +++ (spaces (0 ⊔ (n ∸ S.length s))) +++ s +++ ": "
-          +++ " N = "   +++ pprint w (f g (# 3))
-          +++ " -N = "  +++ pprint w (f g (# 2))
-          +++ " CN1 = " +++ pprint w (f g (# 1))
-          +++ " CN2 = " +++ pprint w (f g (# 0))
+          +++ " I = "   +++ pprint w (f g (# 3))
+          +++ " -I = "  +++ pprint w (f g (# 2))
+          +++ " SC1 = " +++ pprint w (f g (# 1))
+          +++ " SC2 = " +++ pprint w (f g (# 0))
 
 main = run (putStrLn stringToPrint)
   where

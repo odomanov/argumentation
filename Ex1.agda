@@ -49,55 +49,55 @@ St7  = record { sttext = just T7; stprop = mkProp (Fragment.ftext T7)}
 
 SC = record {Conflicting = conflicting; Conflicted = conflicted}
 
--- Statements
-NS1  : ANode;  NS1 = Lni St1
-NS2  : ANode;  NS2 = Lni St2
-NS3  : ANode;  NS3 = Lni St3
-¬NS3 : ANode; ¬NS3 = Lni ¬St3
-NS5  : ANode;  NS5 = Lni St5
-NS7  : ANode;  NS7 = Lni St7
+-- Statements / I-nodes
+I1  : ANode;  I1 = Lni St1
+I2  : ANode;  I2 = Lni St2
+I3  : ANode;  I3 = Lni St3
+¬I3 : ANode; ¬I3 = Lni ¬St3
+I5  : ANode;  I5 = Lni St5
+I7  : ANode;  I7 = Lni St7
 
--- Schemes
-NA4 : ANode; NA4 = Lnr A-от-эксперта
-NA6 : ANode; NA6 = Lnr A-абдукция
-NA8 : ANode; NA8 = Lnr A-ad-populum
-NC1 : ANode; NC1 = Lnc SC
-NC2 : ANode; NC2 = Lnc SC
+-- Schemes / S-nodes
+SR4 : ANode; SR4 = Lnr A-от-эксперта
+SR6 : ANode; SR6 = Lnr A-абдукция
+SR8 : ANode; SR8 = Lnr A-ad-populum
+SC1 : ANode; SC1 = Lnc SC
+SC2 : ANode; SC2 = Lnc SC
 
 
 
--- N1 ---+
+-- I1 ---+
 --        \
---         N4 ---> N3
+--        SR4 ---> I3
 --        /
--- N2 ---+
+-- I2 ---+
 G1 : AGraph _
 G1 =
-     node0 NS3 ((поддержка , # 0) ∷ []) &
-     node NA4 0.5 {refl} {refl} ((эксперт , # 1) ∷ (говорит , # 0) ∷ []) & -- missed: область
-     node NS2 1.0 {refl} {refl} [] &
-     node NS1 0.7 {refl} {refl} [] &
+     node0 I3  ((поддержка , # 0) ∷ []) &
+     node  SR4 0.5 {refl} {refl} ((эксперт , # 1) ∷ (говорит , # 0) ∷ []) & -- missed: область
+     node  I2  1.0 {refl} {refl} [] &
+     node  I1  0.7 {refl} {refl} [] &
      ∅
 
-_ : nodes G1 ≡ (# 0 , (Ln NS3 _)) ∷v (# 1 , (Ln NA4 _)) ∷v (# 2 , (Ln NS2 _)) ∷v (# 3 , (Ln NS1 _)) ∷v []v
+_ : nodes G1 ≡ (# 0 , (Ln I3 _)) ∷v (# 1 , (Ln SR4 _)) ∷v (# 2 , (Ln I2 _)) ∷v (# 3 , (Ln I1 _)) ∷v []v
 _ = refl
 
 _ : edges G1 ≡ (# 0 , поддержка , # 0) ∷ (# 1 , эксперт , # 1) ∷ (# 1 , говорит , # 0) ∷ []
 _ = refl
 
-_ : G1 [ # 3 ] ≡ (node NS1 0.7 {refl} {refl} [] & ∅)
+_ : G1 [ # 3 ] ≡ (node I1 0.7 {refl} {refl} [] & ∅)
 _ = refl
 
-_ : G1 [ # 2 ] ≡ (node NS2 1.0 {refl} {refl} [] & node NS1 0.7 {refl} {refl} [] & ∅)
+_ : G1 [ # 2 ] ≡ (node I2 1.0 {refl} {refl} [] & node I1 0.7 {refl} {refl} [] & ∅)
 _ = refl
 
-_ : G1 [ # 1 ] ≡ ( node NA4 0.5 {refl} {refl} ((эксперт , # 1) ∷ (говорит , # 0) ∷ []) &
-                   node NS2 1.0 {refl} {refl} [] & node NS1 0.7 {refl} {refl} [] &
+_ : G1 [ # 1 ] ≡ ( node SR4 0.5 {refl} {refl} ((эксперт , # 1) ∷ (говорит , # 0) ∷ []) &
+                   node I2 1.0 {refl} {refl} [] & node I1 0.7 {refl} {refl} [] &
                    ∅
                  )
 _ = refl
 
-_ : roots G1 ≡ (_ , (Ln NS3 _)) ∷ []
+_ : roots G1 ≡ (_ , (Ln I3 _)) ∷ []
 _ = refl
 
 _ : sucs G1 (# 1) ≡ (эксперт , # 1) ∷ (говорит , # 0) ∷ []
@@ -131,31 +131,31 @@ G1lim = steps 100 G1
 
 
 
--- N2 ---- <N4> ---∙ 
+-- I2 ---- <SR4> ---∙ 
 --         /        \
--- N1 ----∙          N3
+-- I1 ----∙          I3
 --                  /
--- N5 ---- <N6> ---∙ 
+-- I5 ---- <SR6> ---∙ 
 G2 : AGraph _
 G2 =
-     node0 NS3 ((объяснение , # 0) ∷ (поддержка  , # 2) ∷ []) &
-     node NA6 0.4 {refl} {refl} ((факт  , # 0) ∷ []) &
-     node NS5 0.6 {refl} {refl} [] &
-     node NA4 0.5 {refl} {refl} ((эксперт  , # 1) ∷ (говорит , # 0) ∷ []) & -- missed: область
-     node NS2 1.0 {refl} {refl} [] &
-     node NS1 0.7 {refl} {refl} [] &
+     node0 I3  ((объяснение , # 0) ∷ (поддержка  , # 2) ∷ []) &
+     node  SR6 0.4 {refl} {refl} ((факт  , # 0) ∷ []) &
+     node  I5  0.6 {refl} {refl} [] &
+     node  SR4 0.5 {refl} {refl} ((эксперт  , # 1) ∷ (говорит , # 0) ∷ []) & -- missed: область
+     node  I2  1.0 {refl} {refl} [] &
+     node  I1  0.7 {refl} {refl} [] &
      ∅
 
 -- part of G2, actually
 G3 : AGraph _
 G3 =
-     node NA4 0.5 {refl} {refl} ((эксперт  , # 1) ∷ (говорит , # 0) ∷ []) &
-     node NS2 1.0 {refl} {refl} [] &
-     node NS1 0.7 {refl} {refl} [] &
+     node SR4 0.5 {refl} {refl} ((эксперт  , # 1) ∷ (говорит , # 0) ∷ []) &
+     node I2  1.0 {refl} {refl} [] &
+     node I1  0.7 {refl} {refl} [] &
      ∅
 
-_ : nodes G2 ≡ (# 0 , (Ln NS3 _)) ∷v (# 1 , (Ln NA6 _)) ∷v (# 2 , (Ln NS5 _)) ∷v (# 3 , (Ln NA4 _))
-            ∷v (# 4 , (Ln NS2 _)) ∷v (# 5 , (Ln NS1 _)) ∷v []v
+_ : nodes G2 ≡ (# 0 , (Ln I3 _)) ∷v (# 1 , (Ln SR6 _)) ∷v (# 2 , (Ln I5 _)) ∷v (# 3 , (Ln SR4 _))
+            ∷v (# 4 , (Ln I2 _)) ∷v (# 5 , (Ln I1 _)) ∷v []v
 _ = refl
 
 _ : edges G2 ≡ (# 0 , объяснение , # 0) ∷ (# 0 , поддержка , # 2)
@@ -176,12 +176,12 @@ _ = refl
 
 
 _ : NArgs G2 (# 0) ≡ record { Scheme = A-абдукция
-                            ; NPremises = just (Ln NS5 _) ∷v []v
-                            ; NConclusion = just (Ln NS3 _)
+                            ; NPremises = just (Ln I5 _) ∷v []v
+                            ; NConclusion = just (Ln I3 _)
                             } ∷
                      record { Scheme = A-от-эксперта
-                            ; NPremises = just (Ln NS1 _) ∷v just (Ln NS2 _) ∷v nothing ∷v []v
-                            ; NConclusion = just (Ln NS3 _)
+                            ; NPremises = just (Ln I1 _) ∷v just (Ln I2 _) ∷v nothing ∷v []v
+                            ; NConclusion = just (Ln I3 _)
                             } ∷ []
 _ = refl
 
@@ -194,7 +194,7 @@ _ = refl
 _ : NArgs G2 (# 4) ≡ []
 _ = refl
 
-_ : roots G2 ≡ (# 0 , (Ln NS3 _)) ∷ []
+_ : roots G2 ≡ (# 0 , (Ln I3 _)) ∷ []
 _ = refl
 
 _ : G2 [ (# 0) ] ≡ G2
@@ -223,16 +223,16 @@ _ = refl
 
 -- indexes
 
-_ : G2 ! (# 0) ≡ context (Ln NS3 nothing) ((объяснение , # 0) ∷ (поддержка , # 2) ∷ [])
+_ : G2 ! (# 0) ≡ context (Ln I3 nothing) ((объяснение , # 0) ∷ (поддержка , # 2) ∷ [])
 _ = refl
 
-_ : G2 ! (# 1) ≡ node NA6 0.4 {refl} {refl} ((факт     , # 0) ∷ [])
+_ : G2 ! (# 1) ≡ node SR6 0.4 {refl} {refl} ((факт     , # 0) ∷ [])
 _ = refl
 
-_ : G2 ![ (# 0) > (# 0) ] ≡ node NA6 0.4 {refl} {refl} ((факт     , # 0) ∷ [])
+_ : G2 ![ (# 0) > (# 0) ] ≡ node SR6 0.4 {refl} {refl} ((факт     , # 0) ∷ [])
 _ = refl
 
-_ : G2 ![ (# 1) > (# 2) ] ≡ node NS2 1.0 {refl} {refl} []
+_ : G2 ![ (# 1) > (# 2) ] ≡ node I2 1.0 {refl} {refl} []
 _ = refl
 
 
@@ -250,28 +250,28 @@ G2lim = steps 100 G2
 
 
 
--- N2 ---- <N4> ---∙ 
+-- I2 ---- <N4> ---∙ 
 --         /        \
--- N1 ----∙          N3
+-- I1 ----∙          I3
 --                  /|
--- N5 ---- <N6> ---∙ |
+-- I5 ---- <N6> ---∙ |
 --                   |
--- N7 ---- <N8> -----∙
+-- I7 ---- <N8> -----∙
 G4 : AGraph _
 G4 =
-     node0 NS3 ((объяснение , # 0) ∷ (поддержка , # 2) ∷ (поддержка , # 4) ∷ []) &
-     node NA8 0.9 {refl} {refl} ((все-признают , # 0) ∷ []) &
-     node NS7 0.9 {refl} {refl} [] &
-     node NA6 0.4 {refl} {refl} ((факт     , # 0) ∷ []) &
-     node NS5 0.6 {refl} {refl} [] &
-     node NA4 0.5 {refl} {refl} ((эксперт  , # 1) ∷ (говорит , # 0) ∷ []) &
-     node NS2 1.0 {refl} {refl} [] &
-     node NS1 0.7 {refl} {refl} [] &
+     node0 I3 ((объяснение , # 0) ∷ (поддержка , # 2) ∷ (поддержка , # 4) ∷ []) &
+     node SR8 0.9 {refl} {refl} ((все-признают , # 0) ∷ []) &
+     node I7 0.9 {refl} {refl} [] &
+     node SR6 0.4 {refl} {refl} ((факт     , # 0) ∷ []) &
+     node I5 0.6 {refl} {refl} [] &
+     node SR4 0.5 {refl} {refl} ((эксперт  , # 1) ∷ (говорит , # 0) ∷ []) &
+     node I2 1.0 {refl} {refl} [] &
+     node I1 0.7 {refl} {refl} [] &
      ∅
 
-_ : nodes G4 ≡ (# 0 , (Ln NS3 _)) ∷v (# 1 , (Ln NA8 _)) ∷v (# 2 , (Ln NS7 _))
-            ∷v (# 3 , (Ln NA6 _)) ∷v (# 4 , (Ln NS5 _)) ∷v (# 5 , (Ln NA4 _))
-            ∷v (# 6 , (Ln NS2 _)) ∷v (# 7 , (Ln NS1 _)) ∷v []v
+_ : nodes G4 ≡ (# 0 , (Ln I3 _)) ∷v (# 1 , (Ln SR8 _)) ∷v (# 2 , (Ln I7 _))
+            ∷v (# 3 , (Ln SR6 _)) ∷v (# 4 , (Ln I5 _)) ∷v (# 5 , (Ln SR4 _))
+            ∷v (# 6 , (Ln I2 _)) ∷v (# 7 , (Ln I1 _)) ∷v []v
 _ = refl
 
 _ : edges G4 ≡ (# 0 , объяснение , # 0)
@@ -298,22 +298,22 @@ _ = refl
 
 -- all inputs
 _ : Arg G4 (# 0) (# 4) ≡ just record { Scheme = A-от-эксперта
-                                     ; NPremises = just (Ln NS1 _) ∷v just (Ln NS2 _) ∷v nothing ∷v []v
-                                     ; NConclusion = just (Ln NS3 _)
+                                     ; NPremises = just (Ln I1 _) ∷v just (Ln I2 _) ∷v nothing ∷v []v
+                                     ; NConclusion = just (Ln I3 _)
                                      }
 _ = refl
 
 _ : NArgs G4 (# 0) ≡ record { Scheme = A-ad-populum
-                            ; NPremises = just (Ln NS7 _) ∷v []v
-                            ; NConclusion = just (Ln NS3 _)
+                            ; NPremises = just (Ln I7 _) ∷v []v
+                            ; NConclusion = just (Ln I3 _)
                             } ∷
                      record { Scheme = A-абдукция
-                            ; NPremises = just (Ln NS5 _) ∷v []v
-                            ; NConclusion = just (Ln NS3 _)
+                            ; NPremises = just (Ln I5 _) ∷v []v
+                            ; NConclusion = just (Ln I3 _)
                             } ∷
                      record { Scheme = A-от-эксперта
-                            ; NPremises = just (Ln NS1 _) ∷v just (Ln NS2 _) ∷v nothing ∷v []v
-                            ; NConclusion = just (Ln NS3 _)
+                            ; NPremises = just (Ln I1 _) ∷v just (Ln I2 _) ∷v nothing ∷v []v
+                            ; NConclusion = just (Ln I3 _)
                             } ∷ []
 _ = refl
 
@@ -335,22 +335,22 @@ _ = refl
 _ : NArgs- G4 (# 4) ≡ []
 _ = refl
 
-_ : roots G4 ≡ (# 0 , (Ln NS3 _)) ∷ []
+_ : roots G4 ≡ (# 0 , (Ln I3 _)) ∷ []
 _ = refl
 
 
 -- indexes
 
-_ : G4 ! (# 0) ≡ context (Ln NS3 nothing) ((объяснение , _) ∷ (поддержка , _) ∷ (поддержка , _) ∷ [])
+_ : G4 ! (# 0) ≡ context (Ln I3 nothing) ((объяснение , _) ∷ (поддержка , _) ∷ (поддержка , _) ∷ [])
 _ = refl
 
-_ : G4 ! (# 3) ≡ node NA6 0.4 ((факт     , _) ∷ [])
+_ : G4 ! (# 3) ≡ node SR6 0.4 ((факт     , _) ∷ [])
 _ = refl
 
-_ : G4 ![ (# 0) > (# 2) ] ≡ node NA6 0.4 ((факт     , _) ∷ [])
+_ : G4 ![ (# 0) > (# 2) ] ≡ node SR6 0.4 ((факт     , _) ∷ [])
 _ = refl
 
-_ : G4 ![ (# 3) > (# 2) ] ≡ node NS2 1.0 {refl} {refl} []
+_ : G4 ![ (# 3) > (# 2) ] ≡ node I2 1.0 {refl} {refl} []
 _ = refl
 
 
@@ -365,36 +365,36 @@ G4lim = steps 100 G4
 
 -- Graph with conflicts  --------------------------------------------
 
--- N2 ---- <N4> ---∙ 
+-- I2 ---- <N4> ---∙ 
 --         /        \
--- N1 ----∙          N3 -∙ 
+-- I1 ----∙          I3 -∙ 
 --         \        /|    \
--- N5 ---- <N6> ---∙ CN1  CN2
+-- I5 ---- <N6> ---∙ CN1  CN2
 --                   |    /
--- N7 ---- <N8> ----¬N3 -∙ 
+-- I7 ---- <N8> ----¬I3 -∙ 
 G5 : AGraph _
 G5 =
-     node NC1 1.0 {refl} {refl} ((conflicted , # 0) ∷ (conflicting , # 3) ∷ []) &
-     node0 ¬NS3 ((поддержка , # 0) ∷ []) &
-     node NA8 0.9 {refl} {refl} ((все-признают , # 0) ∷ []) &
-     node NS7 0.9 {refl} {refl} [] &
+     node SC1 1.0 {refl} {refl} ((conflicted , # 0) ∷ (conflicting , # 3) ∷ []) &
+     node0 ¬I3 ((поддержка , # 0) ∷ []) &
+     node SR8 0.9 {refl} {refl} ((все-признают , # 0) ∷ []) &
+     node I7 0.9 {refl} {refl} [] &
      G2                -- missed область in A-от-эксперта !
 
 G6 : AGraph _
 G6 =
-     node NC2 1.0 {refl} {refl} ((conflicted , # 4) ∷ (conflicting , # 1) ∷ []) &
+     node SC2 1.0 {refl} {refl} ((conflicted , # 4) ∷ (conflicting , # 1) ∷ []) &
      G5
 
 
-_ : nodes G5 ≡ (# 0 , (Ln NC1 _)) ∷v (# 1 , (Ln ¬NS3 _)) ∷v (# 2 , (Ln NA8 _)) ∷v (# 3 , (Ln NS7 _))
-            ∷v (# 4 , (Ln NS3 _)) ∷v (# 5 , (Ln NA6 _))  ∷v (# 6 , (Ln NS5 _)) ∷v (# 7 , (Ln NA4 _))
-            ∷v (# 8 , (Ln NS2 _)) ∷v (# 9 , (Ln NS1 _))  ∷v []v
+_ : nodes G5 ≡ (# 0 , (Ln SC1 _)) ∷v (# 1 , (Ln ¬I3 _)) ∷v (# 2 , (Ln SR8 _)) ∷v (# 3 , (Ln I7 _))
+            ∷v (# 4 , (Ln I3 _)) ∷v (# 5 , (Ln SR6 _))  ∷v (# 6 , (Ln I5 _)) ∷v (# 7 , (Ln SR4 _))
+            ∷v (# 8 , (Ln I2 _)) ∷v (# 9 , (Ln I1 _))  ∷v []v
 _ = refl
 
-_ : roots G5 ≡ (# 0 , (Ln NC1 _)) ∷ []
+_ : roots G5 ≡ (# 0 , (Ln SC1 _)) ∷ []
 _ = refl
 
-_ : roots¬CA G5 ≡ (# 1 , (Ln ¬NS3 _)) ∷ (# 4 , (Ln NS3 _)) ∷ []
+_ : roots¬CA G5 ≡ (# 1 , (Ln ¬I3 _)) ∷ (# 4 , (Ln I3 _)) ∷ []
 _ = refl
 
 _ : theSame {10} (# 1) (# 0) (# 0) ≡ true
@@ -487,47 +487,47 @@ w = 110
 ws = 90 -- "section" title width
 
 printG1 : AGraph 4 → (∀ {n} → AGraph n → Fin n → MC) → String
-printG1 g f = "\nN1  = " +++ pprint w (f g (# 3))
-          +++ "  N2  = " +++ pprint w (f g (# 2))
-          +++ "  N3  = " +++ pprint w (f g (# 0))
-          +++ "  N4  = " +++ pprint w (f g (# 1))
+printG1 g f = "\nI1  = " +++ pprint w (f g (# 3))
+          +++ "  I2  = " +++ pprint w (f g (# 2))
+          +++ "  I3  = " +++ pprint w (f g (# 0))
+          +++ "  I4  = " +++ pprint w (f g (# 1))
 printG2 : AGraph 6 → (∀ {n} → AGraph n → Fin n → MC) → String
-printG2 g f = "\nN1  = " +++ pprint w (f g (# 5))
-          +++ "  N2  = " +++ pprint w (f g (# 4))
-          +++ "  N3  = " +++ pprint w (f g (# 0))
-          +++ "  N4  = " +++ pprint w (f g (# 3))
-          +++ "\nN5  = " +++ pprint w (f g (# 2))
-          +++ "  N6  = " +++ pprint w (f g (# 1))
+printG2 g f = "\nI1  = " +++ pprint w (f g (# 5))
+          +++ "  I2  = " +++ pprint w (f g (# 4))
+          +++ "  I3  = " +++ pprint w (f g (# 0))
+          +++ "  I4  = " +++ pprint w (f g (# 3))
+          +++ "\nI5  = " +++ pprint w (f g (# 2))
+          +++ "  I6  = " +++ pprint w (f g (# 1))
 printG4 : AGraph 8 → (∀ {n} → AGraph n → Fin n → MC) → String
-printG4 g f = "\nN1 = " +++ pprint w (f g (# 7))
-          +++ "  N2 = " +++ pprint w (f g (# 6))
-          +++ "  N3 = " +++ pprint w (f g (# 0))
-          +++ "  N4 = " +++ pprint w (f g (# 5))
-          +++ "\nN5 = " +++ pprint w (f g (# 4))
-          +++ "  N6 = " +++ pprint w (f g (# 3))
-          +++ "  N7 = " +++ pprint w (f g (# 2))
-          +++ "  N8 = " +++ pprint w (f g (# 1))
+printG4 g f = "\nI1 = " +++ pprint w (f g (# 7))
+          +++ "  I2 = " +++ pprint w (f g (# 6))
+          +++ "  I3 = " +++ pprint w (f g (# 0))
+          +++ "  I4 = " +++ pprint w (f g (# 5))
+          +++ "\nI5 = " +++ pprint w (f g (# 4))
+          +++ "  I6 = " +++ pprint w (f g (# 3))
+          +++ "  I7 = " +++ pprint w (f g (# 2))
+          +++ "  I8 = " +++ pprint w (f g (# 1))
 printG5 : AGraph 10 → (∀ {n} → AGraph n → Fin n → MC) → String
-printG5 g f = "\nN1  = " +++ pprint w (f g (# 9))
-          +++ "  N2  = " +++ pprint w (f g (# 8))
-          +++ "  N3  = " +++ pprint w (f g (# 4))
-          +++ "  N4  = " +++ pprint w (f g (# 7))
-          +++ "  N5  = " +++ pprint w (f g (# 6))
-          +++ "\nN6  = " +++ pprint w (f g (# 5))
-          +++ "  N7  = " +++ pprint w (f g (# 3))
-          +++ "  N8  = " +++ pprint w (f g (# 2))
-          +++ "  -N3 = " +++ pprint w (f g (# 1))
+printG5 g f = "\nI1  = " +++ pprint w (f g (# 9))
+          +++ "  I2  = " +++ pprint w (f g (# 8))
+          +++ "  I3  = " +++ pprint w (f g (# 4))
+          +++ "  I4  = " +++ pprint w (f g (# 7))
+          +++ "  I5  = " +++ pprint w (f g (# 6))
+          +++ "\nI6  = " +++ pprint w (f g (# 5))
+          +++ "  I7  = " +++ pprint w (f g (# 3))
+          +++ "  I8  = " +++ pprint w (f g (# 2))
+          +++ "  -I3 = " +++ pprint w (f g (# 1))
           +++ "  CN1 = " +++ pprint w (f g (# 0))
 printG6 : AGraph 11 → (∀ {n} → AGraph n → Fin n → MC) → String
-printG6 g f = "\nN1  = " +++ pprint w (f g (# 10))
-          +++ "  N2  = " +++ pprint w (f g (# 9))
-          +++ "  N3  = " +++ pprint w (f g (# 5))
-          +++ "  N4  = " +++ pprint w (f g (# 8))
-          +++ "\nN5  = " +++ pprint w (f g (# 7))
-          +++ "  N6  = " +++ pprint w (f g (# 6))
-          +++ "  N7  = " +++ pprint w (f g (# 4))
-          +++ "  N8  = " +++ pprint w (f g (# 3))
-          +++ "\n-N3 = " +++ pprint w (f g (# 2))
+printG6 g f = "\nI1  = " +++ pprint w (f g (# 10))
+          +++ "  I2  = " +++ pprint w (f g (# 9))
+          +++ "  I3  = " +++ pprint w (f g (# 5))
+          +++ "  I4  = " +++ pprint w (f g (# 8))
+          +++ "\nI5  = " +++ pprint w (f g (# 7))
+          +++ "  I6  = " +++ pprint w (f g (# 6))
+          +++ "  I7  = " +++ pprint w (f g (# 4))
+          +++ "  I8  = " +++ pprint w (f g (# 3))
+          +++ "\n-I3 = " +++ pprint w (f g (# 2))
           +++ "  CN1 = " +++ pprint w (f g (# 1))
           +++ "  CN2 = " +++ pprint w (f g (# 0))
 
@@ -623,34 +623,34 @@ main = run (putStrLn stringToPrint)
 
     -- +++ (pprint 110 G6)
 
-    -- +++ "\nN1+N2 = " +++ pprint w (val←Ctx G2 (# 5) ⟪ _⊕_ Pref ⟫ val←Ctx G2 (# 4))
-    -- +++ "\nN4+N6 = " +++ pprint w (val←Ctx G2 (# 3) ⟪ _⊕_ Pref ⟫ val←Ctx G2 (# 1))
-    -- +++ "\nN1+N5 = " +++ pprint w (val←Ctx G2 (# 5) ⟪ _⊕_ Pref ⟫ val←Ctx G2 (# 2))
-    -- +++ "\nN1.N2 = " +++ pprint w (val←Ctx G2 (# 5) ⟪ _⊙_ Pref ⟫ val←Ctx G2 (# 4))
-    -- +++ "\nN4.N6 = " +++ pprint w (val←Ctx G2 (# 3) ⟪ _⊙_ Pref ⟫ val←Ctx G2 (# 1))
-    -- +++ "\nN1.N5 = " +++ pprint w (val←Ctx G2 (# 5) ⟪ _⊙_ Pref ⟫ val←Ctx G2 (# 2))
+    -- +++ "\nI1+I2 = " +++ pprint w (val←Ctx G2 (# 5) ⟪ _⊕_ Pref ⟫ val←Ctx G2 (# 4))
+    -- +++ "\nI4+I6 = " +++ pprint w (val←Ctx G2 (# 3) ⟪ _⊕_ Pref ⟫ val←Ctx G2 (# 1))
+    -- +++ "\nI1+I5 = " +++ pprint w (val←Ctx G2 (# 5) ⟪ _⊕_ Pref ⟫ val←Ctx G2 (# 2))
+    -- +++ "\nI1.I2 = " +++ pprint w (val←Ctx G2 (# 5) ⟪ _⊙_ Pref ⟫ val←Ctx G2 (# 4))
+    -- +++ "\nI4.I6 = " +++ pprint w (val←Ctx G2 (# 3) ⟪ _⊙_ Pref ⟫ val←Ctx G2 (# 1))
+    -- +++ "\nI1.I5 = " +++ pprint w (val←Ctx G2 (# 5) ⟪ _⊙_ Pref ⟫ val←Ctx G2 (# 2))
     -- -- +++ "\nNConflicts 0: " +++ "" +++ pprint w (NConflicts G5 (# 0))
     -- -- +++ "\nNConflicts 1: " +++ "" +++ pprint w (NConflicts G5 (# 1))
     -- -- +++ "\nNConflicts 2: " +++ "" +++ pprint w (NConflicts G5 (# 2))
     -- -- +++ "\nNConflicts 3: " +++ "" +++ pprint w (NConflicts G5 (# 3))
     -- -- +++ "\nNConflicts 4: " +++ "" +++ pprint w (NConflicts G5 (# 4))
     -- +++ "\nG5repl0  ======================="
-    -- +++ "\nN1 = " +++ pprint w (val←i (replaceInGraph G5 (# 0) (just (LA⊤ Pref))) (# 7))
-    -- +++ "\nN2 = " +++ pprint w (val←i (replaceInGraph G5 (# 0) (just (LA⊤ Pref))) (# 6))
-    -- +++ "\nN3 = " +++ pprint w (val←i (replaceInGraph G5 (# 0) (just (LA⊤ Pref))) (# 0))
-    -- +++ "\nN4 = " +++ pprint w (val←i (replaceInGraph G5 (# 0) (just (LA⊤ Pref))) (# 5))
-    -- +++ "\nN5 = " +++ pprint w (val←i (replaceInGraph G5 (# 0) (just (LA⊤ Pref))) (# 4))
-    -- +++ "\nN6 = " +++ pprint w (val←i (replaceInGraph G5 (# 0) (just (LA⊤ Pref))) (# 3))
-    -- +++ "\nN7 = " +++ pprint w (val←i (replaceInGraph G5 (# 0) (just (LA⊤ Pref))) (# 2))
-    -- +++ "\nN8 = " +++ pprint w (val←i (replaceInGraph G5 (# 0) (just (LA⊤ Pref))) (# 1))
+    -- +++ "\nI1 = " +++ pprint w (val←i (replaceInGraph G5 (# 0) (just (LA⊤ Pref))) (# 7))
+    -- +++ "\nI2 = " +++ pprint w (val←i (replaceInGraph G5 (# 0) (just (LA⊤ Pref))) (# 6))
+    -- +++ "\nI3 = " +++ pprint w (val←i (replaceInGraph G5 (# 0) (just (LA⊤ Pref))) (# 0))
+    -- +++ "\nI4 = " +++ pprint w (val←i (replaceInGraph G5 (# 0) (just (LA⊤ Pref))) (# 5))
+    -- +++ "\nI5 = " +++ pprint w (val←i (replaceInGraph G5 (# 0) (just (LA⊤ Pref))) (# 4))
+    -- +++ "\nI6 = " +++ pprint w (val←i (replaceInGraph G5 (# 0) (just (LA⊤ Pref))) (# 3))
+    -- +++ "\nI7 = " +++ pprint w (val←i (replaceInGraph G5 (# 0) (just (LA⊤ Pref))) (# 2))
+    -- +++ "\nI8 = " +++ pprint w (val←i (replaceInGraph G5 (# 0) (just (LA⊤ Pref))) (# 1))
     -- +++ "\nG5repl2  ======================="
-    -- +++ "\nN1 = " +++ pprint w (val←i (replaceInGraph G5 (# 2) (just (LA⊤ Pref))) (# 7))
-    -- +++ "\nN2 = " +++ pprint w (val←i (replaceInGraph G5 (# 2) (just (LA⊤ Pref))) (# 6))
-    -- +++ "\nN3 = " +++ pprint w (val←i (replaceInGraph G5 (# 2) (just (LA⊤ Pref))) (# 0))
-    -- +++ "\nN4 = " +++ pprint w (val←i (replaceInGraph G5 (# 2) (just (LA⊤ Pref))) (# 5))
-    -- +++ "\nN5 = " +++ pprint w (val←i (replaceInGraph G5 (# 2) (just (LA⊤ Pref))) (# 4))
-    -- +++ "\nN6 = " +++ pprint w (val←i (replaceInGraph G5 (# 2) (just (LA⊤ Pref))) (# 3))
-    -- +++ "\nN7 = " +++ pprint w (val←i (replaceInGraph G5 (# 2) (just (LA⊤ Pref))) (# 2))
-    -- +++ "\nN8 = " +++ pprint w (val←i (replaceInGraph G5 (# 2) (just (LA⊤ Pref))) (# 1))
+    -- +++ "\nI1 = " +++ pprint w (val←i (replaceInGraph G5 (# 2) (just (LA⊤ Pref))) (# 7))
+    -- +++ "\nI2 = " +++ pprint w (val←i (replaceInGraph G5 (# 2) (just (LA⊤ Pref))) (# 6))
+    -- +++ "\nI3 = " +++ pprint w (val←i (replaceInGraph G5 (# 2) (just (LA⊤ Pref))) (# 0))
+    -- +++ "\nI4 = " +++ pprint w (val←i (replaceInGraph G5 (# 2) (just (LA⊤ Pref))) (# 5))
+    -- +++ "\nI5 = " +++ pprint w (val←i (replaceInGraph G5 (# 2) (just (LA⊤ Pref))) (# 4))
+    -- +++ "\nI6 = " +++ pprint w (val←i (replaceInGraph G5 (# 2) (just (LA⊤ Pref))) (# 3))
+    -- +++ "\nI7 = " +++ pprint w (val←i (replaceInGraph G5 (# 2) (just (LA⊤ Pref))) (# 2))
+    -- +++ "\nI8 = " +++ pprint w (val←i (replaceInGraph G5 (# 2) (just (LA⊤ Pref))) (# 1))
     -- +++ "\nG5repl7  ======================="
-    -- +++ "\nN1 = "
+    -- +++ "\nI1 = "
