@@ -210,6 +210,7 @@ G4 = steps 4 G
 
 G100 = steps 100 G
 
+G200 = steps 200 G
 
 
 
@@ -256,5 +257,7 @@ main = run (putStrLn stringToPrint)
     +++ printG G4 val←i
     +++ ppretty ws (docSection ws "step 100")
     +++ printG G100 val←i
+    +++ ppretty ws (docSection ws "step 200")
+    +++ printG G200 val←i
 
     -- +++ (pprint 110 G)
