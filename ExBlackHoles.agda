@@ -154,7 +154,6 @@ G =
        1.0 {refl} {refl}
        ((conflicting , # 0) ∷ (conflicted , # 6) ∷ []) &
      node0 S4
-       -- 1.0 {refl} {refl}
        ((причинная-связь , # 0) ∷ []) &
      node A2
        0.8 {refl} {refl}
@@ -163,7 +162,6 @@ G =
        0.9 {refl} {refl}
        [] &     
      node0 S8
-       -- 1.0 {refl} {refl}
        ((вывод , # 0) ∷ []) &
      node A3
        1.0 {refl} {refl}
@@ -172,7 +170,6 @@ G =
        0.7 {refl} {refl}
        [] &
      node0 S9
-       -- 1.0 {refl} {refl}
        ((вывод , # 0) ∷ []) &
      node A4
        1.0 {refl} {refl}
@@ -187,7 +184,6 @@ G =
        0.8 {refl} {refl}
        [] &
      node0 S2
-       -- 1.0 {refl} {refl}
        ((вывод , # 0) ∷ []) &
      node A1
        0.7 {refl} {refl}
