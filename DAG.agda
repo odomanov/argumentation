@@ -56,6 +56,8 @@ _⨀_ _⨁_ : MC → MC → MC
 x ⨀ y = x ⟪ _⊙_ la ⟫ y 
 x ⨁ y = x ⟪ _⊕_ la ⟫ y 
 
+⟨_,_⟩ : MC → MC → MC
+⟨ x , y ⟩ = x ⟪ mean la ⟫ y
 
 -- δi-th graph relative to i  
 _[_≻_] : ∀ {n} → AGraph (ℕsuc n)
@@ -480,9 +482,7 @@ val+conflicts {n} g0 g i = (val g0 i) ⨀ ¬foldConflicts g i
 
 -- the value of the next iteration
 iterationVal : ∀ {n} → AGraph n → AGraph n → Fin n → MC
-iterationVal g0 gin i = (val←i gin i)
-                        ⟪ mean la ⟫
-                        (val+conflicts g0 gin i)
+iterationVal g0 gin i = ⟨ (val←i gin i) , (val+conflicts g0 gin i) ⟩
 
 private
   step' : ∀ {n}
