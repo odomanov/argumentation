@@ -159,12 +159,18 @@ docSection n s = line <> text (s +++ " ")
 docFloat : Float → Doc
 docFloat x = text (Data.Float.show x)
 
--- rounded to 5 decimal places
-docFloatRounded : Float → Doc
-docFloatRounded x = text (Data.Float.show ((primRound (x * 100000.0)) /100000))
+-- rounded to n decimal places
+docFloatRounded : ℕ → Float → Doc
+docFloatRounded n x = text (Data.Float.show ((primRound (x * 10^n)) /10^n))
   where
-  _/100000 : ℤ → Float
-  (+ n) /100000 = (primNatToFloat n) ÷ 100000.0
-  (-[1+ n ]) /100000 = primFloatNegate ((primNatToFloat (n ∸ 1)) ÷ 100000.0)
+  10^n = tofloat (primRound (primExp ((primNatToFloat n) * (primLog 10.0))))
+    where
+    tofloat : ℤ → Float
+    tofloat (+ n) = (primNatToFloat n) * 1.0
+    tofloat (-[1+ n ]) = (primNatToFloat (n ∸ 1)) * 1.0
+  
+  _/10^n : ℤ → Float
+  (+ n) /10^n = (primNatToFloat n) ÷ 10^n
+  (-[1+ n ]) /10^n = primFloatNegate ((primNatToFloat (n ∸ 1)) ÷ 10^n)
 
 

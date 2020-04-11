@@ -99,6 +99,9 @@ FUmax a b = record
   }
 
 
+docFU : FUnit → Doc
+docFU (mkFUnit x _ _) = docFloatRounded 4 x 
+
 
 -------------------------------------------------------
 -- Trust Algebra
@@ -180,9 +183,6 @@ postulate
     FU= FU≤ Trust⊙ Trust⊕ -- Trust⊖
     Trust⊘ Trust∧ Trust∨ FUmean FU1 FU0
 
-docTrust : FUnit → Doc
-docTrust (mkFUnit x _ _) = docFloatRounded x
-
 Trust : LabelAlgebra _ _ _
 Trust = record
   { Carrier = FUnit
@@ -198,7 +198,7 @@ Trust = record
   ; ⊤ = FU1
   ; ⊥ = FU0
   ; isLabelAlgebra = Trust-isLabelAlgebra
-  ; doc = docTrust
+  ; doc = docFU
   }
 
 
@@ -255,9 +255,6 @@ postulate
     FU= FU≤ Pref⊙ Pref⊕ -- Pref⊖
     Pref⊘ Pref⊙ Pref∨ FUmean FU1 FU0
 
-docPref : FUnit → Doc
-docPref (mkFUnit x _ _) = docFloatRounded x 
-
 Pref : LabelAlgebra _ _ _
 Pref = record
   { Carrier = FUnit
@@ -273,7 +270,7 @@ Pref = record
   ; ⊤ = FU1
   ; ⊥ = FU0
   ; isLabelAlgebra = Pref-isLabelAlgebra
-  ; doc = docPref
+  ; doc = docFU
   }
 
 
@@ -329,9 +326,6 @@ postulate
     FU= FU≤ Łuk⊙ Łuk⊕ -- Łuk⊖
     Łuk⊘ Łuk∧ Łuk∨ FUmean FU1 FU0
 
-docŁuk : FUnit → Doc
-docŁuk (mkFUnit x _ _) = docFloatRounded x 
-
 Łuk : LabelAlgebra _ _ _
 Łuk = record
   { Carrier = FUnit
@@ -347,7 +341,7 @@ docŁuk (mkFUnit x _ _) = docFloatRounded x
   ; ⊤ = FU1
   ; ⊥ = FU0
   ; isLabelAlgebra = Łuk-isLabelAlgebra
-  ; doc = docŁuk
+  ; doc = docFU
   }
 
 
@@ -383,9 +377,6 @@ postulate
     FU= FU≤ Göd⊙ Göd⊕ -- Göd⊖
     Göd⊘ Göd∧ Göd∨ FUmean FU1 FU0
 
-docGödel : FUnit → Doc
-docGödel (mkFUnit x _ _) = docFloatRounded x 
-
 Gödel : LabelAlgebra _ _ _
 Gödel = record
   { Carrier = FUnit
@@ -401,7 +392,7 @@ Gödel = record
   ; ⊤ = FU1
   ; ⊥ = FU0
   ; isLabelAlgebra = Gödel-isLabelAlgebra
-  ; doc = docGödel
+  ; doc = docFU
   }
 
 
@@ -443,9 +434,6 @@ postulate
     FU= FU≤ prod⊙ prod⊕ -- prod⊖
     prod⊘ prod∧ prod∨ FUmean FU1 FU0
 
-docProduct : FUnit → Doc
-docProduct (mkFUnit x _ _) = docFloatRounded x 
-
 Product : LabelAlgebra _ _ _
 Product = record
   { Carrier = FUnit
@@ -461,7 +449,7 @@ Product = record
   ; ⊤ = FU1
   ; ⊥ = FU0
   ; isLabelAlgebra = Product-isLabelAlgebra
-  ; doc = docProduct
+  ; doc = docFU
   }
 
 
