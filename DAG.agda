@@ -52,6 +52,9 @@ _ ⟪ _ ⟫ _ = nothing
 ⟪ op ⟫ (just v) = just (op v)
 ⟪ _ ⟫ _ = nothing
 
+_⨀_ _⨁_ : MC → MC → MC
+x ⨀ y = x ⟪ _⊙_ la ⟫ y 
+x ⨁ y = x ⟪ _⊕_ la ⟫ y 
 
 
 -- δi-th graph relative to i  
@@ -148,11 +151,15 @@ ALNode←i : ∀ {n} → AGraph n → Fin n → ALNode
 ALNode←i g i = label (g ! i)
 
 ALNode←δi : ∀ {n} → AGraph (ℕsuc n) → (i : Fin (ℕsuc n)) → Fin (n - i) → ALNode
-ALNode←δi g i δi = label (g ! i ≻ δi)
+ALNode←δi g i δi = ALNode←i g (i ≻ δi)
 
 -- Algebra label from the node of the i-th context
 val←i : ∀ {n} → AGraph n → Fin n → MC
 val←i g i = LNode.value (ALNode←i g i)
+
+-- replace value in context
+replaceVal : ∀ {n} → AContext n → MC → AContext n
+replaceVal (context (Ln nd _) sucs) v = context (Ln nd v) sucs
 
 
 -- successors
@@ -206,15 +213,33 @@ isAttack g i δi with Role←i g i δi
 ... | just r = isRAnode (ALNode←i (g [ i ]) (suc δi)) ∧ (r =ᵇ атака)
 
 
+
+-- declarations to be defined later
+
+NArgs : ∀ {n} → AGraph (ℕsuc n) → (i : Fin (ℕsuc n)) → List (AArg × MC)
+val   : ∀ {n} → AGraph n → (i : Fin n) → MC
+
+
+
+-- ALNode of the i-th context -- recursively computed
+ALNodev←i : ∀ {n} → AGraph n → Fin n → ALNode
+ALNodev←i {ℕzero} g i = label (g ! i)
+ALNodev←i {ℕsuc n} g i with NArgs g i 
+... | [] = label (g ! i)
+... | _  = label (replaceVal (g ! i) (val g i))
+
+ALNodev←δi : ∀ {n} → AGraph (ℕsuc n) → (i : Fin (ℕsuc n)) → Fin (n - i) → ALNode
+ALNodev←δi g i δi = ALNodev←i g (i ≻ δi)
+
 -- argument for δi-th of the i-th context, if exists
-Arg : ∀ {n} → AGraph (ℕsuc n) → (i : Fin (ℕsuc n)) → (δi : Fin (n - i)) → Maybe AArg
-Arg {n} g i δi with ALNode←δi g i δi
-... | Ln (Lnr s) v = just (mkArg s (premises s) (just (ALNode←i g i)))
+Arg : ∀ {n} → AGraph (ℕsuc n) → (i : Fin (ℕsuc n)) → (δi : Fin (n - i)) → Maybe (AArg × MC)
+Arg {n} g i δi with ALNode←i g (i ≻ δi)
+... | Ln (Lnr s) v = just (mkArg s (premises s) (just (ALNode←i g i)) , v)
   where
   extr : Role → Sucs (n - i - suc δi) → Maybe ALNode
   extr r [] = nothing
   extr r ((r1 , δδi) ∷ xs) with r =ᵇ r1
-  ... | true  = just (ALNode←δi (g [ i ]) (suc δi) δδi)
+  ... | true  = just (ALNodev←i (g [ i ]) ((suc δi) ≻ δδi))
   ... | false = extr r xs
 
   premises' : ∀ {m} → Vec Role m → Vec (Maybe ALNode) m
@@ -227,12 +252,11 @@ Arg {n} g i δi with ALNode←δi g i δi
 
 
 -- the list of arguments (RA-nodes) of the i-th context
-NArgs : ∀ {n} → AGraph (ℕsuc n) → (i : Fin (ℕsuc n)) → List AArg
 NArgs {ℕzero} _ _ = []
 NArgs {n} g i = nargs (sucs←i g i)
   where
   -- list of RA-nodes from sucs
-  nargs : Sucs (n - i) → List AArg
+  nargs : Sucs (n - i) → List (AArg × MC)
   nargs [] = []
   nargs (x ∷ xs) with Arg g i (proj₂ x)
   ... | nothing  = nargs xs
@@ -341,7 +365,7 @@ valRA (mkArg _ prems concl) = valRA' prems concl
   valRA' []v (just (Ln _ nothing))  = MC⊤      -- missed conclusion value
   valRA' []v nothing                = nothing  -- missed conclusion itself
   valRA' (nothing  ∷v _) _          = nothing  -- missed premise
-  valRA' ((just x) ∷v xs) c = LNode.value x ⟪ _⊙_ la ⟫ valRA' xs c
+  valRA' ((just x) ∷v xs) c = LNode.value x ⨀ valRA' xs c
 
 
 private
@@ -351,23 +375,22 @@ private
   op nothing   (just v2) = just v2
   op nothing   nothing   = nothing
   
-  valargs : List AArg → MC
+  valargs : List (AArg × MC) → MC
   valargs [] = MC⊥   -- impossible case, actually
-  valargs (x ∷ []) with valRA x
+  valargs (x ∷ []) with valRA (proj₁ x)
   ... | nothing = nothing
-  ... | just v  = just v
-  valargs (x ∷ xs) with valRA x
+  ... | just v  = (proj₂ x) ⨀ just v
+  valargs (x ∷ xs) with valRA (proj₁ x)
   ... | nothing = valargs xs
-  ... | just v  = op (just v) (valargs xs)
+  ... | just v  = op ((proj₂ x) ⨀ just v) (valargs xs)
 
 -- the value of the i-th node computed recursively
 
-val : ∀ {n} → AGraph n → (i : Fin n) → MC
 val {ℕzero} _ _ = nothing
 val {ℕsuc n} g i with NArgs g i | val←i g i
 ... | []   | v       = v  
 ... | args | nothing = valargs args 
-... | args | v       = v ⟪ _⊕_ la ⟫ valargs args 
+... | args | v       = v ⨁ valargs args 
 
 
 
@@ -389,6 +412,7 @@ compute {n} g = compute' {n} {_} {≤-reflexive refl} g g
 
 -- 'conflicting' and 'conflicted' indexes
 c-ing : ∀ {n} → AGraph n → (ic : Fin n) → Maybe (Fin (n - suc ic))
+c-ing {ℕzero} _ _ = nothing
 c-ing g ic = RoleIdx←i g ic conflicting
 
 c-ed : ∀ {n} → AGraph n → (ic : Fin n) → Maybe (Fin (n - suc ic))
@@ -407,9 +431,10 @@ c-ed←CA {_} _ _ _ = nothing   -- for n = 0, 1, 2
 
 -- the list of conflicts (= conflicting indexes) of the i-th context
 NConflicts : ∀ {n} → AGraph n → Fin n → List (Fin n)
-NConflicts {n} g i = fold↓ f (NConflicts0 g i) 
+NConflicts {ℕzero} _ _ = []
+NConflicts {ℕsuc n} g i = fold↓ f (NConflicts0 g i) 
   where
-  f : Fin n → List (Fin n) → List (Fin n)
+  f : Fin (ℕsuc n) → List (Fin (ℕsuc n)) → List (Fin (ℕsuc n))
   f ic l with c-ing g ic
   ... | nothing = l
   ... | just ing with theSame i ic ing | c-ed g ic
@@ -426,9 +451,6 @@ NConflicts {n} g i = fold↓ f (NConflicts0 g i)
 
 
 -- Conflict iterations
-
-replaceVal : ∀ {n} → AContext n → MC → AContext n
-replaceVal (context (Ln nd _) sucs) v = context (Ln nd v) sucs
 
 -- -- replace value in i-th context
 -- replaceInGraph : ∀ {n} → AGraph n → Fin n → MC → AGraph n
@@ -452,7 +474,7 @@ foldConflicts {n} g i = List.foldr f MC⊥ (NConflicts g i)
 
 -- value corrected by conflicts
 val+conflicts : ∀ {n} → AGraph n → AGraph n → Fin n → MC
-val+conflicts {n} g0 g i = (val g0 i) ⟪ _⊙_ la ⟫ ¬foldConflicts g i
+val+conflicts {n} g0 g i = (val g0 i) ⨀ ¬foldConflicts g i
 
 -- iteration steps
 
