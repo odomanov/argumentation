@@ -397,7 +397,7 @@ Gödel = record
 
 
 -------------------------------------------------------
--- Product t-norm (Shirtcliff coefficients)
+-- Product t-norm (Shortliffe coefficients)
 
 postulate
   prod0≤v⊙ : ∀ x y → 0.0 [≤] ((value x) [*] (value y)) ≡ true
