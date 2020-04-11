@@ -55,22 +55,22 @@ _ ⟪ _ ⟫ _ = nothing
 
 
 -- δi-th graph relative to i  
-_[_>_] : ∀ {n} → AGraph (ℕsuc n)
+_[_≻_] : ∀ {n} → AGraph (ℕsuc n)
                → (i : Fin (ℕsuc n))
                → (δi : Fin (n - i))
                → AGraph _
-g [ i > δi ] = Ac.tail (g [ i ]) [ δi ]
+g [ i ≻ δi ] = Ac.tail (g [ i ]) [ δi ]
 
 -- i-th context
 _!_ : ∀ {n} → AGraph n → (i : Fin n) → AContext (n - suc i)
 g ! i = Ac.head (g [ i ])
 
 -- δi-th context relative to i  
-_![_>_] : ∀ {n} → AGraph (ℕsuc n)
+_!_≻_ : ∀ {n} → AGraph (ℕsuc n)
                 → (i : Fin (ℕsuc n))
                 → (δi : Fin (n - i))
                 → AContext _ 
-g ![ i > δi ] = Ac.head (Ac.tail (g [ i ]) [ δi ])
+g ! i ≻ δi = Ac.head (Ac.tail (g [ i ]) [ δi ])
 
 
 
@@ -110,11 +110,11 @@ theSame {ℕsuc (ℕsuc _)} i₁ i₂ δi₂ with (toℕ i₁) ℕ.≟ ℕsuc ((
 ... | no _  = false
 theSame _ _ _ = false  -- for n = 0, 1
 
--- i, δi → i
-realIdx : ∀ {n} → (i : Fin n) → Fin (n - suc i) → Fin n
-realIdx zero δi = Fin.inject≤ (suc δi) (s≤s (≤-reflexive refl)) 
-realIdx (suc zero) δi = Fin.inject≤ (suc (suc δi)) (s≤s (≤-reflexive refl))
-realIdx (suc (suc i)) δi = Fin.inject≤ (suc ((suc (suc i)) Fin.+ δi)) p3 
+-- i, δi → i ("real" index)
+_≻_ : ∀ {n} → (i : Fin (ℕsuc n)) → Fin (n - i) → Fin (ℕsuc n)
+zero          ≻ δi = Fin.inject≤ (suc δi) (s≤s (≤-reflexive refl)) 
+(suc zero)    ≻ δi = Fin.inject≤ (suc (suc δi)) (s≤s (≤-reflexive refl))
+(suc (suc i)) ≻ δi = Fin.inject≤ (suc ((suc (suc i)) Fin.+ δi)) p3 
 
 -- should be true, but I can't prove it
 -- lm : ∀ n i δi → theSame {n} (realIdx {n} i δi) i δi ≡ true
@@ -148,7 +148,7 @@ ALNode←i : ∀ {n} → AGraph n → Fin n → ALNode
 ALNode←i g i = label (g ! i)
 
 ALNode←δi : ∀ {n} → AGraph (ℕsuc n) → (i : Fin (ℕsuc n)) → Fin (n - i) → ALNode
-ALNode←δi g i δi = label (g ![ i > δi ])
+ALNode←δi g i δi = label (g ! i ≻ δi)
 
 -- Algebra label from the node of the i-th context
 val←i : ∀ {n} → AGraph n → Fin n → MC
@@ -168,7 +168,7 @@ sucs←δi : ∀ {n} → AGraph (ℕsuc n)
                 → (i : Fin (ℕsuc n))
                 → (δi : Fin (n - i))
                 → Sucs (n - i - suc δi)
-sucs←δi g i δi = successors (g ![ i > δi ])
+sucs←δi g i δi = successors (g ! i ≻ δi)
 
 
 -- extract δi-th role from the successors list, if exists
@@ -413,7 +413,7 @@ NConflicts {n} g i = fold↓ f (NConflicts0 g i)
   f ic l with c-ing g ic
   ... | nothing = l
   ... | just ing with theSame i ic ing | c-ed g ic
-  ...            | true | just ied = realIdx ic ied ∷ l
+  ...            | true | just ied = ic ≻ ied ∷ l
   ...            | _    | _ = l
 
   -- the list of conflicts of the 0-th context
