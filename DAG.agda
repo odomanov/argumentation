@@ -435,18 +435,18 @@ NConflicts {ℕzero} _ _ = []
 NConflicts {ℕsuc n} g i = fold↓ f (NConflicts0 g i) 
   where
   f : Fin (ℕsuc n) → List (Fin (ℕsuc n)) → List (Fin (ℕsuc n))
-  f ic l with c-ing g ic
+  f ic l with c-ed g ic
   ... | nothing = l
-  ... | just ing with theSame i ic ing | c-ed g ic
-  ...            | true | just ied = ic ≻ ied ∷ l
+  ... | just ied with theSame i ic ied | c-ing g ic
+  ...            | true | just ing = ic ≻ ing ∷ l
   ...            | _    | _ = l
 
   -- the list of conflicts of the 0-th context
   NConflicts0 : ∀ {n} → AGraph n → Fin n → List (Fin n)
-  NConflicts0 {ℕsuc n} g i with c-ing g zero
+  NConflicts0 {ℕsuc n} g i with c-ed g (# 0)
   ... | nothing = []
-  ... | just ing with theSame i (# 0) ing | c-ed g (# 0)
-  ...            | true | just ied = ((Fin.inject≤ (suc ied) (s≤s (≤-reflexive refl))) ∷ [])
+  ... | just ied with theSame i (# 0) ied | c-ing g (# 0)
+  ...            | true | just ing = ((Fin.inject≤ (suc ing) (s≤s (≤-reflexive refl))) ∷ [])
   ...            | _    | _ = []
 
 
