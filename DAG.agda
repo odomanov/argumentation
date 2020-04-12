@@ -75,7 +75,7 @@ _!_≻_ : ∀ {n} → AGraph (ℕsuc n)
                 → (i : Fin (ℕsuc n))
                 → (δi : Fin (n - i))
                 → AContext _ 
-g ! i ≻ δi = Ac.head (Ac.tail (g [ i ]) [ δi ])
+g ! i ≻ δi = Ac.head (g [ i ≻ δi ]) --(Ac.tail (g [ i ]) [ δi ])
 
 
 
@@ -314,7 +314,6 @@ roots¬CA {n} g = filterb (P g) (V.toList (nodes g))
   ... | false | _  = false
 
 
-{-# TERMINATING #-}    -- the termination check fails
 -- fold down on the whole Fin n
 fold↓ : ∀ {t n}
         → {Ty : Set t}
@@ -482,7 +481,7 @@ val+conflicts {n} g0 g i = (val g0 i) ⨀ ¬foldConflicts g i
 
 -- the value of the next iteration
 iterationVal : ∀ {n} → AGraph n → AGraph n → Fin n → MC
-iterationVal g0 gin i = ⟨ (val←i gin i) , (val+conflicts g0 gin i) ⟩
+iterationVal g0 gin i = ⟨ val←i gin i , val+conflicts g0 gin i ⟩
 
 private
   step' : ∀ {n}
