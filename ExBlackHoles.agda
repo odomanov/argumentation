@@ -231,30 +231,41 @@ open import ShowDAG la
 open import IO
 
 w = 110
-ws = 90 -- "section" title width
+ws = 80 -- "section" title width
 
 printG : AGraph 17 → (∀ {n} → AGraph n → Fin n → MC) → String
-printG g f = "\n S1 = " +++ pprint w (f g (# 16))
+printG g f = "\n  S1 = " +++ pprint w (f g (# 16))
           +++ " S2 = "  +++ pprint w (f g (# 14))
           +++ " S3 = "  +++ pprint w (f g (# 5))
           +++ " S4 = "  +++ pprint w (f g (# 3))
           +++ " S5 = "  +++ pprint w (f g (# 13))
-          +++ "\n S6 = "  +++ pprint w (f g (# 8))
+          +++ "\n  S6 = "  +++ pprint w (f g (# 8))
           +++ " S7 = "  +++ pprint w (f g (# 11))
           +++ " S8 = "  +++ pprint w (f g (# 6))
           +++ " S9 = "  +++ pprint w (f g (# 9))
           +++ " A2 = "  +++ pprint w (f g (# 4))
 
+-- -- without C1
+-- printG : AGraph 16 → (∀ {n} → AGraph n → Fin n → MC) → String
+-- printG g f = "\n  S1 = " +++ pprint w (f g (# 15))
+--           +++ " S2 = "  +++ pprint w (f g (# 13))
+--           +++ " S3 = "  +++ pprint w (f g (# 4))
+--           +++ " S4 = "  +++ pprint w (f g (# 2))
+--           +++ " S5 = "  +++ pprint w (f g (# 12))
+--           +++ "\n  S6 = "  +++ pprint w (f g (# 7))
+--           +++ " S7 = "  +++ pprint w (f g (# 10))
+--           +++ " S8 = "  +++ pprint w (f g (# 5))
+--           +++ " S9 = "  +++ pprint w (f g (# 8))
+--           +++ " A2 = "  +++ pprint w (f g (# 3))
+
 main = run (putStrLn stringToPrint)
   where
   wh = 12
-  stringToPrint = S.replicate ws '-'
+  stringToPrint = ""  --S.replicate ws '-'
     +++ ppretty ws (docSection ws "original")
     +++ printG G val←i
     +++ ppretty ws (docSection ws "computed w/o conflicts")
     +++ printG G val
-    -- +++ ppretty ws (docSection ws "step 0")
-    -- +++ printG G0 val←i
     +++ ppretty ws (docSection ws "step 1")
     +++ printG G1 val←i
     +++ ppretty ws (docSection ws "step 2")
@@ -268,4 +279,10 @@ main = run (putStrLn stringToPrint)
     +++ ppretty ws (docSection ws "step 200")
     +++ printG G200 val←i
 
+    +++ "\n\nContradiction degree:   before = "
+    +++ pprint w ((val←i G0 (# 3) ⨀ val←i G0 (# 9)) ⨁ (val←i G0 (# 4) ⨀ val←i G0 (# 6)))
+    +++ " after = "
+    +++ pprint w ((val←i G200 (# 3) ⨀ val←i G200 (# 9)) ⨁ (val←i G200 (# 4) ⨀ val←i G200 (# 6)))
+    -- +++ pprint w (val←i G200 (# 2) ⨀ val←i G200 (# 8))
+    
     -- +++ (pprint 110 G)
