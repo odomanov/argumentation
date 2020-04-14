@@ -14,7 +14,7 @@ open import WLPretty
 record IsLabelAlgebra {c ℓ₁ ℓ₂} {A : Set c}
                          (_≈_ : Rel A ℓ₁)
                          (_≤_ : Rel A ℓ₂)
-                         (_⊙_ : Op₂ A)
+                         (_⊗_ : Op₂ A)
                          (_⊕_ : Op₂ A)
                          -- (_⊖_ : Op₂ A)
                          (⊘   : Op₁ A)
@@ -29,10 +29,10 @@ record IsLabelAlgebra {c ℓ₁ ℓ₂} {A : Set c}
     maximum   : Maximum _≤_ ⊤
     minimum   : Minimum _≤_ ⊥
     -- support
-    ⊙-comm    : Commutative _≈_ _⊙_
-    ⊙-mono    : ∀ p q r → p ≤ q → (p ⊙ r) ≤ (q ⊙ r) --  Monotone 
-    ⊙-assoc   : Associative _≈_ _⊙_
-    ⊙-neut    : ∀ a → (a ⊙ ⊤) ≈ a
+    ⊗-comm    : Commutative _≈_ _⊗_
+    ⊗-mono    : ∀ p q r → p ≤ q → (p ⊗ r) ≤ (q ⊗ r) --  Monotone 
+    ⊗-assoc   : Associative _≈_ _⊗_
+    ⊗-neut    : ∀ a → (a ⊗ ⊤) ≈ a
     -- aggregation    
     ⊕-comm    : Commutative _≈_ _⊕_
     ⊕-mono    : ∀ p q r → p ≤ q → (p ⊕ r) ≤ (q ⊕ r) --  Monotone 
@@ -55,12 +55,12 @@ record LabelAlgebra c ℓ₁ ℓ₂ : Set (suc (c ⊔ ℓ₁ ⊔ ℓ₂)) where
   infix  4 _≈_ _≤_
   infixr 6 _⊕_
   -- infixr 7 _⊖_
-  infixr 7 _⊙_
+  infixr 7 _⊗_
   field
     Carrier : Set c
     _≈_     : Rel Carrier ℓ₁  -- The underlying equality.
     _≤_     : Rel Carrier ℓ₂  -- The partial order.
-    _⊙_     : Op₂ Carrier     -- The support operation.
+    _⊗_     : Op₂ Carrier     -- The support operation.
     _⊕_     : Op₂ Carrier     -- The aggregation operation.
     -- _⊖_     : Op₂ Carrier     -- The conflict operation.
     ⊘       : Op₁ Carrier     -- The negation operation.
@@ -69,7 +69,7 @@ record LabelAlgebra c ℓ₁ ℓ₂ : Set (suc (c ⊔ ℓ₁ ⊔ ℓ₂)) where
     mean    : Op₂ Carrier     -- The half-sum
     ⊤       : Carrier         -- The maximum.
     ⊥       : Carrier         -- The minimum.
-    isLabelAlgebra : IsLabelAlgebra _≈_ _≤_ _⊙_ _⊕_ -- _⊖_
+    isLabelAlgebra : IsLabelAlgebra _≈_ _≤_ _⊗_ _⊕_ -- _⊖_
                                     ⊘ _∧_ _∨_ mean ⊤ ⊥ 
     doc : Carrier → Doc
     

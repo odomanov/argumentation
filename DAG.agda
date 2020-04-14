@@ -52,8 +52,8 @@ _ ⟪ _ ⟫ _ = nothing
 ⟪ op ⟫ (just v) = just (op v)
 ⟪ _ ⟫ _ = nothing
 
-_⨀_ _⨁_ : MC → MC → MC
-x ⨀ y = x ⟪ _⊙_ la ⟫ y 
+_⨂_ _⨁_ : MC → MC → MC
+x ⨂ y = x ⟪ _⊗_ la ⟫ y 
 x ⨁ y = x ⟪ _⊕_ la ⟫ y 
 
 ⟨_,_⟩ : MC → MC → MC
@@ -366,7 +366,7 @@ valRA (mkArg _ prems concl) = valRA' prems concl
   valRA' []v (just (Ln _ nothing))  = MC⊤      -- missed conclusion value
   valRA' []v nothing                = nothing  -- missed conclusion itself
   valRA' (nothing  ∷v _) _          = nothing  -- missed premise
-  valRA' ((just x) ∷v xs) c = LNode.value x ⨀ valRA' xs c
+  valRA' ((just x) ∷v xs) c = LNode.value x ⨂ valRA' xs c
 
 
 private
@@ -380,10 +380,10 @@ private
   valargs [] = MC⊥   -- impossible case, actually
   valargs (x ∷ []) with valRA (proj₁ x)
   ... | nothing = nothing
-  ... | just v  = (proj₂ x) ⨀ just v
+  ... | just v  = (proj₂ x) ⨂ just v
   valargs (x ∷ xs) with valRA (proj₁ x)
   ... | nothing = valargs xs
-  ... | just v  = op ((proj₂ x) ⨀ just v) (valargs xs)
+  ... | just v  = op ((proj₂ x) ⨂ just v) (valargs xs)
 
 -- the value of the i-th node computed recursively
 
@@ -475,7 +475,7 @@ foldConflicts {n} g i = List.foldr f MC⊥ (NConflicts g i)
 
 -- value corrected by conflicts
 val+conflicts : ∀ {n} → AGraph n → AGraph n → Fin n → MC
-val+conflicts {n} g0 g i = (val g0 i) ⨀ ¬foldConflicts g i
+val+conflicts {n} g0 g i = val←i g i ⨂ ¬foldConflicts g i
 
 -- iteration steps
 

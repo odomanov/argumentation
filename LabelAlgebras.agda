@@ -1,5 +1,5 @@
 -- Using Labels for reasoning. Definitions of Label algebras
--- TODO: Prove 0≤v⊙ etc.
+-- TODO: Prove 0≤v⊗ etc.
 
 module LabelAlgebras where
 
@@ -107,20 +107,20 @@ docFU (mkFUnit x _ _) = docFloatRounded 4 x
 -- Trust Algebra
 
 postulate
-  0≤v⊙ : ∀ x y → 0.0 [≤] (value x) [*] (value y) ≡ true
-  v≤1⊙ : ∀ x y → (value x) [*] (value y) [≤] 1.0 ≡ true
+  0≤v⊗ : ∀ x y → 0.0 [≤] (value x) [*] (value y) ≡ true
+  v≤1⊗ : ∀ x y → (value x) [*] (value y) [≤] 1.0 ≡ true
 
--- 0≤v⊙ : ∀ x y → 0.0 [≤] (value x) [*] (value y) ≡ true
--- 0≤v⊙ (mkFUnit value₁ 0≤v₁ v≤2) (mkFUnit value₂ 0≤v₂ v≤3) = {!0≤v₁!}
+-- 0≤v⊗ : ∀ x y → 0.0 [≤] (value x) [*] (value y) ≡ true
+-- 0≤v⊗ (mkFUnit value₁ 0≤v₁ v≤2) (mkFUnit value₂ 0≤v₂ v≤3) = {!0≤v₁!}
 
--- 0≤v⊙ : ∀ {x y} (v) → {_ : v ≡ (value x) [*] (value y)} → 0.0 [≤] v ≡ true
--- 0≤v⊙ {mkFUnit value₁ 0≤v₁ v≤2} {mkFUnit value₂ 0≤v₂ v≤3} v {p} = {!0≤v₁!}
+-- 0≤v⊗ : ∀ {x y} (v) → {_ : v ≡ (value x) [*] (value y)} → 0.0 [≤] v ≡ true
+-- 0≤v⊗ {mkFUnit value₁ 0≤v₁ v≤2} {mkFUnit value₂ 0≤v₂ v≤3} v {p} = {!0≤v₁!}
 
-Trust⊙ : FUnit → FUnit → FUnit
-Trust⊙ a b = record
+Trust⊗ : FUnit → FUnit → FUnit
+Trust⊗ a b = record
   { value = (value a) [*] (value b)
-  ; 0≤v = 0≤v⊙ a b
-  ; v≤1 = v≤1⊙ a b
+  ; 0≤v = 0≤v⊗ a b
+  ; v≤1 = v≤1⊗ a b
   }
 
 postulate
@@ -180,7 +180,7 @@ Trust∨ a b = record
 
 postulate
   Trust-isLabelAlgebra : IsLabelAlgebra
-    FU= FU≤ Trust⊙ Trust⊕ -- Trust⊖
+    FU= FU≤ Trust⊗ Trust⊕ -- Trust⊖
     Trust⊘ Trust∧ Trust∨ FUmean FU1 FU0
 
 Trust : LabelAlgebra _ _ _
@@ -188,7 +188,7 @@ Trust = record
   { Carrier = FUnit
   ; _≈_ = FU=
   ; _≤_ = FU≤
-  ; _⊙_ = Trust⊙
+  ; _⊗_ = Trust⊗
   ; _⊕_ = Trust⊕
   -- ; _⊖_ = Trust⊖
   ; ⊘   = Trust⊘
@@ -207,8 +207,8 @@ Trust = record
 -------------------------------------------------------
 -- Preference Algebra
 
-Pref⊙ : FUnit → FUnit → FUnit
-Pref⊙ a b = record
+Pref⊗ : FUnit → FUnit → FUnit
+Pref⊗ a b = record
   { value = fmin (value a) (value b)
   ; 0≤v = min0≤v a b 
   ; v≤1 = minv≤1 a b 
@@ -252,19 +252,19 @@ Pref∨ a b = record
 
 postulate
   Pref-isLabelAlgebra : IsLabelAlgebra
-    FU= FU≤ Pref⊙ Pref⊕ -- Pref⊖
-    Pref⊘ Pref⊙ Pref∨ FUmean FU1 FU0
+    FU= FU≤ Pref⊗ Pref⊕ -- Pref⊖
+    Pref⊘ Pref⊗ Pref∨ FUmean FU1 FU0
 
 Pref : LabelAlgebra _ _ _
 Pref = record
   { Carrier = FUnit
   ; _≈_ = FU=
   ; _≤_ = FU≤
-  ; _⊙_ = Pref⊙
+  ; _⊗_ = Pref⊗
   ; _⊕_ = Pref⊕
   -- ; _⊖_ = Pref⊖
   ; ⊘   = Pref⊘
-  ; _∧_ = Pref⊙
+  ; _∧_ = Pref⊗
   ; _∨_ = Pref∨
   ; mean = FUmean
   ; ⊤ = FU1
@@ -279,14 +279,14 @@ Pref = record
 -- Łukasiewicz Algebra
 
 postulate
-  luk0≤v⊙ : ∀ x y → 0.0 [≤] (fmax 0.0 ((value x) [+] (value y) [-] 1.0)) ≡ true
-  lukv≤1⊙ : ∀ x y → (fmax 0.0 ((value x) [+] (value y) [-] 1.0)) [≤] 1.0 ≡ true
+  luk0≤v⊗ : ∀ x y → 0.0 [≤] (fmax 0.0 ((value x) [+] (value y) [-] 1.0)) ≡ true
+  lukv≤1⊗ : ∀ x y → (fmax 0.0 ((value x) [+] (value y) [-] 1.0)) [≤] 1.0 ≡ true
 
-Łuk⊙ : FUnit → FUnit → FUnit
-Łuk⊙ a b = record
+Łuk⊗ : FUnit → FUnit → FUnit
+Łuk⊗ a b = record
   { value = fmax 0.0 ((value a) [+] (value b) [-] 1.0)
-  ; 0≤v = luk0≤v⊙ a b 
-  ; v≤1 = lukv≤1⊙ a b 
+  ; 0≤v = luk0≤v⊗ a b 
+  ; v≤1 = lukv≤1⊗ a b 
   }
 
 postulate
@@ -323,7 +323,7 @@ postulate
 
 postulate
   Łuk-isLabelAlgebra : IsLabelAlgebra
-    FU= FU≤ Łuk⊙ Łuk⊕ -- Łuk⊖
+    FU= FU≤ Łuk⊗ Łuk⊕ -- Łuk⊖
     Łuk⊘ Łuk∧ Łuk∨ FUmean FU1 FU0
 
 Łuk : LabelAlgebra _ _ _
@@ -331,7 +331,7 @@ postulate
   { Carrier = FUnit
   ; _≈_ = FU=
   ; _≤_ = FU≤
-  ; _⊙_ = Łuk⊙
+  ; _⊗_ = Łuk⊗
   ; _⊕_ = Łuk⊕
   -- ; _⊖_ = Łuk⊖
   ; ⊘   = Łuk⊘
@@ -348,8 +348,8 @@ postulate
 -------------------------------------------------------
 -- Gödel t-norm
 
-Göd⊙ : FUnit → FUnit → FUnit
-Göd⊙ a b = record
+Göd⊗ : FUnit → FUnit → FUnit
+Göd⊗ a b = record
   { value = fmin (value a) (value b)
   ; 0≤v = min0≤v a b 
   ; v≤1 = minv≤1 a b 
@@ -369,12 +369,12 @@ Göd⊘ a = record
   ; v≤1 = v≤1⊘ a 
   }
 
-Göd∧ = Göd⊙
+Göd∧ = Göd⊗
 Göd∨ = Göd⊕
 
 postulate
   Gödel-isLabelAlgebra : IsLabelAlgebra
-    FU= FU≤ Göd⊙ Göd⊕ -- Göd⊖
+    FU= FU≤ Göd⊗ Göd⊕ -- Göd⊖
     Göd⊘ Göd∧ Göd∨ FUmean FU1 FU0
 
 Gödel : LabelAlgebra _ _ _
@@ -382,7 +382,7 @@ Gödel = record
   { Carrier = FUnit
   ; _≈_ = FU=
   ; _≤_ = FU≤
-  ; _⊙_ = Göd⊙
+  ; _⊗_ = Göd⊗
   ; _⊕_ = Göd⊕
   -- ; _⊖_ = Göd⊖
   ; ⊘   = Göd⊘
@@ -400,16 +400,16 @@ Gödel = record
 -- Product t-norm (Shortliffe coefficients)
 
 postulate
-  prod0≤v⊙ : ∀ x y → 0.0 [≤] ((value x) [*] (value y)) ≡ true
-  prodv≤1⊙ : ∀ x y → ((value x) [*] (value y)) [≤] 1.0 ≡ true
+  prod0≤v⊗ : ∀ x y → 0.0 [≤] ((value x) [*] (value y)) ≡ true
+  prodv≤1⊗ : ∀ x y → ((value x) [*] (value y)) [≤] 1.0 ≡ true
   prod0≤v⊕ : ∀ x y → 0.0 [≤] (value x) [+] (value y) [-] ((value x) [*] (value y)) ≡ true
   prodv≤1⊕ : ∀ x y → (value x) [+] (value y) [-] ((value x) [*] (value y)) [≤] 1.0 ≡ true
 
-prod⊙ : FUnit → FUnit → FUnit
-prod⊙ a b = record
+prod⊗ : FUnit → FUnit → FUnit
+prod⊗ a b = record
   { value = (value a) [*] (value b)
-  ; 0≤v = prod0≤v⊙ a b 
-  ; v≤1 = prodv≤1⊙ a b 
+  ; 0≤v = prod0≤v⊗ a b 
+  ; v≤1 = prodv≤1⊗ a b 
   }
 
 prod⊕ : FUnit → FUnit → FUnit
@@ -431,7 +431,7 @@ prod∨ = FUmax
 
 postulate
   Product-isLabelAlgebra : IsLabelAlgebra
-    FU= FU≤ prod⊙ prod⊕ -- prod⊖
+    FU= FU≤ prod⊗ prod⊕ -- prod⊖
     prod⊘ prod∧ prod∨ FUmean FU1 FU0
 
 Product : LabelAlgebra _ _ _
@@ -439,7 +439,7 @@ Product = record
   { Carrier = FUnit
   ; _≈_ = FU=
   ; _≤_ = FU≤
-  ; _⊙_ = prod⊙
+  ; _⊗_ = prod⊗
   ; _⊕_ = prod⊕
   -- ; _⊖_ = prod⊖
   ; ⊘   = prod⊘
