@@ -493,7 +493,7 @@ private
     where
     f : ∀ {k} → AContext k → AGraph k → AGraph (ℕsuc k)
     f {k} c g = (replaceVal c (iterationVal g0 gin
-      (Fin.inject≤ (Fin.fromℕ (ℕsuc n ∸ (ℕsuc k))) (s≤s (m∸n≤m n k))))) & g
+      (Fin.inject≤ (Fin.fromℕ (n ∸ k)) (s≤s (m∸n≤m n k))))) & g
 
 steps : ∀ {n}
         → ℕ         -- number of iterations 
