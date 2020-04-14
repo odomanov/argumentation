@@ -22,6 +22,7 @@ open import WLPretty public
 -- boolean equality
 
 record BEq {ℓ} (A B : Set ℓ): Set ℓ where
+  infixl 7 _=ᵇ_
   field
     _=ᵇ_ : A → B → Bool
     -- isEquivalence = IsEquivalence _=ᵇ_
