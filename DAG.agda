@@ -431,23 +431,23 @@ c-ed←CA {ℕsuc (ℕsuc (ℕsuc n))} g ic i with c-ing g ic
 c-ed←CA {_} _ _ _ = nothing   -- for n = 0, 1, 2
 
 -- the list of conflicts (= conflicting indexes) of the i-th context
-NConflicts : ∀ {n} → AGraph n → Fin n → List (Fin n)
+NConflicts : ∀ {n} → AGraph n → Fin n → List (Fin n × Fin n)
 NConflicts {ℕzero} _ _ = []
 NConflicts {ℕsuc n} g i = fold↓ f (NConflicts0 g i) 
   where
-  f : Fin (ℕsuc n) → List (Fin (ℕsuc n)) → List (Fin (ℕsuc n))
+  f : Fin (ℕsuc n) → List (Fin (ℕsuc n) × Fin (ℕsuc n)) → List (Fin (ℕsuc n) × Fin (ℕsuc n))
   f ic l with c-ed g ic
   ... | nothing = l
   ... | just ied with theSame i ic ied | c-ing g ic
-  ...            | true | just ing = ic ≻ ing ∷ l
+  ...            | true | just ing = (ic , ic ≻ ing) ∷ l
   ...            | _    | _ = l
 
   -- the list of conflicts of the 0-th context
-  NConflicts0 : ∀ {n} → AGraph n → Fin n → List (Fin n)
+  NConflicts0 : ∀ {n} → AGraph n → Fin n → List (Fin n × Fin n)
   NConflicts0 {ℕsuc n} g i with c-ed g (# 0)
   ... | nothing = []
   ... | just ied with theSame i (# 0) ied | c-ing g (# 0)
-  ...            | true | just ing = ((Fin.inject≤ (suc ing) (s≤s (≤-reflexive refl))) ∷ [])
+  ...            | true | just ing = (# 0 , (Fin.inject≤ (suc ing) (s≤s (≤-reflexive refl)))) ∷ []
   ...            | _    | _ = []
 
 
@@ -466,8 +466,8 @@ replaceInGraph {n} g i v = foldr (λ k → AGraph k) f ∅ g
 foldConflicts : ∀ {n} → AGraph n → Fin n → MC
 foldConflicts {n} g i = List.foldr f MC⊥ (NConflicts g i)
   where
-  f : Fin n → MC → MC
-  f i v = v ⟪ _LA∨_ la ⟫ (val g i)
+  f : Fin n × Fin n → MC → MC
+  f i v = v ⨁ ((val g (proj₁ i)) ⨂ (val g (proj₂ i)))
 
 -- negation of foldConflicts
 ¬foldConflicts : ∀ {n} → AGraph n → Fin n → MC
