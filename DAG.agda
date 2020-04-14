@@ -453,14 +453,14 @@ NConflicts {ℕsuc n} g i = fold↓ f (NConflicts0 g i)
 
 -- Conflict iterations
 
--- -- replace value in i-th context
--- replaceInGraph : ∀ {n} → AGraph n → Fin n → MC → AGraph n
--- replaceInGraph {n} g i v = foldr (λ k → AGraph k) f ∅ g
---   where
---   f : ∀ {k} → AContext k → AGraph k → AGraph (ℕsuc k)
---   f {k} c g with k ℕ.≟ n - suc i 
---   ... | yes _ = (replaceVal c v) & g
---   ... | no _  = c & g
+-- replace value in i-th context
+replaceInGraph : ∀ {n} → AGraph n → Fin n → MC → AGraph n
+replaceInGraph {n} g i v = foldr (λ k → AGraph k) f ∅ g
+  where
+  f : ∀ {k} → AContext k → AGraph k → AGraph (ℕsuc k)
+  f {k} c g with k =ᵇ (n - suc i) 
+  ... | true  = (replaceVal c v) & g
+  ... | false = c & g
 
 -- the cumulative value of all conflicts of the i-th context
 foldConflicts : ∀ {n} → AGraph n → Fin n → MC
