@@ -216,6 +216,10 @@ G3 = steps 3 G
 
 G4 = steps 4 G
 
+G5 = steps 5 G
+
+G10 = steps 10 G
+
 G100 = steps 100 G
 
 G200 = steps 200 G
@@ -233,7 +237,7 @@ open import IO
 w = 110
 ws = 80 -- "section" title width
 
-printG : AGraph 17 → (∀ {n} → AGraph n → Fin n → MC) → String
+printG : AGraph 17 → (AGraph 17 → Fin 17 → MC) → String
 printG g f = "\n  S1 = " +++ pprint w (f g (# 16))
           +++ " S2 = "  +++ pprint w (f g (# 14))
           +++ " S3 = "  +++ pprint w (f g (# 5))
@@ -268,21 +272,29 @@ main = run (putStrLn stringToPrint)
     +++ printG G val
     +++ ppretty ws (docSection ws "step 1")
     +++ printG G1 val←i
+    +++ ppretty ws (docSection ws "step 1 - confl")
+    +++ printG G1 foldConflicts
+    +++ ppretty ws (docSection ws "step 1 - val+confl")
+    +++ printG G1 (val+conflicts G)
     +++ ppretty ws (docSection ws "step 2")
     +++ printG G2 val←i
     +++ ppretty ws (docSection ws "step 3")
     +++ printG G3 val←i
     +++ ppretty ws (docSection ws "step 4")
     +++ printG G4 val←i
+    +++ ppretty ws (docSection ws "step 5")
+    +++ printG G5 val←i
+    +++ ppretty ws (docSection ws "step 10")
+    +++ printG G10 val←i
     +++ ppretty ws (docSection ws "step 100")
     +++ printG G100 val←i
     +++ ppretty ws (docSection ws "step 200")
     +++ printG G200 val←i
 
     +++ "\n\nContradiction degree:   before = "
-    +++ pprint w ((val←i G0 (# 3) ⨀ val←i G0 (# 9)) ⨁ (val←i G0 (# 4) ⨀ val←i G0 (# 6)))
+    +++ pprint w ((val←i G0 (# 3) ⨂ val←i G0 (# 9)) ⨁ (val←i G0 (# 4) ⨂ val←i G0 (# 6)))
     +++ " after = "
-    +++ pprint w ((val←i G200 (# 3) ⨀ val←i G200 (# 9)) ⨁ (val←i G200 (# 4) ⨀ val←i G200 (# 6)))
-    -- +++ pprint w (val←i G200 (# 2) ⨀ val←i G200 (# 8))
+    +++ pprint w ((val←i G200 (# 3) ⨂ val←i G200 (# 9)) ⨁ (val←i G200 (# 4) ⨂ val←i G200 (# 6)))
+    -- +++ pprint w (val←i G200 (# 2) ⨂ val←i G200 (# 8))
     
     -- +++ (pprint 110 G)
