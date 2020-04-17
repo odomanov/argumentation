@@ -52,6 +52,8 @@ _ ⟪ _ ⟫ _ = nothing
 ⟪ op ⟫ (just v) = just (op v)
 ⟪ _ ⟫ _ = nothing
 
+infixl 10 _⨂_ _⨁_
+
 _⨂_ _⨁_ : MC → MC → MC
 x ⨂ y = x ⟪ _⊗_ la ⟫ y 
 x ⨁ y = x ⟪ _⊕_ la ⟫ y 
