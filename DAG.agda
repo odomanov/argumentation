@@ -31,9 +31,11 @@ open import AIF
 
 ANode = Node {la = la}           -- node
 ALNode = LNode {la = la}         -- labeled node
+ALNode3 = LNode3 {la = la}  
 AContext = Context ALNode Role   -- argumentation context
 AGraph = Graph ALNode Role       -- argumentation graph     
 ATree = Ac.Tree ALNode Role      -- argumentation tree
+ATree3 = Ac.Tree ALNode3 Role 
 AArg = Argument {la = la}        -- argument
 
 MC = Maybe (Carrier la)
@@ -57,7 +59,11 @@ infixl 10 _⨂_ _⨁_
 
 _⨂_ _⨁_ : MC → MC → MC
 x ⨂ y = x ⟪ _⊗_ la ⟫ y 
-x ⨁ y = x ⟪ _⊕_ la ⟫ y 
+-- x ⨁ y = x ⟪ _⊕_ la ⟫ y 
+nothing ⨁ just y  = just y 
+just x  ⨁ nothing = just x 
+nothing ⨁ nothing = nothing 
+just x  ⨁ just y  = just (_⊕_ la x y)  
 
 ⟨_,_⟩ : MC → MC → MC
 ⟨ x , y ⟩ = x ⟪ mean la ⟫ y
@@ -416,17 +422,74 @@ compute {n} g = compute' {n} {_} {≤-reflexive refl} g g
 valTree  : ATree → MC
 valTrees : List (Role × ATree) → MC
 
-{-# TERMINATING #-}
-valTree (Ac.node (Ln _ v) []) = v 
-valTree (Ac.node (Ln _ _) ((_ , (Ac.node (Ln (Lnr _) v) prems)) ∷ rts)) = (List.foldr f v prems) ⨁ (valTrees rts)
+-- deduction
+foldPremises : MC → List (Role × ATree) → MC
+foldPremises vconcl prems = List.foldr f vconcl prems
   where
   f : (Role × ATree) → MC → MC
   f (_ , t) v = valTree t ⨂ v
+
+-- fold incoming
+foldIns : MC → List (Role × ATree) → MC
+foldIns v0 [] = v0
+foldIns v0 ((_ , (Ac.node (Ln (Lnr _) vconcl) prems)) ∷ rts) = (foldPremises vconcl prems) ⨁ (foldIns v0 rts)
+foldIns _ _ = MC⊥   --  !!!  TODO
+
+{-# TERMINATING #-}
+valTree (Ac.node (Ln _ v) []) = v 
+valTree (Ac.node (Ln (Lnc _) _) ((role "conflicting" , (Ac.node (Ln (Lnr _) _) _)) ∷ rts)) = valTrees rts
+valTree (Ac.node (Ln (Lnc _) _) ((role "conflicted"  , (Ac.node (Ln (Lnr _) _) _)) ∷ rts)) = valTrees rts
+valTree (Ac.node (Ln _ _) ((_ , (Ac.node (Ln (Lnr _) v) prems)) ∷ rts)) = (foldPremises v prems) ⨁ (valTrees rts)
+valTree (Ac.node (Ln (Lnc _) v) (_ ∷ rts)) = v
 valTree (Ac.node (Ln _ _) (_ ∷ rts)) = valTrees rts
 
 valTrees [] = MC⊥
 valTrees ((r , t) ∷ [])  = valTree t 
 valTrees ((r , t) ∷ rts) = valTree t ⨁ valTrees rts
+
+
+zipTree : ATree → ATree → ATree → ATree3 
+zipTree (Ac.node (Ln nd1 v1) rts1) (Ac.node (Ln nd2 v2) rts2) (Ac.node (Ln nd3 v3) rts3) =
+  Ac.node (Ln3 nd1 (v1 , v2 , v3)) (zip' rts1 rts2 rts3)
+  where
+  zip' : List (Role × ATree) → List (Role × ATree) → List (Role × ATree) → List (Role × ATree3)
+  zip' [] [] [] = []
+  zip' ((r1 , t1) ∷ rts1) ((r2 , t2) ∷ rts2) ((r3 , t3) ∷ rts3) = ((r1 , zipTree t1 t2 t3)) ∷ zip' rts1 rts2 rts3
+  zip' _ _ _ = []
+
+valTree3 : ATree3 → MC
+
+MC3 = MC × MC × MC
+
+fff : (Role × ATree3) → MC → MC
+fff (_ , t) v = valTree3 t ⨂ v
+
+-- deduction
+foldPremises3 : MC3 → MC3 → List (Role × ATree3) → MC
+foldPremises3 (nothing , _ , _) (_ , _ , varg) prems = List.foldr fff varg prems
+foldPremises3 (just v0 , _ , _) (_ , _ , varg) prems with List.foldr fff varg prems
+... | just v  = just v0 ⨂ just v
+... | nothing = just v0
+
+-- fold incoming
+foldIns3 : MC3 → List (Role × ATree3) → MC
+foldIns3 vconcl l = List.foldr f MC⊥ l
+  where
+  f : Role × ATree3 → MC → MC
+  f (role "conflicting" , (Ac.node (Ln3 (Lnr _) _) _)) v = v
+  f (role "conflicted"  , (Ac.node (Ln3 (Lnr _) _) _)) v = v
+  f (_ , (Ac.node (Ln3 (Lnr _) varg) prems)) v = v ⨁ (foldPremises3 vconcl varg prems)
+  f (_ , (Ac.node _ _)) v = v
+
+
+{-# TERMINATING #-}
+valTree3 (Ac.node (Ln3 _ (_ , _ , v)) []) = v
+valTree3 (Ac.node (Ln3 _ vv@(nothing , _ , v)) rts) = v  ⨁ foldIns3 vv rts
+valTree3 (Ac.node (Ln3 _ vv@(v0 , _ , _)) rts) = v0 ⨁ foldIns3 vv rts
+
+
+valTree3←i : ∀ {n} → AGraph n → AGraph n → AGraph n → Fin n → MC
+valTree3←i g0 gprev g i = valTree3 (zipTree (toTree g0 i) (toTree gprev i) (toTree g i))
 
 valTree←i : ∀ {n} → AGraph n → Fin n → MC
 valTree←i g i = valTree (toTree g i)
@@ -511,18 +574,22 @@ iterationVal g0 gin i = ⟨ val←i gin i , val+conflicts g0 gin i ⟩
 private
   step' : ∀ {n}
          → AGraph n  -- initial graph
+         → AGraph n  -- previous iteration
          → AGraph n  -- current iteration
          → AGraph n  -- next iteration
-  step' {ℕzero} ∅ _ = ∅
-  step' {ℕsuc n} g0 gin = foldr (λ k → AGraph k) f ∅ gin
+  step' {ℕzero} ∅ _ _ = ∅
+  step' {ℕsuc n} g0 gprev g = foldr (λ k → AGraph k) f ∅ g
     where
+    newval : ℕ → MC
+    newval k = valTree3←i g0 gprev g (Fin.inject≤ (Fin.fromℕ (n ∸ k)) (s≤s (m∸n≤m n k)))
+
     f : ∀ {k} → AContext k → AGraph k → AGraph (ℕsuc k)
-    f {k} c g = (replaceVal c (iterationVal g0 gin
-      (Fin.inject≤ (Fin.fromℕ (n ∸ k)) (s≤s (m∸n≤m n k))))) & g
+    f {k} (context (Ln nd v) sucs) g = context (Ln nd (newval k)) sucs & g
 
 steps : ∀ {n}
         → ℕ         -- number of iterations 
         → AGraph n  -- initial graph
         → AGraph n  -- final iteration
-steps  ℕzero   g = compute g
-steps (ℕsuc i) g = step' g (steps i g)
+steps 0 g = g
+steps 1 g = step' g g g
+steps (ℕsuc (ℕsuc i)) g = step' g (steps i g) (steps (ℕsuc i) g) 

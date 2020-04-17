@@ -261,6 +261,12 @@ module _ {c ℓ₁ ℓ₂} {la : LabelAlgebra c ℓ₁ ℓ₂} where
         node  : Node
         value : Maybe (Carrier la)
 
+    record LNode3 : Set (c l⊔ ℓ₁ l⊔ ℓ₂) where
+      constructor Ln3
+      field
+        node  : Node
+        value : Maybe (Carrier la) × Maybe (Carrier la) × Maybe (Carrier la)
+
     -- Node equality, boolean.
     private
       _=N_ : Node → Node → Bool
