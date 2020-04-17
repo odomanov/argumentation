@@ -33,6 +33,7 @@ ANode = Node {la = la}           -- node
 ALNode = LNode {la = la}         -- labeled node
 AContext = Context ALNode Role   -- argumentation context
 AGraph = Graph ALNode Role       -- argumentation graph     
+ATree = Ac.Tree ALNode Role      -- argumentation tree
 AArg = Argument {la = la}        -- argument
 
 MC = Maybe (Carrier la)
@@ -407,6 +408,28 @@ compute {n} g = compute' {n} {_} {≤-reflexive refl} g g
   compute' {ℕsuc n} {ℕsuc k} {p} g0 ((context (Ln nd _) sucs) & g) =
     (context (Ln nd (val g0 (Fin.inject≤ (Fin.fromℕ (ℕsuc n ∸ ℕsuc k)) (s≤s (m∸n≤m n k))))) sucs)
     & compute' {ℕsuc n} {k} {≤⇒pred≤ p} g0 g
+
+
+
+
+------------------------------------------------------------------------
+valTree  : ATree → MC
+valTrees : List (Role × ATree) → MC
+
+{-# TERMINATING #-}
+valTree (Ac.node (Ln _ v) []) = v 
+valTree (Ac.node (Ln _ _) ((_ , (Ac.node (Ln (Lnr _) v) prems)) ∷ rts)) = (List.foldr f v prems) ⨁ (valTrees rts)
+  where
+  f : (Role × ATree) → MC → MC
+  f (_ , t) v = valTree t ⨂ v
+valTree (Ac.node (Ln _ _) (_ ∷ rts)) = valTrees rts
+
+valTrees [] = MC⊥
+valTrees ((r , t) ∷ [])  = valTree t 
+valTrees ((r , t) ∷ rts) = valTree t ⨁ valTrees rts
+
+valTree←i : ∀ {n} → AGraph n → Fin n → MC
+valTree←i g i = valTree (toTree g i)
 
 
 
