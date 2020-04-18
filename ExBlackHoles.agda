@@ -235,7 +235,7 @@ open import ShowDAG la
 open import IO
 
 w = 110
-ws = 110 -- "section" title width
+ws = 80 -- "section" title width
 
 printG : AGraph 17 → (AGraph 17 → Fin 17 → MC) → String
 printG g f = "\n  S1 = " +++ pprint w (f g (# 16))
@@ -251,7 +251,7 @@ printG g f = "\n  S1 = " +++ pprint w (f g (# 16))
           +++ " A2 = "  +++ pprint w (f g (# 4))
           +++ " A3 = "  +++ pprint w (f g (# 7))
           +++ " A4 = "  +++ pprint w (f g (# 10))
-          +++ "\n  C1 = "  +++ pprint w (f g (# 0))
+          +++ " C1 = "  +++ pprint w (f g (# 0))
           +++ " C2 = "  +++ pprint w (f g (# 1))
           +++ " C2' = "  +++ pprint w (f g (# 2))
 
