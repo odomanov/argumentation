@@ -214,7 +214,7 @@ main = run (putStrLn stringToPrint)
     +++ ppretty ws (docSection ws "G2 step 100")
     +++ printG2 G2100 val←i
 
-    +++ "\n\nContradiction degree:   step0 = "
+    +++ "\n\nContradiction degree:  step0 = "
     +++ pprint w (val←i G20 (# 1) ⨂ val←i G20 (# 2))
     +++ " step100 = "
     +++ pprint w (val←i G2100 (# 1) ⨂ val←i G2100 (# 2))
