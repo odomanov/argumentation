@@ -54,9 +54,9 @@ CC→A = Ln (Lnc record {Conflicting = conflicting; Conflicted = conflicted})
 
 G : AGraph _
 G =
-     context CC→A ((conflicted , # 2) ∷ (conflicting , # 4) ∷ []) &
-     context CB→C ((conflicted , # 2) ∷ (conflicting , # 1) ∷ []) &
-     context CA→B ((conflicted , # 2) ∷ (conflicting , # 1) ∷ []) &
+     context CC→A ((conflicted , # 4) ∷ (conflicting , # 2) ∷ []) &
+     context CB→C ((conflicted , # 1) ∷ (conflicting , # 2) ∷ []) &
+     context CA→B ((conflicted , # 1) ∷ (conflicting , # 2) ∷ []) &
      context C [] &
      context B [] &
      context A [] &
@@ -73,37 +73,26 @@ _ = refl
 _ : roots¬CA G ≡ (# 3 , C) ∷ (# 4 , B)  ∷ (# 5 , A)  ∷ []
 _ = refl
 
-_ : NConflicts G (# 3) ≡ (# 4) ∷ []
+_ : NConflicts G (# 3) ≡ (# 1 , # 4) ∷ []
 _ = refl
 
-_ : NConflicts G (# 4) ≡ (# 5) ∷ []
+_ : NConflicts G (# 4) ≡ (# 2 , # 5) ∷ []
 _ = refl
 
-_ : NConflicts G (# 5) ≡ (# 3) ∷ []
+_ : NConflicts G (# 5) ≡ (# 0 , # 3) ∷ []
 _ = refl
 
 
-G0 = compute G
 
-_ : G0 ≡ steps 0 G
-_ = refl
-
+G0 = steps 0 G
 G1 = steps 1 G
-
 G2 = steps 2 G
-
 G3 = steps 3 G
-
 G4 = steps 4 G
-
 G5 = steps 5 G
-
 G6 = steps 6 G
-
 G7 = steps 7 G
-
 G100 = steps 100 G
-
 G200 = steps 200 G
 
 
@@ -130,23 +119,32 @@ main = run (putStrLn stringToPrint)
   where
   wh = 10
   stringToPrint = S.replicate ws '-'
-    +++ printABC wh "G orig" G val←i
-    +++ printABC wh "G computed" G val
-    +++ printABC wh "G0" G0 val←i
-    +++ printABC wh "G1" G1 val←i
-    +++ printABC wh "G2" G2 val←i
-    +++ printABC wh "G3" G3 val←i
-    +++ printABC wh "G4" G4 val←i
-    +++ printABC wh "G5" G5 val←i
-    +++ printABC wh "G6" G6 val←i
-    +++ printABC wh "G7" G7 val←i
-    +++ printABC wh "G100" G100 val←i
-    +++ printABC wh "G200" G200 val←i
+    -- +++ printABC wh "G orig" G val←i
+    -- +++ printABC wh "G computed" G val
+    +++ printABC wh "step 0" G0 val←i
+    +++ printABC wh "step 1" G1 val←i
+    +++ printABC wh "step 2" G2 val←i
+    +++ printABC wh "step 3" G3 val←i
+    +++ printABC wh "step 4" G4 val←i
+    +++ printABC wh "step 5" G5 val←i
+    +++ printABC wh "step 6" G6 val←i
+    +++ printABC wh "step 7" G7 val←i
+    +++ printABC wh "step 100" G100 val←i
+    +++ printABC wh "step 200" G200 val←i
 
-    +++ printABC 17 "foldConflicts:G "  G foldConflicts
-    +++ printABC 17 "foldConflicts:G5"  G5 foldConflicts
-    +++ printABC 17 "-foldConflicts:G5" G5 ¬foldConflicts
-    +++ printABC 17 "val+conflicts:G5"  G5 (val+conflicts G0)
-    +++ printABC 17 "iterationVal:G5"   G5 (iterationVal G0)
+    +++ "\n\nContradiction degree:  step0 = "
+    +++ pprint w ((val←i G0 (# 3) ⨂ val←i G0 (# 4))
+      ⨁ (val←i G0 (# 4) ⨂ val←i G0 (# 5))
+      ⨁ (val←i G0 (# 5) ⨂ val←i G0 (# 3)))
+    +++ " step200 = "
+    +++ pprint w ((val←i G200 (# 3) ⨂ val←i G200 (# 4))
+      ⨁ (val←i G200 (# 4) ⨂ val←i G200 (# 5))
+      ⨁ (val←i G200 (# 5) ⨂ val←i G200 (# 3)))
+
+    -- +++ printABC 17 "foldConflicts:G "  G foldConflicts
+    -- +++ printABC 17 "foldConflicts:G5"  G5 foldConflicts
+    -- +++ printABC 17 "-foldConflicts:G5" G5 ¬foldConflicts
+    -- +++ printABC 17 "val+conflicts:G5"  G5 (val+conflicts G0)
+    -- +++ printABC 17 "iterationVal:G5"   G5 (iterationVal G0)
 
     -- +++ (pprint 110 G)
