@@ -494,7 +494,7 @@ foldIns3 vroot ins = List.foldr f MC⊥ ins
 --   f _ v = v
 
 {-# TERMINATING #-}
-valTree3 (Ac.node (Ln3 _ (_ , _ , v)) []) = v
+valTree3 (Ac.node (Ln3 _ (v0 , _ , _)) []) = v0
 valTree3 (Ac.node (Ln3 _ vroot@(nothing , _ , _)) rts) = foldIns3 vroot rts --⨂ (⟪ ⊘ la ⟫ foldConflicts3 rts)
 valTree3 (Ac.node (Ln3 _ vroot@(just v0 , _ , _)) rts) = (just v0 ⨁ foldIns3 vroot rts) --⨂ (⟪ ⊘ la ⟫ foldConflicts3 rts)
 
