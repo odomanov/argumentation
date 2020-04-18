@@ -86,6 +86,8 @@ G1100 = steps 100 G1
 
 
 
+-- single conflict --------------------------------------------
+
 -- I2 ---SC---> I2
 G2 : AGraph _
 G2 =
@@ -100,7 +102,9 @@ G21 = steps 1 G2
 G22 = steps 2 G2
 G23 = steps 3 G2
 G24 = steps 4 G2
+G210 = steps 10 G2
 G2100 = steps 100 G2
+G2200 = steps 200 G2
 
 
 
@@ -116,7 +120,7 @@ G7 : AGraph _
 G7 =
      node SC 1.0 {refl} {refl} ((conflicted , # 2) ∷ (conflicting , # 1) ∷ []) &
      node SC 1.0 {refl} {refl} ((conflicted , # 0) ∷ (conflicting , # 1) ∷ []) &
-     node I2 0.3 {refl} {refl} [] &
+     node I2 0.4 {refl} {refl} [] &
      node I1 0.1 {refl} {refl} [] &
      ∅
 
@@ -127,6 +131,7 @@ G73 = steps 3 G7
 G74 = steps 4 G7
 G7100 = steps 100 G7
 G7200 = steps 200 G7
+G71000 = steps 1000 G7
 
 
 
@@ -142,74 +147,71 @@ open import IO
 w = 110
 ws = 90 -- "section" title width
 
-printG1 : AGraph 4 → (∀ {n} → AGraph n → Fin n → MC) → String
-printG1 g f = "\n  I = "    +++ pprint w (f g (# 3))
+printG1 : ℕ → String → AGraph 4 → (AGraph 4 → Fin 4 → MC) → String
+printG1 n s g f = "\n" +++ (spaces (0 ⊔ (n ∸ S.length s))) +++ s +++ ": "
+          +++ " I = "    +++ pprint w (f g (# 3))
           +++ " -I = "    +++ pprint w (f g (# 2))
           +++ " Concl = " +++ pprint w (f g (# 0))
           +++ " SR  = "   +++ pprint w (f g (# 1))
-printG2 : AGraph 3 → (∀ {n} → AGraph n → Fin n → MC) → String
-printG2 g f = "\n  I1 = " +++ pprint w (f g (# 2))
+printG2 : ℕ → String → AGraph 3 → (AGraph 3 → Fin 3 → MC) → String
+printG2 n s g f = "\n" +++ (spaces (0 ⊔ (n ∸ S.length s))) +++ s +++ ": "
+          +++ " I1 = " +++ pprint w (f g (# 2))
           +++ " I2 = "   +++ pprint w (f g (# 1))
           +++ " C = "    +++ pprint w (f g (# 0))
 printG7 : ℕ → String → AGraph 4 → (AGraph 4 → Fin 4 → MC) → String
 printG7 n s g f = "\n" +++ (spaces (0 ⊔ (n ∸ S.length s))) +++ s +++ ": "
           +++ " I = "   +++ pprint w (f g (# 3))
-          +++ " -I = "  +++ pprint w (f g (# 2))
+          +++ " not-I = "  +++ pprint w (f g (# 2))
           +++ " SC1 = " +++ pprint w (f g (# 1))
           +++ " SC2 = " +++ pprint w (f g (# 0))
 
 main = run (putStrLn stringToPrint)
   where
-  wh = 12
-  stringToPrint = ""  
-    -- +++ ppretty ws (docSection ws "G1 original")
-    -- +++ printG1 G1 val←i
-    -- +++ ppretty ws (docSection ws "G1 w/o conflicts")
-    -- +++ printG1 G1 val
-    -- +++ ppretty ws (docSection ws "G1 step 0")
-    -- +++ printG1 G10 val←i
-    -- +++ ppretty ws (docSection ws "G1 step 1")
-    -- +++ printG1 G11 val←i
-    -- +++ ppretty ws (docSection ws "G1 step 2")
-    -- +++ printG1 G12 val←i
-    -- +++ ppretty ws (docSection ws "G1 step 3")
-    -- +++ printG1 G13 val←i
-    -- +++ ppretty ws (docSection ws "G1 step 4")
-    -- +++ printG1 G14 val←i
-    -- +++ ppretty ws (docSection ws "G1 step 100")
-    -- +++ printG1 G1100 val←i
+  wh = 13
+  stringToPrint = ""
+    +++ "\n~~ Contradiction degree ~~~~~"
+    -- +++ printG1 wh "G1 original" G1 val←i
+    -- +++ printG1 wh "G1 w/o conflicts" G1 (val G1)
+    +++ printG1 wh "G1 step 0  " G10 val←i
+    +++ printG1 wh "G1 step 1  " G11 val←i
+    -- +++ printG1 wh "G1 step 2  " G12 val←i
+    -- +++ printG1 wh "G1 step 3  " G13 val←i
+    -- +++ printG1 wh "G1 step 4  " G14 val←i
+    -- +++ printG1 wh "G1 step 100" G1100 val←i
 
-    -- +++ ppretty ws (docSection ws "G2 original")
-    -- +++ printG2 G2 val←i
-    -- +++ ppretty ws (docSection ws "G2 w/o conflicts")
-    -- +++ printG2 G2 valTree←i
-    +++ ppretty ws (docSection ws "G2 step 0")
-    +++ printG2 G20 val←i
-    +++ ppretty ws (docSection ws "G2 step 1")
-    +++ printG2 G21 val←i
-    +++ ppretty ws (docSection ws "G2 step 2")
-    +++ printG2 G22 val←i
-    +++ ppretty ws (docSection ws "G2 step 3")
-    +++ printG2 G23 val←i
-    +++ ppretty ws (docSection ws "G2 step 4")
-    +++ printG2 G24 val←i
-    +++ ppretty ws (docSection ws "G2 step 100")
-    +++ printG2 G2100 val←i
+    +++ "\n\n~~ Single conflict ~~~~~"
+    -- +++ printG2 wh "G2 original" G2 val←i
+    -- +++ printG2 wh "G2 w/o conflicts" G2 (val G2)
+    +++ printG2 wh "G2 step 0  " G20 val←i
+    +++ printG2 wh "G2 step 1  " G21 val←i
+    +++ printG2 wh "G2 step 2  " G22 val←i
+    +++ printG2 wh "G2 step 3  " G23 val←i
+    +++ printG2 wh "G2 step 4  " G24 val←i
+    +++ printG2 wh "G2 step 10 " G210 val←i
+    +++ printG2 wh "G2 step 100" G2100 val←i
+    +++ printG2 wh "G2 step 200" G2200 val←i
 
     +++ "\n\nContradiction degree:  step0 = "
     +++ pprint w (val←i G20 (# 1) ⨂ val←i G20 (# 2))
     +++ " step100 = "
     +++ pprint w (val←i G2100 (# 1) ⨂ val←i G2100 (# 2))
 
+    +++ "\n\n~~ 2 opposite conflicts ~~~~~" 
     -- +++ printG7 wh "G7 original" G7 val←i
     -- +++ printG7 wh "G7 w/o conflicts" G7 val
-    -- -- +++ printG7 wh "G7 step 0" G70 val←i
-    -- -- +++ printG7 wh "G7 step 1" G71 val←i
-    -- -- +++ printG7 wh "G7 step 2" G72 val←i
-    -- -- +++ printG7 wh "G7 step 3" G73 val←i
-    -- -- +++ printG7 wh "G7 step 4" G74 val←i
-    -- -- +++ printG7 wh "G7 step 100" G7100 val←i
-    -- +++ printG7 wh "G7 step 200" G7200 val←i
+    +++ printG7 wh "G7 step 0" G70 val←i
+    +++ printG7 wh "G7 step 1" G71 val←i
+    +++ printG7 wh "G7 step 2" G72 val←i
+    +++ printG7 wh "G7 step 3" G73 val←i
+    +++ printG7 wh "G7 step 4" G74 val←i
+    +++ printG7 wh "G7 step 100" G7100 val←i
+    +++ printG7 wh "G7 step 200" G7200 val←i
+    +++ printG7 wh "G7 step 1000" G71000 val←i
+
+    +++ "\n\nContradiction degree:  step0 = "
+    +++ pprint w (val←i G70 (# 1) ⨂ val←i G70 (# 2))
+    +++ " step100 = "
+    +++ pprint w (val←i G7100 (# 1) ⨂ val←i G7100 (# 2))
 
     -- +++ printG7 17 "NEG foldConflicts" G7 ¬foldConflicts
     -- +++ printG7 17 "val+conflicts" G7 (val+conflicts G7)
