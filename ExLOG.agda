@@ -77,17 +77,11 @@ G1 =
      ∅
 
 
-
-G10 = steps 0 G1   --compute G1
-
+G10 = steps 0 G1  
 G11 = steps 1 G1
-
 G12 = steps 2 G1
-
 G13 = steps 3 G1
-
 G14 = steps 4 G1
-
 G1100 = steps 100 G1
 
 
@@ -101,17 +95,11 @@ G2 =
      ∅
 
 
-
-G20 = steps 0 G2 --compute G2
-
+G20 = steps 0 G2 
 G21 = steps 1 G2
-
 G22 = steps 2 G2
-
 G23 = steps 3 G2
-
 G24 = steps 4 G2
-
 G2100 = steps 100 G2
 
 
@@ -132,18 +120,12 @@ G7 =
      node I1 0.1 {refl} {refl} [] &
      ∅
 
-G70 = steps 0 G7  --compute G7
-
+G70 = steps 0 G7  
 G71 = steps 1 G7
-
 G72 = steps 2 G7
-
 G73 = steps 3 G7
-
 G74 = steps 4 G7
-
 G7100 = steps 100 G7
-
 G7200 = steps 200 G7
 
 
