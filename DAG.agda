@@ -485,18 +485,10 @@ foldIns3 vroot ins = List.foldr f MC⊥ ins
   f (_ , (Ac.node (Ln3 (Lnr _) varg) prems)) v = v ⨁ (foldPremises3 vroot varg prems)
   f (_ , (Ac.node _ _)) v = v
 
--- foldConflicts3 : List (Role × ATree3) → MC
--- foldConflicts3 ins = List.foldr f MC⊥ ins
---   where
---   f : Role × ATree3 → MC → MC
---   f (role "conflicted" , Ac.node (Ln3 (Lnc _) (_ , vcprev , _)) ((r , Ac.node (Ln3 _ (_ , viprev , _)) _) ∷ [])) v =
---     v ⨁ (vcprev ⨂ viprev) 
---   f _ v = v
-
 {-# TERMINATING #-}
 valTree3 (Ac.node (Ln3 _ (v0 , _ , _)) []) = v0
-valTree3 (Ac.node (Ln3 _ vroot@(nothing , _ , _)) rts) = foldIns3 vroot rts --⨂ (⟪ ⊘ la ⟫ foldConflicts3 rts)
-valTree3 (Ac.node (Ln3 _ vroot@(just v0 , _ , _)) rts) = (just v0 ⨁ foldIns3 vroot rts) --⨂ (⟪ ⊘ la ⟫ foldConflicts3 rts)
+valTree3 (Ac.node (Ln3 _ vroot@(nothing , _ , _)) rts) = foldIns3 vroot rts 
+valTree3 (Ac.node (Ln3 _ vroot@(just v0 , _ , _)) rts) = (just v0 ⨁ foldIns3 vroot rts) 
 
 
 valTree3←i : ∀ {n} → AGraph n → AGraph n → AGraph n → Fin n → MC
