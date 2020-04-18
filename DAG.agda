@@ -51,15 +51,18 @@ _⟪_⟫_ : MC → ((Carrier la) → (Carrier la) → (Carrier la)) → MC → M
 _ ⟪ _ ⟫ _ = nothing
 
 -- same for a unary operation
+infixr 10 ⟪_⟫_
+
 ⟪_⟫_ : ((Carrier la) → (Carrier la)) → MC → MC
 ⟪ op ⟫ (just v) = just (op v)
 ⟪ _ ⟫ _ = nothing
 
 infixl 10 _⨂_ _⨁_
 
-_⨂_ _⨁_ : MC → MC → MC
+_⨂_ : MC → MC → MC
 x ⨂ y = x ⟪ _⊗_ la ⟫ y 
--- x ⨁ y = x ⟪ _⊕_ la ⟫ y 
+
+_⨁_ : MC → MC → MC
 nothing ⨁ just y  = just y 
 just x  ⨁ nothing = just x 
 nothing ⨁ nothing = nothing 
@@ -461,8 +464,9 @@ valTree3 : ATree3 → MC
 
 MC3 = MC × MC × MC
 
-fff : (Role × ATree3) → MC → MC
-fff (_ , t) v = valTree3 t ⨂ v
+private
+  fff : (Role × ATree3) → MC → MC
+  fff (_ , t) v = valTree3 t ⨂ v
 
 -- deduction
 foldPremises3 : MC3 → MC3 → List (Role × ATree3) → MC
@@ -481,11 +485,18 @@ foldIns3 vroot ins = List.foldr f MC⊥ ins
   f (_ , (Ac.node (Ln3 (Lnr _) varg) prems)) v = v ⨁ (foldPremises3 vroot varg prems)
   f (_ , (Ac.node _ _)) v = v
 
+-- foldConflicts3 : List (Role × ATree3) → MC
+-- foldConflicts3 ins = List.foldr f MC⊥ ins
+--   where
+--   f : Role × ATree3 → MC → MC
+--   f (role "conflicted" , Ac.node (Ln3 (Lnc _) (_ , vcprev , _)) ((r , Ac.node (Ln3 _ (_ , viprev , _)) _) ∷ [])) v =
+--     v ⨁ (vcprev ⨂ viprev) 
+--   f _ v = v
 
 {-# TERMINATING #-}
 valTree3 (Ac.node (Ln3 _ (_ , _ , v)) []) = v
-valTree3 (Ac.node (Ln3 _ vroot@(nothing , _ , _)) rts) = foldIns3 vroot rts
-valTree3 (Ac.node (Ln3 _ vroot@(v0 , _ , _)) rts) = v0 ⨁ foldIns3 vroot rts
+valTree3 (Ac.node (Ln3 _ vroot@(nothing , _ , _)) rts) = foldIns3 vroot rts --⨂ (⟪ ⊘ la ⟫ foldConflicts3 rts)
+valTree3 (Ac.node (Ln3 _ vroot@(just v0 , _ , _)) rts) = (just v0 ⨁ foldIns3 vroot rts) --⨂ (⟪ ⊘ la ⟫ foldConflicts3 rts)
 
 
 valTree3←i : ∀ {n} → AGraph n → AGraph n → AGraph n → Fin n → MC
@@ -555,7 +566,7 @@ foldConflicts : ∀ {n} → AGraph n → Fin n → MC
 foldConflicts {n} g i = List.foldr f MC⊥ (NConflicts g i)
   where
   f : Fin n × Fin n → MC → MC
-  f i v = v ⨁ ((val g (proj₁ i)) ⨂ (val g (proj₂ i)))
+  f (i1 , i2) v = v ⨁ (val←i g i1 ⨂ val←i g i2)
 
 -- negation of foldConflicts
 ¬foldConflicts : ∀ {n} → AGraph n → Fin n → MC
@@ -582,6 +593,7 @@ private
     where
     newval : ℕ → MC
     newval k = valTree3←i g0 gprev g (Fin.inject≤ (Fin.fromℕ (n ∸ k)) (s≤s (m∸n≤m n k)))
+               ⨂ ¬foldConflicts gprev (Fin.inject≤ (Fin.fromℕ (n ∸ k)) (s≤s (m∸n≤m n k)))
 
     f : ∀ {k} → AContext k → AGraph k → AGraph (ℕsuc k)
     f {k} (context (Ln nd v) sucs) g = context (Ln nd (newval k)) sucs & g
