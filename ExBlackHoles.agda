@@ -206,7 +206,7 @@ _ : Arg G (# 3) (# 0) ≡ just (record
         } , just (V 0.8))
 _ = refl
 
-G0 = compute G
+G0 = steps 0 G
 
 G1 = steps 1 G
 
@@ -235,7 +235,7 @@ open import ShowDAG la
 open import IO
 
 w = 110
-ws = 80 -- "section" title width
+ws = 110 -- "section" title width
 
 printG : AGraph 17 → (AGraph 17 → Fin 17 → MC) → String
 printG g f = "\n  S1 = " +++ pprint w (f g (# 16))
@@ -247,7 +247,13 @@ printG g f = "\n  S1 = " +++ pprint w (f g (# 16))
           +++ " S7 = "  +++ pprint w (f g (# 11))
           +++ " S8 = "  +++ pprint w (f g (# 6))
           +++ " S9 = "  +++ pprint w (f g (# 9))
+          +++ "\n  A1 = "  +++ pprint w (f g (# 15))
           +++ " A2 = "  +++ pprint w (f g (# 4))
+          +++ " A3 = "  +++ pprint w (f g (# 7))
+          +++ " A4 = "  +++ pprint w (f g (# 10))
+          +++ "\n  C1 = "  +++ pprint w (f g (# 0))
+          +++ " C2 = "  +++ pprint w (f g (# 1))
+          +++ " C2' = "  +++ pprint w (f g (# 2))
 
 -- -- without C1
 -- printG : AGraph 16 → (∀ {n} → AGraph n → Fin n → MC) → String
@@ -266,16 +272,18 @@ main = run (putStrLn stringToPrint)
   where
   wh = 12
   stringToPrint = ""  --S.replicate ws '-'
-    +++ ppretty ws (docSection ws "original")
-    +++ printG G val←i
-    +++ ppretty ws (docSection ws "computed w/o conflicts")
-    +++ printG G val
+    -- +++ ppretty ws (docSection ws "original")
+    -- +++ printG G val←i
+    -- +++ ppretty ws (docSection ws "computed w/o conflicts")
+    -- +++ printG G (valTree3←i G G)
+    +++ ppretty ws (docSection ws "step 0")
+    +++ printG G0 val←i
     +++ ppretty ws (docSection ws "step 1")
     +++ printG G1 val←i
-    +++ ppretty ws (docSection ws "step 1 - confl")
-    +++ printG G1 foldConflicts
-    +++ ppretty ws (docSection ws "step 1 - val+confl")
-    +++ printG G1 (val+conflicts G)
+    -- +++ ppretty ws (docSection ws "step 1 - confl")
+    -- +++ printG G1 foldConflicts
+    -- +++ ppretty ws (docSection ws "step 1 - val+confl")
+    -- +++ printG G1 (val+conflicts G)
     +++ ppretty ws (docSection ws "step 2")
     +++ printG G2 val←i
     +++ ppretty ws (docSection ws "step 3")
@@ -291,10 +299,13 @@ main = run (putStrLn stringToPrint)
     +++ ppretty ws (docSection ws "step 200")
     +++ printG G200 val←i
 
-    +++ "\n\nContradiction degree:   before = "
+    +++ "\n\nContradiction degree:  step0 = "
     +++ pprint w ((val←i G0 (# 3) ⨂ val←i G0 (# 9)) ⨁ (val←i G0 (# 4) ⨂ val←i G0 (# 6)))
-    +++ " after = "
+    +++ " step1 = "
+    +++ pprint w ((val←i G1 (# 3) ⨂ val←i G1 (# 9)) ⨁ (val←i G1 (# 4) ⨂ val←i G1 (# 6)))
+    +++ " step10 = "
+    +++ pprint w ((val←i G10 (# 3) ⨂ val←i G10 (# 9)) ⨁ (val←i G10 (# 4) ⨂ val←i G10 (# 6)))
+    +++ " step200 = "
     +++ pprint w ((val←i G200 (# 3) ⨂ val←i G200 (# 9)) ⨁ (val←i G200 (# 4) ⨂ val←i G200 (# 6)))
-    -- +++ pprint w (val←i G200 (# 2) ⨂ val←i G200 (# 8))
     
     -- +++ (pprint 110 G)
