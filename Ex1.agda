@@ -23,7 +23,7 @@ open import ArgSchemes
 
 -- la = Pref
 la = Łuk
-import DAG; module DAGla = DAG la; open DAGla
+import DAG; module DAGla = DAG la; open DAGla 
 
 node : ∀ {n} → ANode
              → (v : Float) → {0.0 [≤] v ≡ true} → {v [≤] 1.0 ≡ true}
@@ -175,14 +175,14 @@ _ : preds G2 (# 5) ≡ (# 3 , эксперт) ∷ []
 _ = refl
 
 
-_ : NArgs G2 (# 0) ≡ record { Scheme = A-абдукция
+_ : NArgs G2 (# 0) ≡ (record { Scheme = A-абдукция
                             ; NPremises = just (Ln I5 _) ∷v []v
                             ; NConclusion = just (Ln I3 _)
-                            } ∷
-                     record { Scheme = A-от-эксперта
+                            } , _) ∷
+                     (record { Scheme = A-от-эксперта
                             ; NPremises = just (Ln I1 _) ∷v just (Ln I2 _) ∷v nothing ∷v []v
                             ; NConclusion = just (Ln I3 _)
-                            } ∷ []
+                            } , _) ∷ []
 _ = refl
 
 _ : NArgs+ G2 (# 0) ≡ (поддержка , # 2) ∷ []
@@ -200,14 +200,14 @@ _ = refl
 _ : G2 [ (# 0) ] ≡ G2
 _ = refl
 
-_ : G2 [ (# 0) > (# 0) ] ≡ G2 [ (# 1) ]
+_ : G2 [ ((# 0) ≻ (# 0)) ] ≡ G2 [ (# 1) ]
 _ = refl
 
 _ : theSame {5} (# 1) (# 0) (# 0) ≡ true
 _ = refl
 
 -- G3 is a part of G2
-_ : G2 [ (# 0) > (# 2) ] ≡ G3
+_ : G2 [ ((# 0) ≻ (# 2)) ] ≡ G3
 _ = refl
 
 -- не доказывается в общем виде
@@ -229,10 +229,10 @@ _ = refl
 _ : G2 ! (# 1) ≡ node SR6 0.4 {refl} {refl} ((факт     , # 0) ∷ [])
 _ = refl
 
-_ : G2 ![ (# 0) > (# 0) ] ≡ node SR6 0.4 {refl} {refl} ((факт     , # 0) ∷ [])
+_ : G2 ! (# 0) ≻ (# 0) ≡ node SR6 0.4 {refl} {refl} ((факт     , # 0) ∷ [])
 _ = refl
 
-_ : G2 ![ (# 1) > (# 2) ] ≡ node I2 1.0 {refl} {refl} []
+_ : G2 ! (# 1) ≻ (# 2) ≡ node I2 1.0 {refl} {refl} []
 _ = refl
 
 
@@ -297,24 +297,24 @@ _ = refl
 
 
 -- all inputs
-_ : Arg G4 (# 0) (# 4) ≡ just record { Scheme = A-от-эксперта
+_ : Arg G4 (# 0) (# 4) ≡ just (record { Scheme = A-от-эксперта
                                      ; NPremises = just (Ln I1 _) ∷v just (Ln I2 _) ∷v nothing ∷v []v
                                      ; NConclusion = just (Ln I3 _)
-                                     }
+                                     } , _)
 _ = refl
 
-_ : NArgs G4 (# 0) ≡ record { Scheme = A-ad-populum
+_ : NArgs G4 (# 0) ≡ (record { Scheme = A-ad-populum
                             ; NPremises = just (Ln I7 _) ∷v []v
                             ; NConclusion = just (Ln I3 _)
-                            } ∷
-                     record { Scheme = A-абдукция
+                            } , _) ∷
+                     (record { Scheme = A-абдукция
                             ; NPremises = just (Ln I5 _) ∷v []v
                             ; NConclusion = just (Ln I3 _)
-                            } ∷
-                     record { Scheme = A-от-эксперта
+                            } , _) ∷
+                     (record { Scheme = A-от-эксперта
                             ; NPremises = just (Ln I1 _) ∷v just (Ln I2 _) ∷v nothing ∷v []v
                             ; NConclusion = just (Ln I3 _)
-                            } ∷ []
+                            } , _) ∷ []
 _ = refl
 
 -- only attacks
@@ -347,10 +347,10 @@ _ = refl
 _ : G4 ! (# 3) ≡ node SR6 0.4 ((факт     , _) ∷ [])
 _ = refl
 
-_ : G4 ![ (# 0) > (# 2) ] ≡ node SR6 0.4 ((факт     , _) ∷ [])
+_ : G4 ! (# 0) ≻ (# 2) ≡ node SR6 0.4 ((факт     , _) ∷ [])
 _ = refl
 
-_ : G4 ![ (# 3) > (# 2) ] ≡ node I2 1.0 {refl} {refl} []
+_ : G4 ! (# 3) ≻ (# 2) ≡ node I2 1.0 {refl} {refl} []
 _ = refl
 
 
@@ -403,16 +403,16 @@ _ = refl
 _ : theSame {10} (# 6) (# 2) (# 3) ≡ true
 _ = refl
 
-_ : realIdx {10} (# 0) (# 0) ≡ (# 1)
+_ : _≻_ {10} (# 0) (# 0) ≡ (# 1)
 _ = refl
 
-_ : realIdx {10} (# 2) (# 3) ≡ (# 6)
+_ : _≻_ {10} (# 2) (# 3) ≡ (# 6)
 _ = refl
 
-_ : realIdx {10} (# 0) (# 3) ≡ (# 4)
+_ : _≻_ {10} (# 0) (# 3) ≡ (# 4)
 _ = refl
 
-_ : realIdx {10} (# 4) (# 0) ≡ (# 5)
+_ : _≻_ {10} (# 4) (# 0) ≡ (# 5)
 _ = refl
 
 _ : c-ing G5 (# 0) ≡ just (# 3)
@@ -430,14 +430,14 @@ _ = refl
 _ : NConflicts G5 (# 0) ≡ []
 _ = refl
 
-_ : NConflicts G5 (# 1) ≡ []
-_ = refl
+-- _ : NConflicts G5 (# 1) ≡ []
+-- _ = refl
 
 _ : NConflicts G5 (# 2) ≡ []
 _ = refl
 
-_ : NConflicts G5 (# 4) ≡ (# 1) ∷ []
-_ = refl
+-- _ : NConflicts G5 (# 4) ≡ ((# 1) , _) ∷ []
+-- _ = refl
 
 
 G50 = compute G5
@@ -605,7 +605,7 @@ main = run (putStrLn stringToPrint)
     +++ ppretty ws (docSection ws "G6 orig")
     +++ printG6 G6 val←i
     +++ ppretty ws (docSection ws "G6 computed")
-    +++ printG6 G6 val
+    +++ printG6 G6 valTree←i
     +++ ppretty ws (docSection ws "G60")
     +++ printG6 G60 val←i
     +++ ppretty ws (docSection ws "G61")
