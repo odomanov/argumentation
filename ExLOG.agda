@@ -78,7 +78,7 @@ G1 =
 
 
 
-G10 = compute G1
+G10 = steps 0 G1   --compute G1
 
 G11 = steps 1 G1
 
@@ -92,21 +92,17 @@ G1100 = steps 100 G1
 
 
 
--- I3  ---+
---         \
---         SC
---         /
--- ¬I3 ---+
+-- I2 ---SC---> I2
 G2 : AGraph _
 G2 =
-     node  SC 1.0 {refl} {refl} ((conflicting , # 0) ∷ (conflicted , # 1) ∷ []) & 
-     node ¬I3 0.5 {refl} {refl} [] &
-     node  I3 0.7 {refl} {refl} [] &
+     node SC 1.0 {refl} {refl} ((conflicting , # 0) ∷ (conflicted , # 1) ∷ []) & 
+     node I2 0.5 {refl} {refl} [] &
+     node I1 0.7 {refl} {refl} [] &
      ∅
 
 
 
-G20 = compute G2
+G20 = steps 0 G2 --compute G2
 
 G21 = steps 1 G2
 
@@ -136,7 +132,7 @@ G7 =
      node I1 0.1 {refl} {refl} [] &
      ∅
 
-G70 = compute G7
+G70 = steps 0 G7  --compute G7
 
 G71 = steps 1 G7
 
@@ -170,8 +166,8 @@ printG1 g f = "\n  I = "    +++ pprint w (f g (# 3))
           +++ " Concl = " +++ pprint w (f g (# 0))
           +++ " SR  = "   +++ pprint w (f g (# 1))
 printG2 : AGraph 3 → (∀ {n} → AGraph n → Fin n → MC) → String
-printG2 g f = "\n  I = " +++ pprint w (f g (# 2))
-          +++ " -I = "   +++ pprint w (f g (# 1))
+printG2 g f = "\n  I1 = " +++ pprint w (f g (# 2))
+          +++ " I2 = "   +++ pprint w (f g (# 1))
           +++ " C = "    +++ pprint w (f g (# 0))
 printG7 : ℕ → String → AGraph 4 → (AGraph 4 → Fin 4 → MC) → String
 printG7 n s g f = "\n" +++ (spaces (0 ⊔ (n ∸ S.length s))) +++ s +++ ": "
@@ -201,10 +197,12 @@ main = run (putStrLn stringToPrint)
     -- +++ ppretty ws (docSection ws "G1 step 100")
     -- +++ printG1 G1100 val←i
 
-    +++ ppretty ws (docSection ws "G2 original")
-    +++ printG2 G2 val←i
-    +++ ppretty ws (docSection ws "G2 w/o conflicts")
-    +++ printG2 G2 val
+    -- +++ ppretty ws (docSection ws "G2 original")
+    -- +++ printG2 G2 val←i
+    -- +++ ppretty ws (docSection ws "G2 w/o conflicts")
+    -- +++ printG2 G2 valTree←i
+    +++ ppretty ws (docSection ws "G2 step 0")
+    +++ printG2 G20 val←i
     +++ ppretty ws (docSection ws "G2 step 1")
     +++ printG2 G21 val←i
     +++ ppretty ws (docSection ws "G2 step 2")
@@ -216,9 +214,9 @@ main = run (putStrLn stringToPrint)
     +++ ppretty ws (docSection ws "G2 step 100")
     +++ printG2 G2100 val←i
 
-    +++ "\n\nContradiction degree:   before = "
+    +++ "\n\nContradiction degree:   step0 = "
     +++ pprint w (val←i G20 (# 1) ⨂ val←i G20 (# 2))
-    +++ " after = "
+    +++ " step100 = "
     +++ pprint w (val←i G2100 (# 1) ⨂ val←i G2100 (# 2))
 
     -- +++ printG7 wh "G7 original" G7 val←i
