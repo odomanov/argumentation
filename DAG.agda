@@ -8,7 +8,6 @@ open import Data.Bool
 open import Data.Empty using (⊥)
 open import Data.Fin as Fin
   using (Fin; Fin′; zero; suc; #_; toℕ; _≟_) renaming (_ℕ-ℕ_ to _-_)
-open import Data.Fin.Patterns as FinP 
 open import Data.Graph.Acyclic as Ac hiding (node) public
 open import Data.List as List using (List; []; _∷_)
 open import Data.Maybe
@@ -16,7 +15,7 @@ open import Data.Nat as ℕ renaming (zero to ℕzero; suc to ℕsuc)
 open import Data.Nat.Properties
 open import Data.Product using (_×_; _,_; proj₁; proj₂)
 open import Data.String as S renaming (_++_ to _+++_)
-open import Data.Vec as V renaming ([] to []v; _∷_ to _∷v_) hiding ([_]; foldr) 
+open import Data.Vec as Vec renaming ([] to []v; _∷_ to _∷v_) hiding ([_]; foldr) 
 open import Data.Unit using (⊤)
 open import Function using (_∘_; _$_; id)
 open import Relation.Binary.PropositionalEquality using (_≡_; _≢_; refl; cong)
@@ -29,18 +28,19 @@ open import Relation.Nullary using (yes; no)
 open import ArgPrelude 
 open import AIF
 
-ANode = Node {la = la}           -- node
-ALNode = LNode {la = la}         -- labeled node
-ALNode3 = LNode3 {la = la}  
+ANode    = Node {la = la}        -- node
+ALNode   = LNode {la = la}       -- labeled node
 AContext = Context ALNode Role   -- argumentation context
-AGraph = Graph ALNode Role       -- argumentation graph     
-ATree = Ac.Tree ALNode Role      -- argumentation tree
-ATree3 = Ac.Tree ALNode3 Role 
-AArg = Argument {la = la}        -- argument
+AGraph   = Graph ALNode Role     -- argumentation graph     
+ATree    = Ac.Tree ALNode Role   -- argumentation tree
+ALNode3  = LNode3 {la = la}  
+ATree3   = Ac.Tree ALNode3 Role 
+-- AArg     = Argument {la = la}    -- argument
 
 MC = Maybe (Carrier la)
 MC⊥ = just (LA⊥ la)
 MC⊤ = just (LA⊤ la)
+MC3 = MC × MC × MC
 
 Sucs : ℕ → Set
 Sucs n = List (Role × Fin n)
@@ -94,27 +94,27 @@ g ! i ≻ δi = Ac.head (g [ i ≻ δi ]) --(Ac.tail (g [ i ]) [ δi ])
 -- Auxiliary statements
 
 p1 : ∀ n i → (n - suc i) ℕ.≤ n
-p1 (ℕsuc n) FinP.0F = ≤-step ≤-refl
+p1 (ℕsuc n) zero    = ≤-step ≤-refl
 p1 (ℕsuc n) (suc i) = ≤-step (p1 n i)
 
 p2 : ∀ n i → ℕsuc ((toℕ i) + (ℕsuc n - i)) ℕ.≤ ℕsuc (ℕsuc n)
-p2 0 FinP.0F = s≤s (s≤s z≤n)
-p2 0 FinP.1F = ≤-reflexive refl
-p2 (ℕsuc n) FinP.0F = s≤s (s≤s (s≤s ≤-refl))
+p2 0 zero = s≤s (s≤s z≤n)
+p2 0 (suc zero) = ≤-reflexive refl
+p2 (ℕsuc n)  zero   = s≤s (s≤s (s≤s ≤-refl))
 p2 (ℕsuc n) (suc i) = s≤s (s≤s (≤-reflexive (pppp n i)))
   where
   pppp : ∀ n i → toℕ i + (ℕsuc n - i) ≡ ℕsuc n
-  pppp 0 FinP.0F = refl
-  pppp 0 FinP.1F = refl
-  pppp (ℕsuc n) FinP.0F = refl
+  pppp 0 zero = refl
+  pppp 0 (suc zero) = refl
+  pppp (ℕsuc n)  zero = refl
   pppp (ℕsuc n) (suc i) = cong ℕsuc (pppp n i)
 
 p3 : ∀ {n} {i : Fin n} → ℕsuc (ℕsuc (ℕsuc (toℕ i + (n - suc i)))) ℕ.≤ ℕsuc (ℕsuc n)
-p3 {ℕsuc n} {FinP.0F} = s≤s (s≤s (s≤s ≤-refl))
+p3 {ℕsuc n} {zero} = s≤s (s≤s (s≤s ≤-refl))
 p3 {ℕsuc n} {suc i} = s≤s (s≤s (s≤s (pppp n i)))
   where
   pppp : ∀ n i → ℕsuc (toℕ i + (n - suc i)) ℕ.≤ n
-  pppp (ℕsuc n) FinP.0F = s≤s ≤-refl
+  pppp (ℕsuc n) zero    = s≤s ≤-refl
   pppp (ℕsuc n) (suc i) = ≤-pred (s≤s (s≤s (pppp n i))) 
 
 
@@ -167,7 +167,7 @@ ALNode←i g i = label (g ! i)
 ALNode←δi : ∀ {n} → AGraph (ℕsuc n) → (i : Fin (ℕsuc n)) → Fin (n - i) → ALNode
 ALNode←δi g i δi = ALNode←i g (i ≻ δi)
 
--- Algebra label from the node of the i-th context
+-- value from the node of the i-th context
 val←i : ∀ {n} → AGraph n → Fin n → MC
 val←i g i = LNode.value (ALNode←i g i)
 
@@ -293,7 +293,7 @@ NPremises {n} g i with isRAnode (ALNode←i g i)
 -- nodes on which nothing depends (no predecessors)
 roots : ∀ {n} → AGraph n → List (Fin n × ALNode)
 roots ∅ = []
-roots {n} g = filterb (P g) (V.toList (nodes g))
+roots {n} g = filterb (P g) (Vec.toList (nodes g))
   where
   P : ∀ {n} → AGraph n → Fin n × ALNode → Bool
   P g (i , _) with (preds g i)
@@ -317,7 +317,7 @@ preds¬CA ((context nd sucs) & g) (suc i) with (isCAnode nd)
 -- skipping conflicts
 roots¬CA : ∀ {n} → AGraph n → List (Fin n × ALNode)
 roots¬CA ∅ = []
-roots¬CA {n} g = filterb (P g) (V.toList (nodes g))
+roots¬CA {n} g = filterb (P g) (Vec.toList (nodes g))
   where
   P : ∀ {n} → AGraph n → Fin n × ALNode → Bool
   P g (i , nd) with isCAnode nd | (preds¬CA g i)
@@ -327,6 +327,7 @@ roots¬CA {n} g = filterb (P g) (V.toList (nodes g))
 
 
 -- fold down on the whole Fin n
+{-# TERMINATING #-} 
 fold↓ : ∀ {t n}
         → {Ty : Set t}
         → (Fin n → Ty → Ty)
@@ -461,8 +462,6 @@ zipTree (Ac.node (Ln nd1 v1) rts1) (Ac.node (Ln nd2 v2) rts2) (Ac.node (Ln nd3 v
   zip' _ _ _ = []
 
 valTree3 : ATree3 → MC
-
-MC3 = MC × MC × MC
 
 private
   fff : (Role × ATree3) → MC → MC
