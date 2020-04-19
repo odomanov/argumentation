@@ -69,7 +69,10 @@ nothing ⨁ nothing = nothing
 just x  ⨁ just y  = just (_⊕_ la x y)  
 
 ⟨_,_⟩ : MC → MC → MC
-⟨ x , y ⟩ = x ⟪ mean la ⟫ y
+⟨ x , y ⟩ = x ⟪ op ⟫ y
+  where
+  op : Carrier la → Carrier la → Carrier la
+  op a b = proj₁ (mean la a (b , 1))
 
 -- δi-th graph relative to i  
 _[_≻_] : ∀ {n} → AGraph (ℕsuc n)

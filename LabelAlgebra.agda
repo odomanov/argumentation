@@ -3,6 +3,8 @@
 module LabelAlgebra where
 
 open import Algebra
+open import Data.Nat using (ℕ)
+open import Data.Product
 open import Level
 open import Relation.Binary
 open import Relation.Binary.Lattice using (Supremum; Infimum)
@@ -20,7 +22,7 @@ record IsLabelAlgebra {c ℓ₁ ℓ₂} {A : Set c}
                          (⊘   : Op₁ A)
                          (_∧_ : Op₂ A)
                          (_∨_ : Op₂ A)
-                         (mean : Op₂ A)
+                         (mean : A → A × ℕ → A × ℕ)
                          (⊤ : A)
                          (⊥ : A)
                          : Set (suc (c ⊔ ℓ₁ ⊔ ℓ₂)) where
@@ -66,7 +68,7 @@ record LabelAlgebra c ℓ₁ ℓ₂ : Set (suc (c ⊔ ℓ₁ ⊔ ℓ₂)) where
     ⊘       : Op₁ Carrier     -- The negation operation.
     _∧_     : Op₂ Carrier     -- The minimum operation.
     _∨_     : Op₂ Carrier     -- The maximum operation.
-    mean    : Op₂ Carrier     -- The half-sum
+    mean    : Carrier → Carrier × ℕ → Carrier × ℕ     -- The mean function
     ⊤       : Carrier         -- The maximum.
     ⊥       : Carrier         -- The minimum.
     isLabelAlgebra : IsLabelAlgebra _≈_ _≤_ _⊗_ _⊕_ -- _⊖_

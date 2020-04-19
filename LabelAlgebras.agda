@@ -7,9 +7,10 @@ open import Data.Bool
 open import Data.Empty
 open import Data.Maybe
 open import Data.Nat
+open import Data.Product
 open import Data.String renaming (_++_ to _+++_)
 open import Data.Unit
-open import Level
+open import Level renaming (zero to lzero; suc to lsuc)
 open import Relation.Binary.PropositionalEquality using (_≡_; _≢_; refl)
 
 open import ArgPrelude
@@ -53,15 +54,16 @@ fmax : Float → Float → Float
 fmax x y = if x [<] y then y else x 
 
 postulate
-  0≤vmean : ∀ x y → 0.0 [≤] (0.5 [*] (value x [+] value y)) ≡ true
-  v≤1mean : ∀ x y → (0.5 [*] (value x [+] value y)) [≤] 1.0 ≡ true
+  0≤vmean : ∀ n x y → 0.0 [≤] ((fromℕ n) [*] value y [+] value x) [/] (fromℕ (suc n)) ≡ true
+  v≤1mean : ∀ n x y → ((fromℕ n) [*] value y [+] value x) [/] (fromℕ (suc n)) [≤] 1.0 ≡ true
 
-FUmean : FUnit → FUnit → FUnit 
-FUmean a b = record
-  { value = 0.5 [*] (value a [+] value b) 
-  ; 0≤v = 0≤vmean a b 
-  ; v≤1 = v≤1mean a b 
-  }
+FUmean : FUnit → FUnit × ℕ → FUnit × ℕ
+FUmean _ (_ , 0) = (FU0 , 1)
+FUmean a (acc , suc n) = record
+  { value = ((fromℕ n) [*] value acc [+] value a) [/] (fromℕ (suc n)) 
+  ; 0≤v = 0≤vmean n a acc 
+  ; v≤1 = v≤1mean n a acc
+  } , suc (suc n)
 
 
 min0≤v : ∀ x y → (0.0 [≤] (fmin (value x) (value y)) ≡ true)
