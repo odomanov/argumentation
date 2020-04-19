@@ -19,6 +19,7 @@ open import ArgSchemes
 
 la = Pref
 -- la = Łuk
+-- la = Product
 import DAG; module DAGla = DAG la; open DAGla
 
 T1 = mkFrag "St1"
