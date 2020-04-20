@@ -13,6 +13,11 @@ open import Relation.Nullary
 
 open import WLPretty
 
+-- average for n elements
+data Mean {c} (A : Set c) : ℕ → Set c where
+  mn1 : A → Mean A 1
+  mn+ : ∀ {n} → A → Mean A (ℕ.suc n) → Mean A (ℕ.suc (ℕ.suc n)) -- adding function
+
 record IsLabelAlgebra {c ℓ₁ ℓ₂} {A : Set c}
                          (_≈_ : Rel A ℓ₁)
                          (_≤_ : Rel A ℓ₂)
@@ -22,7 +27,8 @@ record IsLabelAlgebra {c ℓ₁ ℓ₂} {A : Set c}
                          (⊘   : Op₁ A)
                          (_∧_ : Op₂ A)
                          (_∨_ : Op₂ A)
-                         (mean : A → A × ℕ → A × ℕ)
+                         (mean : A → A → ℕ → A) -- <n> → <n+1>
+                         (delta : Op₂ A)
                          (⊤ : A)
                          (⊥ : A)
                          : Set (suc (c ⊔ ℓ₁ ⊔ ℓ₂)) where
@@ -51,6 +57,11 @@ record IsLabelAlgebra {c ℓ₁ ℓ₂} {A : Set c}
     sup       : Supremum _≤_ _∨_
     inf       : Infimum  _≤_ _∧_
 
+  meanv : ∀ {n} → Mean A (ℕ.suc n) → A
+  meanv {ℕ.zero}  (mn1 a) = a
+  meanv {ℕ.suc n} (mn+ a acc) = mean a (meanv acc) n
+
+
 
 record LabelAlgebra c ℓ₁ ℓ₂ : Set (suc (c ⊔ ℓ₁ ⊔ ℓ₂)) where
   constructor mkLabelAlgebra
@@ -68,11 +79,12 @@ record LabelAlgebra c ℓ₁ ℓ₂ : Set (suc (c ⊔ ℓ₁ ⊔ ℓ₂)) where
     ⊘       : Op₁ Carrier     -- The negation operation.
     _∧_     : Op₂ Carrier     -- The minimum operation.
     _∨_     : Op₂ Carrier     -- The maximum operation.
-    mean    : Carrier → Carrier × ℕ → Carrier × ℕ     -- The mean function
+    mean    : Carrier → Carrier → ℕ → Carrier     -- The mean function
+    delta   : Op₂ Carrier     -- |a-b|
     ⊤       : Carrier         -- The maximum.
     ⊥       : Carrier         -- The minimum.
     isLabelAlgebra : IsLabelAlgebra _≈_ _≤_ _⊗_ _⊕_ -- _⊖_
-                                    ⊘ _∧_ _∨_ mean ⊤ ⊥ 
+                                    ⊘ _∧_ _∨_ mean delta ⊤ ⊥ 
     doc : Carrier → Doc
     
   open IsLabelAlgebra isLabelAlgebra public

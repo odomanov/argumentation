@@ -8,6 +8,7 @@ open import Data.Bool
 open import Data.Empty using (⊥)
 open import Data.Fin as Fin
   using (Fin; Fin′; zero; suc; #_; toℕ; _≟_) renaming (_ℕ-ℕ_ to _-_)
+open import Data.Fin.Properties as Finₚ using (toℕ-inject₁)
 open import Data.Graph.Acyclic as Ac hiding (node) public
 open import Data.List as List using (List; []; _∷_)
 open import Data.Maybe
@@ -33,6 +34,8 @@ ALNode   = LNode {la = la}       -- labeled node
 AContext = Context ALNode Role   -- argumentation context
 AGraph   = Graph ALNode Role     -- argumentation graph     
 ATree    = Ac.Tree ALNode Role   -- argumentation tree
+ALNode2  = LNode2 {la = la}  
+ATree2   = Ac.Tree ALNode2 Role 
 ALNode3  = LNode3 {la = la}  
 ATree3   = Ac.Tree ALNode3 Role 
 -- AArg     = Argument {la = la}    -- argument
@@ -40,6 +43,7 @@ ATree3   = Ac.Tree ALNode3 Role
 MC = Maybe (Carrier la)
 MC⊥ = just (LA⊥ la)
 MC⊤ = just (LA⊤ la)
+MC2 = MC × MC
 MC3 = MC × MC × MC
 
 Sucs : ℕ → Set
@@ -72,7 +76,13 @@ just x  ⨁ just y  = just (_⊕_ la x y)
 ⟨ x , y ⟩ = x ⟪ op ⟫ y
   where
   op : Carrier la → Carrier la → Carrier la
-  op a b = proj₁ (mean la a (b , 1))
+  op a b = mean la a b 1
+
+⟪mean⟫ : MC → MC → ℕ → MC
+⟪mean⟫ nothing   nothing  _ = nothing
+⟪mean⟫ nothing  (just va) _ = just va
+⟪mean⟫ (just v)  nothing  _ = just v
+⟪mean⟫ (just v) (just va) n = just (mean la v va n)
 
 -- δi-th graph relative to i  
 _[_≻_] : ∀ {n} → AGraph (ℕsuc n)
@@ -424,84 +434,6 @@ fold↑ {n = ℕsuc n} f init = fold' f init (zero)
 
 
 
-
-------------------------------------------------------------------------
--- valTree  : ATree → MC
--- valTrees : List (Role × ATree) → MC
-
--- deduction
--- foldPremises : MC → List (Role × ATree) → MC
--- foldPremises vconcl prems = List.foldr f vconcl prems
---   where
---   f : (Role × ATree) → MC → MC
---   f (_ , t) v = valTree t ⨂ v
-
--- -- fold incoming
--- foldIns : MC → List (Role × ATree) → MC
--- foldIns v0 [] = v0
--- foldIns v0 ((_ , (Ac.node (Ln (Lnr _) vconcl) prems)) ∷ rts) = (foldPremises vconcl prems) ⨁ (foldIns v0 rts)
--- foldIns _ _ = MC⊥   --  !!!  TODO
-
--- {-# TERMINATING #-}
--- valTree (Ac.node (Ln _ v) []) = v 
--- valTree (Ac.node (Ln (Lnc _) _) ((role "conflicting" , (Ac.node (Ln (Lnr _) _) _)) ∷ rts)) = valTrees rts
--- valTree (Ac.node (Ln (Lnc _) _) ((role "conflicted"  , (Ac.node (Ln (Lnr _) _) _)) ∷ rts)) = valTrees rts
--- valTree (Ac.node (Ln _ _) ((_ , (Ac.node (Ln (Lnr _) v) prems)) ∷ rts)) = (foldPremises v prems) ⨁ (valTrees rts)
--- valTree (Ac.node (Ln (Lnc _) v) (_ ∷ rts)) = v
--- valTree (Ac.node (Ln _ _) (_ ∷ rts)) = valTrees rts
-
--- valTrees [] = MC⊥
--- valTrees ((r , t) ∷ [])  = valTree t 
--- valTrees ((r , t) ∷ rts) = valTree t ⨁ valTrees rts
-
-
-zipTree : ATree → ATree → ATree → ATree3 
-zipTree (Ac.node (Ln nd1 v1) rts1) (Ac.node (Ln nd2 v2) rts2) (Ac.node (Ln nd3 v3) rts3) =
-  Ac.node (Ln3 nd1 (v1 , v2 , v3)) (zip' rts1 rts2 rts3)
-  where
-  zip' : List (Role × ATree) → List (Role × ATree) → List (Role × ATree) → List (Role × ATree3)
-  zip' [] [] [] = []
-  zip' ((r1 , t1) ∷ rts1) ((r2 , t2) ∷ rts2) ((r3 , t3) ∷ rts3) = ((r1 , zipTree t1 t2 t3)) ∷ zip' rts1 rts2 rts3
-  zip' _ _ _ = []
-
-valTree3 : ATree3 → MC
-
-private
-  fff : (Role × ATree3) → MC → MC
-  fff (_ , t) v = valTree3 t ⨂ v
-
--- deduction
-foldPremises3 : MC3 → MC3 → List (Role × ATree3) → MC
-foldPremises3 (nothing , _ , _) (_ , _ , varg) prems = List.foldr fff varg prems
-foldPremises3 (just v0 , _ , _) (_ , _ , varg) prems with List.foldr fff varg prems
-... | just v  = just v0 ⨂ just v
-... | nothing = just v0
-
--- fold incoming
-foldIns3 : MC3 → List (Role × ATree3) → MC
-foldIns3 vroot ins = List.foldr f MC⊥ ins
-  where
-  f : Role × ATree3 → MC → MC
-  f (role "conflicting" , (Ac.node (Ln3 (Lnr _) _) _)) v = v
-  f (role "conflicted"  , (Ac.node (Ln3 (Lnr _) _) _)) v = v
-  f (_ , (Ac.node (Ln3 (Lnr _) varg) prems)) v = v ⨁ (foldPremises3 vroot varg prems)
-  f (_ , (Ac.node _ _)) v = v
-
-{-# TERMINATING #-}
-valTree3 (Ac.node (Ln3 _ (v0 , _ , _)) []) = v0
-valTree3 (Ac.node (Ln3 _ vroot@(nothing , _ , _)) rts) = foldIns3 vroot rts 
-valTree3 (Ac.node (Ln3 _ vroot@(just v0 , _ , _)) rts) = (just v0 ⨁ foldIns3 vroot rts) 
-
-
-valTree3←i : ∀ {n} → AGraph n → AGraph n → AGraph n → Fin n → MC
-valTree3←i g0 gprev g i = valTree3 (zipTree (toTree g0 i) (toTree gprev i) (toTree g i))
-
--- valTree←i : ∀ {n} → AGraph n → Fin n → MC
--- valTree←i g i = valTree (toTree g i)
-
-
-
-
 --   Conflicts  --------------------------------------------
 
 -- 'conflicting' and 'conflicted' indexes
@@ -575,6 +507,160 @@ foldConflicts {n} g i = List.foldr f MC⊥ (NConflicts g i)
 -- the value of the next iteration
 -- iterationVal : ∀ {n} → AGraph n → AGraph n → Fin n → MC
 -- iterationVal g0 gin i = ⟨ val←i gin i , val+conflicts g0 gin i ⟩
+
+
+------------------------------------------------------------------------
+-- valTree  : ATree → MC
+-- valTrees : List (Role × ATree) → MC
+
+-- deduction
+-- foldPremises : MC → List (Role × ATree) → MC
+-- foldPremises vconcl prems = List.foldr f vconcl prems
+--   where
+--   f : (Role × ATree) → MC → MC
+--   f (_ , t) v = valTree t ⨂ v
+
+-- -- fold incoming
+-- foldIns : MC → List (Role × ATree) → MC
+-- foldIns v0 [] = v0
+-- foldIns v0 ((_ , (Ac.node (Ln (Lnr _) vconcl) prems)) ∷ rts) = (foldPremises vconcl prems) ⨁ (foldIns v0 rts)
+-- foldIns _ _ = MC⊥   --  !!!  TODO
+
+-- {-# TERMINATING #-}
+-- valTree (Ac.node (Ln _ v) []) = v 
+-- valTree (Ac.node (Ln (Lnc _) _) ((role "conflicting" , (Ac.node (Ln (Lnr _) _) _)) ∷ rts)) = valTrees rts
+-- valTree (Ac.node (Ln (Lnc _) _) ((role "conflicted"  , (Ac.node (Ln (Lnr _) _) _)) ∷ rts)) = valTrees rts
+-- valTree (Ac.node (Ln _ _) ((_ , (Ac.node (Ln (Lnr _) v) prems)) ∷ rts)) = (foldPremises v prems) ⨁ (valTrees rts)
+-- valTree (Ac.node (Ln (Lnc _) v) (_ ∷ rts)) = v
+-- valTree (Ac.node (Ln _ _) (_ ∷ rts)) = valTrees rts
+
+-- valTrees [] = MC⊥
+-- valTrees ((r , t) ∷ [])  = valTree t 
+-- valTrees ((r , t) ∷ rts) = valTree t ⨁ valTrees rts
+
+
+zipTree3 : ATree → ATree → ATree → ATree3 
+zipTree3 (Ac.node (Ln nd1 v1) rts1) (Ac.node (Ln nd2 v2) rts2) (Ac.node (Ln nd3 v3) rts3) =
+  Ac.node (Ln3 nd1 (v1 , v2 , v3)) (zip' rts1 rts2 rts3)
+  where
+  zip' : List (Role × ATree) → List (Role × ATree) → List (Role × ATree) → List (Role × ATree3)
+  zip' [] [] [] = []
+  zip' ((r1 , t1) ∷ rts1) ((r2 , t2) ∷ rts2) ((r3 , t3) ∷ rts3) = ((r1 , zipTree3 t1 t2 t3)) ∷ zip' rts1 rts2 rts3
+  zip' _ _ _ = []
+
+valTree3 : ATree3 → MC
+
+private
+  fff : (Role × ATree3) → MC → MC
+  fff (_ , t) v = valTree3 t ⨂ v
+
+-- deduction
+foldPremises3 : MC3 → MC3 → List (Role × ATree3) → MC
+foldPremises3 (nothing , _ , _) (_ , _ , varg) prems = List.foldr fff varg prems
+foldPremises3 (just v0 , _ , _) (_ , _ , varg) prems with List.foldr fff varg prems
+... | just v  = just v0 ⨂ just v
+... | nothing = just v0
+
+-- fold incoming
+foldIns3 : MC3 → List (Role × ATree3) → MC
+foldIns3 vroot ins = List.foldr f MC⊥ ins
+  where
+  f : Role × ATree3 → MC → MC
+  f (role "conflicting" , (Ac.node (Ln3 (Lnr _) _) _)) v = v
+  f (role "conflicted"  , (Ac.node (Ln3 (Lnr _) _) _)) v = v
+  f (_ , (Ac.node (Ln3 (Lnr _) varg) prems)) v = v ⨁ (foldPremises3 vroot varg prems)
+  f (_ , (Ac.node _ _)) v = v
+
+{-# TERMINATING #-}
+valTree3 (Ac.node (Ln3 _ (v0 , _ , _)) []) = v0
+valTree3 (Ac.node (Ln3 _ vroot@(nothing , _ , _)) rts) = foldIns3 vroot rts 
+valTree3 (Ac.node (Ln3 _ vroot@(just v0 , _ , _)) rts) = (just v0 ⨁ foldIns3 vroot rts) 
+
+
+valTree3←i : ∀ {n} → AGraph n → AGraph n → AGraph n → Fin n → MC
+valTree3←i g0 gprev g i = valTree3 (zipTree3 (toTree g0 i) (toTree gprev i) (toTree g i))
+
+
+----    non recursive   ---------
+
+zipTree2 : ATree → ATree → ATree2 
+zipTree2 (Ac.node (Ln nd1 v1) rts1) (Ac.node (Ln nd2 v2) rts2) =
+  Ac.node (Ln2 nd1 (v1 , v2)) (zip' rts1 rts2)
+  where
+  zip' : List (Role × ATree) → List (Role × ATree) → List (Role × ATree2)
+  zip' [] [] = []
+  zip' ((r1 , t1) ∷ rts1) ((r2 , t2) ∷ rts2) = ((r1 , zipTree2 t1 t2)) ∷ zip' rts1 rts2 
+  zip' _ _ = []
+
+valTree2 : ATree2 → MC
+
+-- deduction
+foldPremises2 : MC2 → MC2 → List (Role × ATree2) → MC
+foldPremises2 (nothing , _) (_ , varg) prems = List.foldr (λ _ v → v) varg prems
+foldPremises2 (just v0 , _) (_ , varg) prems with List.foldr (λ _ v → v) varg prems
+... | just v  = just v0 ⨂ just v
+... | nothing = just v0
+
+-- fold incoming
+foldIns2 : MC2 → List (Role × ATree2) → MC
+foldIns2 vroot ins = List.foldr f MC⊥ ins
+  where
+  f : Role × ATree2 → MC → MC
+  f (role "conflicting" , (Ac.node (Ln2 (Lnr _) _) _)) v = v
+  f (role "conflicted"  , (Ac.node (Ln2 (Lnr _) _) _)) v = v
+  f (_ , (Ac.node (Ln2 (Lnr _) varg) prems)) v = v ⨁ (foldPremises2 vroot varg prems)
+  f (_ , (Ac.node _ _)) v = v
+
+{-# TERMINATING #-}
+valTree2 (Ac.node (Ln2 _ (v0 , _)) []) = v0
+valTree2 (Ac.node (Ln2 _ vroot@(nothing , _)) rts) = foldIns2 vroot rts 
+valTree2 (Ac.node (Ln2 _ vroot@(just v0 , _)) rts) = (just v0 ⨁ foldIns2 vroot rts) 
+
+
+valTree2←i : ∀ {n} → AGraph n → AGraph n → Fin n → MC
+valTree2←i g0 g i = valTree2 (zipTree2 (toTree g0 i) (toTree g i))
+
+
+
+
+-- difference for i
+valδ : ∀ {n} → AGraph n → AGraph n → Fin n → MC
+valδ g0 g i = _⟪ delta la ⟫_
+              (val←i g i )
+              (valTree2←i g0 g i ⨂ ¬foldConflicts g i)
+
+-- среднее от i до zero --- из Fin(n+1) --- max i = # n
+Mean′ : ∀ {a n} → (A : Set a) → Fin (ℕsuc n) → Set a
+Mean′ {n = n} A i = Mean A (Fin.toℕ (suc i))
+  
+⟪meanv⟫ : ∀ {n i} → Mean′ {n = n} MC i → MC
+⟪meanv⟫ {_}      {zero}  (mn1 a) = a
+⟪meanv⟫ {ℕsuc n} {suc i} (mn+ nothing acc) = ⟪meanv⟫ acc
+⟪meanv⟫ {ℕsuc n} {suc i} (mn+ a acc) = ⟪mean⟫ a (⟪meanv⟫ acc) (Fin.toℕ i)
+
+eqq : ∀ {n} (i : Fin n) → Fin.toℕ (Fin.inject₁ i) ≡ Fin.toℕ i
+eqq i = toℕ-inject₁ i 
+
+convert : ∀ {n} (i : Fin n) → Mean MC (ℕsuc (Fin.toℕ (Fin.inject₁ i))) → Mean MC (ℕsuc (Fin.toℕ i))
+convert i acc rewrite eqq i = acc
+
+⟪mean′⟫ : ∀ {n} {i : Fin n} → MC → Mean′ {n = n} MC (Fin.inject₁ i) → Mean′ {n = n} MC (suc i)
+⟪mean′⟫ {_}      {zero} a (mn1 acc) = mn+ a (mn1 acc)  
+⟪mean′⟫ {ℕsuc n} {suc i} a (mn+ a2 acc) = mn+ a (mn+ a2 (convert i acc))  
+
+Correctness : ∀ {n} → AGraph n → AGraph n → MC
+Correctness {ℕzero} _ _   = MC⊥
+Correctness {ℕsuc n} g0 g = ⟪meanv⟫ ((Fin.fold′ {n} Ty f (mn1 ((valδ g0 g (# 0))))) (Fin.fromℕ n))
+  where
+  Ty : Fin (ℕsuc n) → Set c
+  Ty i = Mean′ {n = n} MC i
+  
+  f : ∀ i → Mean′ {n = n} MC (Fin.inject₁ i) → Mean′ {n = n} MC (suc i) 
+  f i acc = mn+ (valδ g0 g (Fin.inject₁ i)) (convert i acc)
+
+
+
+
 
 private
   step' : ∀ {n}
