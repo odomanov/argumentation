@@ -543,12 +543,13 @@ foldConflicts {n} g i = List.foldr f MC⊥ (NConflicts g i)
 
 
 zipTree3 : ATree → ATree → ATree → ATree3
-zipTree3 (Ac.node (Ln nd1 v1) rts1) (Ac.node (Ln nd2 v2) rts2) (Ac.node (Ln nd3 v3) rts3) =
-  Ac.node (Ln nd1 (v1 , v2 , v3)) (zip' rts1 rts2 rts3)
+zipTree3 (Ac.node (Ln nd1 v1) rts1) (Ac.node (Ln nd2 v2) rts2) (Ac.node (Ln nd3 v3) rts3) 
+         = Ac.node (Ln nd1 (v1 , v2 , v3)) (zip' rts1 rts2 rts3)
   where
   zip' : List (Role × ATree) → List (Role × ATree) → List (Role × ATree) → List (Role × ATree3)
   zip' [] [] [] = []
-  zip' ((r1 , t1) ∷ rts1) ((r2 , t2) ∷ rts2) ((r3 , t3) ∷ rts3) = ((r1 , zipTree3 t1 t2 t3)) ∷ zip' rts1 rts2 rts3
+  zip' ((r1 , t1) ∷ rts1) ((r2 , t2) ∷ rts2) ((r3 , t3) ∷ rts3)
+     = ((r1 , zipTree3 t1 t2 t3)) ∷ zip' rts1 rts2 rts3
   zip' _ _ _ = []
 
 valTree3 : ATree3 → MC
@@ -639,13 +640,11 @@ Mean′ {n = n} A i = Mean A (toℕ (suc i))
 ⟪meanv⟫ {ℕsuc n} {suc i} (mn+ nothing acc) = ⟪meanv⟫ acc
 ⟪meanv⟫ {ℕsuc n} {suc i} (mn+ a acc) = ⟪mean⟫ a (⟪meanv⟫ acc) (toℕ i)
 
--- ⟪mean′⟫ : ∀ {n} {i : Fin n} → MC → Mean′ MC (Fin.inject₁ i) → Mean′ MC (suc i)
--- ⟪mean′⟫ {_}      {zero} a (mn1 acc) = mn+ a (mn1 acc)  
--- ⟪mean′⟫ {ℕsuc n} {suc i} a (mn+ a2 acc) = mn+ a (mn+ a2 (convert i acc))  
 
 Correctness : ∀ {n} → AGraph n → AGraph n → MC
 Correctness {ℕzero} _ _   = nothing
-Correctness {ℕsuc n} g0 g = ⟪meanv⟫ {n} ((Fin.fold′ {n} Ty f (mn1 ((valδ g0 g (# 0))))) (fromℕ n))
+Correctness {ℕsuc n} g0 g = ⟪meanv⟫ {n}
+                            $ fold′ {n} Ty f (mn1 (valδ g0 g (# 0))) $ fromℕ n
   where
   Ty : Fin (ℕsuc n) → Set c
   Ty i = Mean′ {n = n} MC i
