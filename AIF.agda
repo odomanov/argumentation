@@ -244,50 +244,42 @@ instance
   
 
 
-module _ {c ℓ₁ ℓ₂} {la : LabelAlgebra c ℓ₁ ℓ₂} where
+data Node : Set where
+  Lni : Statement → Node 
+  Lnr : RA-Scheme → Node 
+  Lnc : CA-Scheme → Node 
+  Lnp : PA-Scheme → Node 
+
+-- Node equality, boolean.
+private
+  _=N_ : Node → Node → Bool
+  Lni x1  =N Lni x2  = x1  =ᵇ x2 
+  Lnr ra1 =N Lnr ra2 = ra1 =ᵇ ra2
+  Lnc ca1 =N Lnc ca2 = ca1 =ᵇ ca2
+  Lnp pa1 =N Lnp pa2 = pa1 =ᵇ pa2
+  _ =N _ = false
+
+Prop←N : Node → Proposition
+Prop←N (Lni s) = Statement.stprop s
+Prop←N _ = mkProp ""                  -- should I use Maybe?
+
+module _ {a} (A : Set a) where -- {c ℓ₁ ℓ₂} {la : LabelAlgebra c ℓ₁ ℓ₂} where
 
   mutual
    
-    data Node : Set where
-      Lni : Statement → Node 
-      Lnr : RA-Scheme → Node 
-      Lnc : CA-Scheme → Node 
-      Lnp : PA-Scheme → Node 
-
-    -- Nodes are labeled. The node's value may be 'nothing'.
-    record LNode : Set (c l⊔ ℓ₁ l⊔ ℓ₂) where
+    -- Nodes labeled with A. 
+    record LNode : Set a where
       constructor Ln
       field
         node  : Node
-        value : Maybe (Carrier la)
+        value : A
 
-    record LNode2 : Set (c l⊔ ℓ₁ l⊔ ℓ₂) where
-      constructor Ln2
-      field
-        node  : Node
-        value : Maybe (Carrier la) × Maybe (Carrier la)
-
-    record LNode3 : Set (c l⊔ ℓ₁ l⊔ ℓ₂) where
-      constructor Ln3
-      field
-        node  : Node
-        value : Maybe (Carrier la) × Maybe (Carrier la) × Maybe (Carrier la)
-
-    -- Node equality, boolean.
-    private
-      _=N_ : Node → Node → Bool
-      Lni x1  =N Lni x2  = x1  =ᵇ x2 
-      Lnr ra1 =N Lnr ra2 = ra1 =ᵇ ra2
-      Lnc ca1 =N Lnc ca2 = ca1 =ᵇ ca2
-      Lnp pa1 =N Lnp pa2 = pa1 =ᵇ pa2
-      _ =N _ = false
-
-      -- Label value is not checked!
-      _=LN_ : LNode → LNode → Bool
-      Ln x1 _ =LN Ln x2 _ = x1 =N x2
+    -- Label value is not checked!
+    _=LN_ : LNode → LNode → Bool
+    Ln x1 _ =LN Ln x2 _ = x1 =N x2
       
     instance 
-      NEq : BEq LNode LNode
+      NEq : BEq (LNode) (LNode)
       _=ᵇ_ {{NEq}} x y = x =LN y
 
     private
@@ -310,11 +302,7 @@ module _ {c ℓ₁ ℓ₂} {la : LabelAlgebra c ℓ₁ ℓ₂} where
       LRNEq : BEq (List (Role × LNode)) (List (Role × LNode))
       _=ᵇ_ {{LRNEq}} x y = x =LRN y
 
-    Prop←N : Node → Proposition
-    Prop←N (Lni s) = Statement.stprop s
-    Prop←N _ = mkProp ""                  -- should I use Maybe?
-
-  record Argument : Set (c l⊔ ℓ₁ l⊔ ℓ₂) where
+  record Argument : Set a where
     constructor mkArg
     field
       Scheme      : RA-Scheme 

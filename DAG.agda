@@ -29,22 +29,20 @@ open import Relation.Nullary using (yes; no)
 open import ArgPrelude 
 open import AIF
 
-ANode    = Node {la = la}        -- node
-ALNode   = LNode {la = la}       -- labeled node
-AContext = Context ALNode Role   -- argumentation context
-AGraph   = Graph ALNode Role     -- argumentation graph     
-ATree    = Ac.Tree ALNode Role   -- argumentation tree
-ALNode2  = LNode2 {la = la}  
-ATree2   = Ac.Tree ALNode2 Role 
-ALNode3  = LNode3 {la = la}  
-ATree3   = Ac.Tree ALNode3 Role 
--- AArg     = Argument {la = la}    -- argument
-
 MC = Maybe (Carrier la)
 MC⊥ = just (LA⊥ la)
 MC⊤ = just (LA⊤ la)
-MC2 = MC × MC
-MC3 = MC × MC × MC
+
+ANode    = Node         -- node
+ALNode   = LNode MC       -- labeled node
+AContext = Context ALNode Role   -- argumentation context
+AGraph   = Graph ALNode Role     -- argumentation graph     
+ATree    = Ac.Tree ALNode Role   -- argumentation tree
+ALNode2  = LNode (MC × MC)  
+ATree2   = Ac.Tree ALNode2 Role 
+ALNode3  = LNode (MC × MC × MC)  
+ATree3   = Ac.Tree ALNode3 Role 
+-- AArg     = Argument {la = la}    -- argument
 
 Sucs : ℕ → Set
 Sucs n = List (Role × Fin n)
@@ -539,9 +537,9 @@ foldConflicts {n} g i = List.foldr f MC⊥ (NConflicts g i)
 -- valTrees ((r , t) ∷ rts) = valTree t ⨁ valTrees rts
 
 
-zipTree3 : ATree → ATree → ATree → ATree3 
+zipTree3 : ATree → ATree → ATree → ATree3
 zipTree3 (Ac.node (Ln nd1 v1) rts1) (Ac.node (Ln nd2 v2) rts2) (Ac.node (Ln nd3 v3) rts3) =
-  Ac.node (Ln3 nd1 (v1 , v2 , v3)) (zip' rts1 rts2 rts3)
+  Ac.node (Ln nd1 (v1 , v2 , v3)) (zip' rts1 rts2 rts3)
   where
   zip' : List (Role × ATree) → List (Role × ATree) → List (Role × ATree) → List (Role × ATree3)
   zip' [] [] [] = []
@@ -555,26 +553,26 @@ private
   fff (_ , t) v = valTree3 t ⨂ v
 
 -- deduction
-foldPremises3 : MC3 → MC3 → List (Role × ATree3) → MC
+foldPremises3 : MC × MC × MC → MC × MC × MC → List (Role × ATree3) → MC
 foldPremises3 (nothing , _ , _) (_ , _ , varg) prems = List.foldr fff varg prems
 foldPremises3 (just v0 , _ , _) (_ , _ , varg) prems with List.foldr fff varg prems
 ... | just v  = just v0 ⨂ just v
 ... | nothing = just v0
 
 -- fold incoming
-foldIns3 : MC3 → List (Role × ATree3) → MC
+foldIns3 : MC × MC × MC → List (Role × ATree3) → MC
 foldIns3 vroot ins = List.foldr f MC⊥ ins
   where
   f : Role × ATree3 → MC → MC
-  f (role "conflicting" , (Ac.node (Ln3 (Lnr _) _) _)) v = v
-  f (role "conflicted"  , (Ac.node (Ln3 (Lnr _) _) _)) v = v
-  f (_ , (Ac.node (Ln3 (Lnr _) varg) prems)) v = v ⨁ (foldPremises3 vroot varg prems)
+  f (role "conflicting" , (Ac.node (Ln (Lnr _) _) _)) v = v
+  f (role "conflicted"  , (Ac.node (Ln (Lnr _) _) _)) v = v
+  f (_ , (Ac.node (Ln (Lnr _) varg) prems)) v = v ⨁ (foldPremises3 vroot varg prems)
   f (_ , (Ac.node _ _)) v = v
 
 {-# TERMINATING #-}
-valTree3 (Ac.node (Ln3 _ (v0 , _ , _)) []) = v0
-valTree3 (Ac.node (Ln3 _ vroot@(nothing , _ , _)) rts) = foldIns3 vroot rts 
-valTree3 (Ac.node (Ln3 _ vroot@(just v0 , _ , _)) rts) = (just v0 ⨁ foldIns3 vroot rts) 
+valTree3 (Ac.node (Ln _ (v0 , _ , _)) []) = v0
+valTree3 (Ac.node (Ln _ vroot@(nothing , _ , _)) rts) = foldIns3 vroot rts 
+valTree3 (Ac.node (Ln _ vroot@(just v0 , _ , _)) rts) = (just v0 ⨁ foldIns3 vroot rts) 
 
 
 valTree3←i : ∀ {n} → AGraph n → AGraph n → AGraph n → Fin n → MC
