@@ -136,6 +136,7 @@ G71 = steps 1 G7
 G72 = steps 2 G7
 G73 = steps 3 G7
 G74 = steps 4 G7
+G710 = steps 10 G7
 G7100 = steps 100 G7
 G7200 = steps 200 G7
 G71000 = steps 1000 G7
@@ -219,23 +220,35 @@ main = run (putStrLn stringToPrint)
     +++ "step100 = " +++ pprint w (Correctness G2 G2100)
     +++ "step200 = " +++ pprint w (Correctness G2 G2200)
     
-    -- +++ "\n\n~~ 2 opposite conflicts ~~~~~" 
-    -- -- +++ printG7 wh "G7 original" G7 val←i
-    -- -- +++ printG7 wh "G7 w/o conflicts" G7 val
-    -- +++ printG7 wh "G7 step 0" G70 val←i
-    -- +++ printG7 wh "G7 step 1" G71 val←i
-    -- +++ printG7 wh "G7 step 2" G72 val←i
-    -- +++ printG7 wh "G7 step 3" G73 val←i
-    -- +++ printG7 wh "G7 step 4" G74 val←i
-    -- +++ printG7 wh "G7 step 100" G7100 val←i
-    -- +++ printG7 wh "G7 step 200" G7200 val←i
-    -- +++ printG7 wh "G7 step 1000" G71000 val←i
+    +++ "\n\n~~ 2 opposite conflicts ~~~~~" 
+    -- +++ printG7 wh "G7 original" G7 val←i
+    -- +++ printG7 wh "G7 w/o conflicts" G7 val
+    +++ printG7 wh "G7 step 0" G70 val←i
+    +++ printG7 wh "G7 step 1" G71 val←i
+    +++ printG7 wh "G7 step 2" G72 val←i
+    +++ printG7 wh "G7 step 3" G73 val←i
+    +++ printG7 wh "G7 step 4" G74 val←i
+    +++ printG7 wh "G7 step 10" G710 val←i
+    +++ printG7 wh "G7 step 100" G7100 val←i
+    +++ printG7 wh "G7 step 200" G7200 val←i
+    +++ printG7 wh "G7 step 1000" G71000 val←i
 
-    -- +++ "\n\nContradiction degree:  step0 = "
-    -- +++ pprint w (val←i G70 (# 1) ⨂ val←i G70 (# 2))
-    -- +++ " step100 = "
-    -- +++ pprint w (val←i G7100 (# 1) ⨂ val←i G7100 (# 2))
+    +++ "\n\nContradiction degree:  step0 = "
+    +++ pprint w (val←i G70 (# 1) ⨂ val←i G70 (# 2))
+    +++ " step100 = "
+    +++ pprint w (val←i G7100 (# 1) ⨂ val←i G7100 (# 2))
 
+    +++ "\nCorrectness: "
+    +++ "step0   = " +++ pprint w (Correctness G7 G70)
+    +++ "step1   = " +++ pprint w (Correctness G7 G71)
+    +++ "step2   = " +++ pprint w (Correctness G7 G72)
+    +++ "step3   = " +++ pprint w (Correctness G7 G73)
+    +++ "step4   = " +++ pprint w (Correctness G7 G74)
+    +++ "\n             "
+    +++ "step10  = " +++ pprint w (Correctness G7 G710)
+    +++ "step100 = " +++ pprint w (Correctness G7 G7100)
+    +++ "step200 = " +++ pprint w (Correctness G7 G7200)
+    
     -- +++ printG7 17 "NEG foldConflicts" G7 ¬foldConflicts
     -- +++ printG7 17 "val+conflicts" G7 (val+conflicts G7)
     -- +++ printG7 17 "iterationVal"  G7 (iterationVal G7)
