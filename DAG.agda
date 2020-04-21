@@ -7,7 +7,8 @@ module DAG {c ℓ₁ ℓ₂} (la : LabelAlgebra c ℓ₁ ℓ₂) where
 open import Data.Bool
 open import Data.Empty using (⊥)
 open import Data.Fin as Fin
-  using (Fin; Fin′; zero; suc; #_; toℕ; _≟_) renaming (_ℕ-ℕ_ to _-_)
+  using (Fin; Fin′; zero; suc; #_; fromℕ; toℕ; inject₁; inject≤; fold′; _≟_)
+  renaming (_ℕ-ℕ_ to _-_)
 open import Data.Fin.Properties as Finₚ using (toℕ-inject₁)
 open import Data.Graph.Acyclic as Ac hiding (node) public
 open import Data.List as List using (List; []; _∷_)
@@ -26,7 +27,7 @@ open import Relation.Nullary using (yes; no)
 -- open import Debug.Trace
 -- open import Data.Nat.Show renaming (show to ℕshow)
 
-open import ArgPrelude 
+open import ArgPrelude hiding (fromℕ) 
 open import AIF
 
 MC = Maybe (Carrier la)
@@ -140,9 +141,9 @@ theSame _ _ _ = false  -- for n = 0, 1
 
 -- i, δi → i ("real" index)
 _≻_ : ∀ {n} → (i : Fin (ℕsuc n)) → Fin (n - i) → Fin (ℕsuc n)
-zero          ≻ δi = Fin.inject≤ (suc δi) (s≤s (≤-reflexive refl)) 
-(suc zero)    ≻ δi = Fin.inject≤ (suc (suc δi)) (s≤s (≤-reflexive refl))
-(suc (suc i)) ≻ δi = Fin.inject≤ (suc ((suc (suc i)) Fin.+ δi)) p3 
+zero          ≻ δi = inject≤ (suc δi) (s≤s (≤-reflexive refl)) 
+(suc zero)    ≻ δi = inject≤ (suc (suc δi)) (s≤s (≤-reflexive refl))
+(suc (suc i)) ≻ δi = inject≤ (suc ((suc (suc i)) Fin.+ δi)) p3 
 
 -- should be true, but I can't prove it
 -- lm : ∀ n i δi → theSame {n} (realIdx {n} i δi) i δi ≡ true
@@ -345,7 +346,7 @@ fold↓ : ∀ {t n}
         → Ty  -- initial
         → Ty
 fold↓ {n = ℕzero}  f init = init
-fold↓ {n = ℕsuc n} f init = fold' f init (Fin.fromℕ n)
+fold↓ {n = ℕsuc n} f init = fold' f init (fromℕ n)
   where
   fold' : ∀ {t n}
           → {Ty : Set t}
@@ -354,7 +355,7 @@ fold↓ {n = ℕsuc n} f init = fold' f init (Fin.fromℕ n)
           → Fin n
           → Ty
   fold' f init zero    = init
-  fold' f init (suc i) = f (suc i) (fold' f init (Fin.inject₁ i))
+  fold' f init (suc i) = f (suc i) (fold' f init (inject₁ i))
 
 
 {-# TERMINATING #-}    -- the termination check fails
@@ -427,7 +428,7 @@ fold↑ {n = ℕsuc n} f init = fold' f init (zero)
 --   compute' : ∀ {n k} → {k ℕ.≤ n} → AGraph n → AGraph k → AGraph k
 --   compute' _ ∅ = ∅
 --   compute' {ℕsuc n} {ℕsuc k} {p} g0 ((context (Ln nd _) sucs) & g) =
---     (context (Ln nd (val g0 (Fin.inject≤ (Fin.fromℕ (ℕsuc n ∸ ℕsuc k)) (s≤s (m∸n≤m n k))))) sucs)
+--     (context (Ln nd (val g0 (inject≤ (fromℕ (ℕsuc n ∸ ℕsuc k)) (s≤s (m∸n≤m n k))))) sucs)
 --     & compute' {ℕsuc n} {k} {≤⇒pred≤ p} g0 g
 
 
@@ -448,7 +449,7 @@ c-ed g ic = RoleIdx←i g ic conflicted
 c-ed←CA : ∀ {n} → AGraph n → (ic : Fin n) → Fin (n - suc ic) → Maybe (Fin (n - suc ic))
 c-ed←CA {ℕsuc (ℕsuc (ℕsuc n))} g ic i with c-ing g ic
 ... | nothing = nothing
-... | just δic with theSame (Fin.inject≤ i (p1 (ℕsuc (ℕsuc (ℕsuc n))) ic)) ic δic
+... | just δic with theSame (inject≤ i (p1 (ℕsuc (ℕsuc (ℕsuc n))) ic)) ic δic
 ...           | false = nothing
 ...           | true = c-ed g ic
 c-ed←CA {_} _ _ _ = nothing   -- for n = 0, 1, 2
@@ -470,7 +471,7 @@ NConflicts {ℕsuc n} g i = fold↓ f (NConflicts0 g i)
   NConflicts0 {ℕsuc n} g i with c-ed g (# 0)
   ... | nothing = []
   ... | just ied with theSame i (# 0) ied | c-ing g (# 0)
-  ...            | true | just ing = (# 0 , (Fin.inject≤ (suc ing) (s≤s (≤-reflexive refl)))) ∷ []
+  ...            | true | just ing = (# 0 , (inject≤ (suc ing) (s≤s (≤-reflexive refl)))) ∷ []
   ...            | _    | _ = []
 
 
@@ -629,26 +630,26 @@ valδ g0 g i = _⟪ delta la ⟫_
 
 -- среднее от i до zero --- из Fin(n+1) --- max i = # n
 Mean′ : ∀ {a n} → (A : Set a) → Fin (ℕsuc n) → Set a
-Mean′ {n = n} A i = Mean A (Fin.toℕ (suc i))
+Mean′ {n = n} A i = Mean A (toℕ (suc i))
   
 ⟪meanv⟫ : ∀ {n i} → Mean′ {n = n} MC i → MC
 ⟪meanv⟫ {_}      {zero}  (mn1 a) = a
 ⟪meanv⟫ {ℕsuc n} {suc i} (mn+ nothing acc) = ⟪meanv⟫ acc
-⟪meanv⟫ {ℕsuc n} {suc i} (mn+ a acc) = ⟪mean⟫ a (⟪meanv⟫ acc) (Fin.toℕ i)
+⟪meanv⟫ {ℕsuc n} {suc i} (mn+ a acc) = ⟪mean⟫ a (⟪meanv⟫ acc) (toℕ i)
 
 -- ⟪mean′⟫ : ∀ {n} {i : Fin n} → MC → Mean′ MC (Fin.inject₁ i) → Mean′ MC (suc i)
 -- ⟪mean′⟫ {_}      {zero} a (mn1 acc) = mn+ a (mn1 acc)  
 -- ⟪mean′⟫ {ℕsuc n} {suc i} a (mn+ a2 acc) = mn+ a (mn+ a2 (convert i acc))  
 
 Correctness : ∀ {n} → AGraph n → AGraph n → MC
-Correctness {ℕzero} _ _   = MC⊥
-Correctness {ℕsuc n} g0 g = ⟪meanv⟫ {n} ((Fin.fold′ {n} Ty f (mn1 ((valδ g0 g (# 0))))) (Fin.fromℕ n))
+Correctness {ℕzero} _ _   = nothing
+Correctness {ℕsuc n} g0 g = ⟪meanv⟫ {n} ((Fin.fold′ {n} Ty f (mn1 ((valδ g0 g (# 0))))) (fromℕ n))
   where
   Ty : Fin (ℕsuc n) → Set c
   Ty i = Mean′ {n = n} MC i
   
-  f : ∀ i → Mean′ {n = n} MC (Fin.inject₁ i) → Mean′ {n = n} MC (suc i) 
-  f i acc rewrite toℕ-inject₁ i = mn+ (valδ g0 g (Fin.inject₁ i)) acc 
+  f : ∀ i → Mean′ {n = n} MC (inject₁ i) → Mean′ {n = n} MC (suc i) 
+  f i acc rewrite toℕ-inject₁ i = mn+ (valδ g0 g (inject₁ i)) acc 
 
 
 
@@ -664,8 +665,8 @@ private
   step' {ℕsuc n} g0 gprev g = foldr (λ k → AGraph k) f ∅ g
     where
     newval : ℕ → MC
-    newval k = valTree3←i g0 gprev g (Fin.inject≤ (Fin.fromℕ (n ∸ k)) (s≤s (m∸n≤m n k)))
-               ⨂ ¬foldConflicts gprev (Fin.inject≤ (Fin.fromℕ (n ∸ k)) (s≤s (m∸n≤m n k)))
+    newval k = valTree3←i g0 gprev g (inject≤ (fromℕ (n ∸ k)) (s≤s (m∸n≤m n k)))
+               ⨂ ¬foldConflicts gprev (inject≤ (fromℕ (n ∸ k)) (s≤s (m∸n≤m n k)))
 
     f : ∀ {k} → AContext k → AGraph k → AGraph (ℕsuc k)
     f {k} (context (Ln nd v) sucs) g = context (Ln nd (newval k)) sucs & g
