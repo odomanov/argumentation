@@ -51,6 +51,10 @@ CC→A : ALNode
 CC→A = Ln (Lnc record {Conflicting = conflicting; Conflicted = conflicted})
           (just (V 1.0 {refl} {refl}))
 
+CA→C : ALNode
+CA→C = Ln (Lnc record {Conflicting = conflicting; Conflicted = conflicted})
+          (just (V 1.0 {refl} {refl}))
+
 
 
 G : AGraph _
@@ -98,6 +102,20 @@ G100 = steps 100 G
 G200 = steps 200 G
 
 
+G' : AGraph _
+G' = context CA→C ((conflicted , # 3) ∷ (conflicting , # 5) ∷ []) & G
+
+G'0 = steps 0 G'
+G'1 = steps 1 G'
+G'2 = steps 2 G'
+G'3 = steps 3 G'
+G'4 = steps 4 G'
+G'5 = steps 5 G'
+G'6 = steps 6 G'
+G'7 = steps 7 G'
+G'10 = steps 10 G'
+G'100 = steps 100 G'
+G'200 = steps 200 G'
 
 
 
@@ -116,6 +134,11 @@ printABC n s g f = "\n" +++ (spaces (0 ⊔ (n ∸ S.length s))) +++ s +++ ": "
            +++ " A = " +++ pprint w (f g (# 5))
            +++ " B = " +++ pprint w (f g (# 4))
            +++ " C = " +++ pprint w (f g (# 3))
+printABC' : ℕ → String → AGraph 7 → (AGraph 7 → Fin 7 → MC) → String
+printABC' n s g f = "\n" +++ (spaces (0 ⊔ (n ∸ S.length s))) +++ s +++ ": "
+           +++ " A = " +++ pprint w (f g (# 6))
+           +++ " B = " +++ pprint w (f g (# 5))
+           +++ " C = " +++ pprint w (f g (# 4))
 
 main = run (putStrLn stringToPrint)
   where
@@ -161,3 +184,46 @@ main = run (putStrLn stringToPrint)
     -- +++ printABC 17 "iterationVal:G5"   G5 (iterationVal G0)
 
     -- +++ (pprint 110 G)
+
+
+    +++ "\n\n~~ with 1 more conflict ~~~~~"
+    +++ printABC' wh "step 0" G'0 val←i
+    +++ printABC' wh "step 1" G'1 val←i
+    +++ printABC' wh "step 2" G'2 val←i
+    +++ printABC' wh "step 3" G'3 val←i
+    +++ printABC' wh "step 4" G'4 val←i
+    +++ printABC' wh "step 5" G'5 val←i
+    +++ printABC' wh "step 6" G'6 val←i
+    +++ printABC' wh "step 7" G'7 val←i
+    +++ printABC' wh "step 10" G'10 val←i
+    +++ printABC' wh "step 100" G'100 val←i
+    +++ printABC' wh "step 200" G'200 val←i
+
+    +++ "\n\nContradiction degree:  step0 = "
+    +++ pprint w ((val←i G'0 (# 4) ⨂ val←i G'0 (# 5))
+      ⨁ (val←i G'0 (# 5) ⨂ val←i G'0 (# 6))
+      ⨁ (val←i G'0 (# 6) ⨂ val←i G'0 (# 4))
+      ⨁ (val←i G'0 (# 4) ⨂ val←i G'0 (# 6)))
+    +++ " step200 = "
+    +++ pprint w ((val←i G'200 (# 4) ⨂ val←i G'200 (# 4))
+      ⨁ (val←i G'200 (# 5) ⨂ val←i G'200 (# 6))
+      ⨁ (val←i G'200 (# 6) ⨂ val←i G'200 (# 4))
+      ⨁ (val←i G'200 (# 4) ⨂ val←i G'200 (# 6)))
+
+    +++ "\nCorrectness: "
+    +++ "  step0 = " +++ pprint w (Correctness G' G'0)
+    +++ "  step1 = " +++ pprint w (Correctness G' G'1)
+    +++ "  step2 = " +++ pprint w (Correctness G' G'2)
+    +++ "  step3 = " +++ pprint w (Correctness G' G'3)
+    +++ "\n             "
+    +++ " step10 = " +++ pprint w (Correctness G' G'10)
+    +++ "step100 = " +++ pprint w (Correctness G' G'100)
+    +++ "step200 = " +++ pprint w (Correctness G' G'200)
+    
+    -- +++ printABC' 17 "foldConflicts:G' "  G' foldConflicts
+    -- +++ printABC' 17 "foldConflicts:G'5"  G'5 foldConflicts
+    -- +++ printABC' 17 "-foldConflicts:G'5" G'5 ¬foldConflicts
+    -- +++ printABC' 17 "val+conflicts:G'5"  G'5 (val+conflicts G'0)
+    -- +++ printABC' 17 "iterationVal:G'5"   G'5 (iterationVal G'0)
+
+    -- +++ (pprint 110 G')
