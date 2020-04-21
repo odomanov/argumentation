@@ -643,14 +643,13 @@ Mean′ {n = n} A i = Mean A (toℕ (suc i))
 
 Correctness : ∀ {n} → AGraph n → AGraph n → MC
 Correctness {ℕzero} _ _   = nothing
-Correctness {ℕsuc n} g0 g = ⟪meanv⟫ {n}
-                            $ fold′ {n} Ty f (mn1 (valδ g0 g (# 0))) $ fromℕ n
+Correctness {ℕsuc n} g0 g = ⟪meanv⟫ $ fold′ Ty f (mn1 (valδ g0 g (# 0))) $ suc (fromℕ n)
   where
-  Ty : Fin (ℕsuc n) → Set c
-  Ty i = Mean′ {n = n} MC i
+  Ty : Fin (ℕsuc (ℕsuc n)) → Set c
+  Ty i = Mean′ MC i
   
-  f : ∀ i → Mean′ {n = n} MC (inject₁ i) → Mean′ {n = n} MC (suc i) 
-  f i acc rewrite toℕ-inject₁ i = mn+ (valδ g0 g (inject₁ i)) acc 
+  f : ∀ i → Mean′ MC (inject₁ i) → Mean′ MC (suc i) 
+  f i acc rewrite toℕ-inject₁ i = mn+ (valδ g0 g i) acc 
 
 
 
