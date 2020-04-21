@@ -17,9 +17,9 @@ open import AIF
 open import LabelAlgebras
 open import ArgSchemes
 
-la = Pref
+-- la = Pref
 -- la = Łuk
--- la = Product
+la = Product
 import DAG; module DAGla = DAG la; open DAGla
 
 T1 = mkFrag "St1"
@@ -93,6 +93,7 @@ G4 = steps 4 G
 G5 = steps 5 G
 G6 = steps 6 G
 G7 = steps 7 G
+G10 = steps 10 G
 G100 = steps 100 G
 G200 = steps 200 G
 
@@ -130,6 +131,7 @@ main = run (putStrLn stringToPrint)
     +++ printABC wh "step 5" G5 val←i
     +++ printABC wh "step 6" G6 val←i
     +++ printABC wh "step 7" G7 val←i
+    +++ printABC wh "step 10" G10 val←i
     +++ printABC wh "step 100" G100 val←i
     +++ printABC wh "step 200" G200 val←i
 
@@ -142,6 +144,16 @@ main = run (putStrLn stringToPrint)
       ⨁ (val←i G200 (# 4) ⨂ val←i G200 (# 5))
       ⨁ (val←i G200 (# 5) ⨂ val←i G200 (# 3)))
 
+    +++ "\nCorrectness: "
+    +++ "  step0 = " +++ pprint w (Correctness G G0)
+    +++ "  step1 = " +++ pprint w (Correctness G G1)
+    +++ "  step2 = " +++ pprint w (Correctness G G2)
+    +++ "  step3 = " +++ pprint w (Correctness G G3)
+    +++ "\n             "
+    +++ " step10 = " +++ pprint w (Correctness G G10)
+    +++ "step100 = " +++ pprint w (Correctness G G100)
+    +++ "step200 = " +++ pprint w (Correctness G G200)
+    
     -- +++ printABC 17 "foldConflicts:G "  G foldConflicts
     -- +++ printABC 17 "foldConflicts:G5"  G5 foldConflicts
     -- +++ printABC 17 "-foldConflicts:G5" G5 ¬foldConflicts
