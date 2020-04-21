@@ -81,8 +81,8 @@ just x  ⨁ just y  = just (_⊕_ la x y)
 
 ⟪mean⟫ : MC → MC → ℕ → MC
 ⟪mean⟫ nothing   nothing  _ = nothing
-⟪mean⟫ nothing  (just va) _ = just va
-⟪mean⟫ (just v)  nothing  _ = just v
+⟪mean⟫ nothing  (just va) _ = nothing
+⟪mean⟫ (just v)  nothing  _ = nothing
 ⟪mean⟫ (just v) (just va) n = just (mean la v va n)
 
 ⟪delta⟫ = _⟪ delta la ⟫_
@@ -629,7 +629,13 @@ valTree3←i g0 gprev g i = valTree3 (zipTree3 (toTree g0 i) (toTree gprev i) (t
 
 -- difference for i
 valδ : ∀ {n} → AGraph n → AGraph n → Fin n → MC
-valδ g0 g i = ⟪delta⟫ (val←i g i) (valTree3←i g0 g0 g i ⨂ ¬foldConflicts g i)
+valδ g0 g i = ⟪delta⟫ (val←i g i) $ valTree3←i g0 g0 g i ⨂ ⟪not⟫ (foldConflicts' g i)
+  where
+  foldConflicts' : ∀ {n} → AGraph n → Fin n → MC
+  foldConflicts' {n} g i = List.foldr f MC⊥ (NConflicts g i)
+    where
+    f : Fin n × Fin n → MC → MC
+    f (i1 , i2) v = v ⟪ _⊕_ la ⟫ (val←i g i1 ⨂ val←i g i2)
 
 -- среднее от i до zero --- из Fin(n+1) --- max i = # n
 Mean′ : ∀ {a n} → (A : Set a) → Fin (ℕsuc n) → Set a
@@ -637,8 +643,8 @@ Mean′ {n = n} A i = Mean A (toℕ (suc i))
   
 ⟪meanv⟫ : ∀ {n i} → Mean′ {n = n} MC i → MC
 ⟪meanv⟫ {_}      {zero}  (mn1 a) = a
-⟪meanv⟫ {ℕsuc n} {suc i} (mn+ nothing acc) = ⟪meanv⟫ acc
-⟪meanv⟫ {ℕsuc n} {suc i} (mn+ a acc) = ⟪mean⟫ a (⟪meanv⟫ acc) (toℕ i)
+⟪meanv⟫ {ℕsuc n} {suc i} (mn+ nothing  acc) = nothing -- ⟪meanv⟫ acc
+⟪meanv⟫ {ℕsuc n} {suc i} (mn+ (just a) acc) = ⟪mean⟫ (just a) (⟪meanv⟫ acc) (toℕ i)
 
 
 Correctness : ∀ {n} → AGraph n → AGraph n → MC
