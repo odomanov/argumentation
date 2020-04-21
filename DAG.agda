@@ -58,7 +58,7 @@ infixr 10 ⟪_⟫_
 
 ⟪_⟫_ : ((Carrier la) → (Carrier la)) → MC → MC
 ⟪ op ⟫ (just v) = just (op v)
-⟪ _ ⟫ _ = nothing
+⟪ _ ⟫  nothing  = nothing
 
 infixl 10 _⨂_ _⨁_
 
@@ -71,6 +71,8 @@ just x  ⨁ nothing = just x
 nothing ⨁ nothing = nothing 
 just x  ⨁ just y  = just (_⊕_ la x y)  
 
+⟪not⟫ = ⟪ ⊘ la ⟫_
+
 ⟨_,_⟩ : MC → MC → MC
 ⟨ x , y ⟩ = x ⟪ op ⟫ y
   where
@@ -82,6 +84,8 @@ just x  ⨁ just y  = just (_⊕_ la x y)
 ⟪mean⟫ nothing  (just va) _ = just va
 ⟪mean⟫ (just v)  nothing  _ = just v
 ⟪mean⟫ (just v) (just va) n = just (mean la v va n)
+
+⟪delta⟫ = _⟪ delta la ⟫_
 
 -- δi-th graph relative to i  
 _[_≻_] : ∀ {n} → AGraph (ℕsuc n)
@@ -624,9 +628,7 @@ valTree2←i g0 g i = valTree2 (zipTree2 (toTree g0 i) (toTree g i))
 
 -- difference for i
 valδ : ∀ {n} → AGraph n → AGraph n → Fin n → MC
-valδ g0 g i = _⟪ delta la ⟫_
-              (val←i g i)
-              (valTree2←i g0 g i ⨂ ¬foldConflicts g i)
+valδ g0 g i = ⟪delta⟫ (val←i g i) (valTree3←i g0 g0 g i ⨂ ¬foldConflicts g i)
 
 -- среднее от i до zero --- из Fin(n+1) --- max i = # n
 Mean′ : ∀ {a n} → (A : Set a) → Fin (ℕsuc n) → Set a
