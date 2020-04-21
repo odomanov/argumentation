@@ -636,15 +636,9 @@ Mean′ {n = n} A i = Mean A (Fin.toℕ (suc i))
 ⟪meanv⟫ {ℕsuc n} {suc i} (mn+ nothing acc) = ⟪meanv⟫ acc
 ⟪meanv⟫ {ℕsuc n} {suc i} (mn+ a acc) = ⟪mean⟫ a (⟪meanv⟫ acc) (Fin.toℕ i)
 
-eqq : ∀ {n} (i : Fin n) → Fin.toℕ (Fin.inject₁ i) ≡ Fin.toℕ i
-eqq i = toℕ-inject₁ i 
-
-convert : ∀ {n} (i : Fin n) → Mean MC (ℕsuc (Fin.toℕ (Fin.inject₁ i))) → Mean MC (ℕsuc (Fin.toℕ i))
-convert i acc rewrite eqq i = acc
-
-⟪mean′⟫ : ∀ {n} {i : Fin n} → MC → Mean′ {n = n} MC (Fin.inject₁ i) → Mean′ {n = n} MC (suc i)
-⟪mean′⟫ {_}      {zero} a (mn1 acc) = mn+ a (mn1 acc)  
-⟪mean′⟫ {ℕsuc n} {suc i} a (mn+ a2 acc) = mn+ a (mn+ a2 (convert i acc))  
+-- ⟪mean′⟫ : ∀ {n} {i : Fin n} → MC → Mean′ MC (Fin.inject₁ i) → Mean′ MC (suc i)
+-- ⟪mean′⟫ {_}      {zero} a (mn1 acc) = mn+ a (mn1 acc)  
+-- ⟪mean′⟫ {ℕsuc n} {suc i} a (mn+ a2 acc) = mn+ a (mn+ a2 (convert i acc))  
 
 Correctness : ∀ {n} → AGraph n → AGraph n → MC
 Correctness {ℕzero} _ _   = MC⊥
@@ -654,7 +648,7 @@ Correctness {ℕsuc n} g0 g = ⟪meanv⟫ ((Fin.fold′ {n} Ty f (mn1 ((valδ g0
   Ty i = Mean′ {n = n} MC i
   
   f : ∀ i → Mean′ {n = n} MC (Fin.inject₁ i) → Mean′ {n = n} MC (suc i) 
-  f i acc = mn+ (valδ g0 g (Fin.inject₁ i)) (convert i acc)
+  f i acc rewrite toℕ-inject₁ i = mn+ (valδ g0 g (Fin.inject₁ i)) acc 
 
 
 
