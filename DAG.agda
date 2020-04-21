@@ -624,7 +624,7 @@ valTree2←i g0 g i = valTree2 (zipTree2 (toTree g0 i) (toTree g i))
 -- difference for i
 valδ : ∀ {n} → AGraph n → AGraph n → Fin n → MC
 valδ g0 g i = _⟪ delta la ⟫_
-              (val←i g i )
+              (val←i g i)
               (valTree2←i g0 g i ⨂ ¬foldConflicts g i)
 
 -- среднее от i до zero --- из Fin(n+1) --- max i = # n
@@ -642,7 +642,7 @@ Mean′ {n = n} A i = Mean A (Fin.toℕ (suc i))
 
 Correctness : ∀ {n} → AGraph n → AGraph n → MC
 Correctness {ℕzero} _ _   = MC⊥
-Correctness {ℕsuc n} g0 g = ⟪meanv⟫ ((Fin.fold′ {n} Ty f (mn1 ((valδ g0 g (# 0))))) (Fin.fromℕ n))
+Correctness {ℕsuc n} g0 g = ⟪meanv⟫ {n} ((Fin.fold′ {n} Ty f (mn1 ((valδ g0 g (# 0))))) (Fin.fromℕ n))
   where
   Ty : Fin (ℕsuc n) → Set c
   Ty i = Mean′ {n = n} MC i
