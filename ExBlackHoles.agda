@@ -193,36 +193,37 @@ G =
        [] &
      ∅
 
-_ : NArgs G (# 3) ≡ (record { Scheme = A-от-корреляции-к-причине
-                           ; NPremises = just (Ln S2 _) ∷v just (Ln S3 _) ∷v []v
-                           ; NConclusion = just (Ln S4 _)
-                           } , _) ∷ []
-_ = refl
+-- _ : NArgs G (# 3) ≡ (record { Scheme = A-от-корреляции-к-причине
+--                            ; NPremises = just (Ln S2 _) ∷v just (Ln S3 _) ∷v []v
+--                            ; NConclusion = just (Ln S4 _)
+--                            } , _) ∷ []
+-- _ = refl
 
-_ : Arg G (# 3) (# 0) ≡ just (record
-        { Scheme = A-от-корреляции-к-причине
-        ; NPremises = just (Ln S2 (just (V 0.63))) ∷v just (Ln S3 (just (V 0.9))) ∷v []v
-        ; NConclusion = just (Ln S4 nothing)
-        } , just (V 0.8))
-_ = refl
+-- _ : Arg G (# 3) (# 0) ≡ just (record
+--         { Scheme = A-от-корреляции-к-причине
+--         ; NPremises = just (Ln S2 (just (V _))) ∷v just (Ln S3 (just (V 0.9))) ∷v []v
+--         ; NConclusion = just (Ln S4 nothing)
+--         } , just (V 0.8))
+-- _ = refl
+
+
 
 G0 = steps 0 G
 
+_ : G ≡ G0
+_ = refl
+
 G1 = steps 1 G
-
 G2 = steps 2 G
-
 G3 = steps 3 G
-
 G4 = steps 4 G
-
 G5 = steps 5 G
-
 G10 = steps 10 G
-
 G100 = steps 100 G
-
 G200 = steps 200 G
+
+-- _ : G100 ≡ G200
+-- _ = refl
 
 
 
@@ -255,19 +256,6 @@ printG g f = "\n  S1 = " +++ pprint w (f g (# 16))
           +++ " C2 = "  +++ pprint w (f g (# 1))
           +++ " C2' = "  +++ pprint w (f g (# 2))
 
--- -- without C1
--- printG : AGraph 16 → (∀ {n} → AGraph n → Fin n → MC) → String
--- printG g f = "\n  S1 = " +++ pprint w (f g (# 15))
---           +++ " S2 = "  +++ pprint w (f g (# 13))
---           +++ " S3 = "  +++ pprint w (f g (# 4))
---           +++ " S4 = "  +++ pprint w (f g (# 2))
---           +++ " S5 = "  +++ pprint w (f g (# 12))
---           +++ "\n  S6 = "  +++ pprint w (f g (# 7))
---           +++ " S7 = "  +++ pprint w (f g (# 10))
---           +++ " S8 = "  +++ pprint w (f g (# 5))
---           +++ " S9 = "  +++ pprint w (f g (# 8))
---           +++ " A2 = "  +++ pprint w (f g (# 3))
-
 main = run (putStrLn stringToPrint)
   where
   wh = 12
@@ -290,8 +278,8 @@ main = run (putStrLn stringToPrint)
     +++ printG G3 val←i
     +++ ppretty ws (docSection ws "step 4")
     +++ printG G4 val←i
-    +++ ppretty ws (docSection ws "step 5")
-    +++ printG G5 val←i
+    -- +++ ppretty ws (docSection ws "step 5")
+    -- +++ printG G5 val←i
     +++ ppretty ws (docSection ws "step 10")
     +++ printG G10 val←i
     +++ ppretty ws (docSection ws "step 100")
@@ -307,5 +295,15 @@ main = run (putStrLn stringToPrint)
     +++ pprint w ((val←i G10 (# 3) ⨂ val←i G10 (# 9)) ⨁ (val←i G10 (# 4) ⨂ val←i G10 (# 6)))
     +++ " step200 = "
     +++ pprint w ((val←i G200 (# 3) ⨂ val←i G200 (# 9)) ⨁ (val←i G200 (# 4) ⨂ val←i G200 (# 6)))
+    
+    +++ "\nCorrectness: "
+    +++ "  step0 = " +++ pprint w (Correctness G G0)
+    +++ "  step1 = " +++ pprint w (Correctness G G1)
+    +++ "  step2 = " +++ pprint w (Correctness G G2)
+    +++ "  step3 = " +++ pprint w (Correctness G G3)
+    +++ "\n             "
+    +++ " step10 = " +++ pprint w (Correctness G G10)
+    +++ "step100 = " +++ pprint w (Correctness G G100)
+    +++ "step200 = " +++ pprint w (Correctness G G200)
     
     -- +++ (pprint 110 G)
