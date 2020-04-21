@@ -97,7 +97,11 @@ G2 =
      ∅
 
 
-G20 = steps 0 G2 
+G20 = steps 0 G2
+
+_ : G2 ≡ G20
+_ = refl
+
 G21 = steps 1 G2
 G22 = steps 2 G2
 G23 = steps 3 G2
@@ -105,6 +109,9 @@ G24 = steps 4 G2
 G210 = steps 10 G2
 G2100 = steps 100 G2
 G2200 = steps 200 G2
+
+_ : G2100 ≡ G2200
+_ = refl
 
 
 
@@ -135,6 +142,12 @@ G71000 = steps 1000 G7
 
 
 
+
+-- _ : (⟪mean⟫ (just (mkFUnit 0.5 _ _)) (just (mkFUnit 0.5 _ _) , 0)) ≡ ((just (mkFUnit 0.0 _ _)) , 1)
+-- _ = refl
+
+-- _ : (⟪mean⟫ (just (mkFUnit 0.5 _ _)) (just (mkFUnit 0.5 _ _) , 1)) ≡ ((just (mkFUnit 0.5 _ _)) , 2)
+-- _ = refl
 
 
 
@@ -169,15 +182,15 @@ main = run (putStrLn stringToPrint)
   where
   wh = 13
   stringToPrint = ""
-    +++ "\n~~ Contradiction degree ~~~~~"
-    -- +++ printG1 wh "G1 original" G1 val←i
-    -- +++ printG1 wh "G1 w/o conflicts" G1 (val G1)
-    +++ printG1 wh "G1 step 0  " G10 val←i
-    +++ printG1 wh "G1 step 1  " G11 val←i
-    -- +++ printG1 wh "G1 step 2  " G12 val←i
-    -- +++ printG1 wh "G1 step 3  " G13 val←i
-    -- +++ printG1 wh "G1 step 4  " G14 val←i
-    -- +++ printG1 wh "G1 step 100" G1100 val←i
+    -- +++ "\n~~ Contradiction degree ~~~~~"
+    -- -- +++ printG1 wh "G1 original" G1 val←i
+    -- -- +++ printG1 wh "G1 w/o conflicts" G1 (val G1)
+    -- +++ printG1 wh "G1 step 0  " G10 val←i
+    -- +++ printG1 wh "G1 step 1  " G11 val←i
+    -- -- +++ printG1 wh "G1 step 2  " G12 val←i
+    -- -- +++ printG1 wh "G1 step 3  " G13 val←i
+    -- -- +++ printG1 wh "G1 step 4  " G14 val←i
+    -- -- +++ printG1 wh "G1 step 100" G1100 val←i
 
     +++ "\n\n~~ Single conflict ~~~~~"
     -- +++ printG2 wh "G2 original" G2 val←i
@@ -196,22 +209,32 @@ main = run (putStrLn stringToPrint)
     +++ " step100 = "
     +++ pprint w (val←i G2100 (# 1) ⨂ val←i G2100 (# 2))
 
-    +++ "\n\n~~ 2 opposite conflicts ~~~~~" 
-    -- +++ printG7 wh "G7 original" G7 val←i
-    -- +++ printG7 wh "G7 w/o conflicts" G7 val
-    +++ printG7 wh "G7 step 0" G70 val←i
-    +++ printG7 wh "G7 step 1" G71 val←i
-    +++ printG7 wh "G7 step 2" G72 val←i
-    +++ printG7 wh "G7 step 3" G73 val←i
-    +++ printG7 wh "G7 step 4" G74 val←i
-    +++ printG7 wh "G7 step 100" G7100 val←i
-    +++ printG7 wh "G7 step 200" G7200 val←i
-    +++ printG7 wh "G7 step 1000" G71000 val←i
+    +++ "\nCorrectness: "
+    +++ "step0   = " +++ pprint w (Correctness G2 G20)
+    +++ "step1   = " +++ pprint w (Correctness G2 G21)
+    +++ "step2   = " +++ pprint w (Correctness G2 G22)
+    +++ "step3   = " +++ pprint w (Correctness G2 G23)
+    +++ "\n             "
+    +++ "step10  = " +++ pprint w (Correctness G2 G210)
+    +++ "step100 = " +++ pprint w (Correctness G2 G2100)
+    +++ "step200 = " +++ pprint w (Correctness G2 G2200)
+    
+    -- +++ "\n\n~~ 2 opposite conflicts ~~~~~" 
+    -- -- +++ printG7 wh "G7 original" G7 val←i
+    -- -- +++ printG7 wh "G7 w/o conflicts" G7 val
+    -- +++ printG7 wh "G7 step 0" G70 val←i
+    -- +++ printG7 wh "G7 step 1" G71 val←i
+    -- +++ printG7 wh "G7 step 2" G72 val←i
+    -- +++ printG7 wh "G7 step 3" G73 val←i
+    -- +++ printG7 wh "G7 step 4" G74 val←i
+    -- +++ printG7 wh "G7 step 100" G7100 val←i
+    -- +++ printG7 wh "G7 step 200" G7200 val←i
+    -- +++ printG7 wh "G7 step 1000" G71000 val←i
 
-    +++ "\n\nContradiction degree:  step0 = "
-    +++ pprint w (val←i G70 (# 1) ⨂ val←i G70 (# 2))
-    +++ " step100 = "
-    +++ pprint w (val←i G7100 (# 1) ⨂ val←i G7100 (# 2))
+    -- +++ "\n\nContradiction degree:  step0 = "
+    -- +++ pprint w (val←i G70 (# 1) ⨂ val←i G70 (# 2))
+    -- +++ " step100 = "
+    -- +++ pprint w (val←i G7100 (# 1) ⨂ val←i G7100 (# 2))
 
     -- +++ printG7 17 "NEG foldConflicts" G7 ¬foldConflicts
     -- +++ printG7 17 "val+conflicts" G7 (val+conflicts G7)
