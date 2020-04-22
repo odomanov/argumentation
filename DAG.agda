@@ -43,7 +43,6 @@ ALNode2  = LNode (MC × MC)
 ATree2   = Ac.Tree ALNode2 Role 
 ALNode3  = LNode (MC × MC × MC)  
 ATree3   = Ac.Tree ALNode3 Role 
--- AArg     = Argument {la = la}    -- argument
 
 Sucs : ℕ → Set
 Sucs n = List (Role × Fin n)
@@ -244,54 +243,6 @@ isAttack g i δi with Role←i g i δi
 
 
 
--- declarations to be defined later
-
--- NArgs : ∀ {n} → AGraph (ℕsuc n) → (i : Fin (ℕsuc n)) → List (AArg × MC)
--- val   : ∀ {n} → AGraph n → (i : Fin n) → MC
-
-
-
--- ALNode of the i-th context -- recursively computed
--- ALNodev←i : ∀ {n} → AGraph n → Fin n → ALNode
--- ALNodev←i {ℕzero} g i = label (g ! i)
--- ALNodev←i {ℕsuc n} g i with NArgs g i 
--- ... | [] = label (g ! i)
--- ... | _  = label (replaceVal (g ! i) (val g i))
-
--- ALNodev←δi : ∀ {n} → AGraph (ℕsuc n) → (i : Fin (ℕsuc n)) → Fin (n - i) → ALNode
--- ALNodev←δi g i δi = ALNodev←i g (i ≻ δi)
-
--- -- argument for δi-th of the i-th context, if exists
--- Arg : ∀ {n} → AGraph (ℕsuc n) → (i : Fin (ℕsuc n)) → (δi : Fin (n - i)) → Maybe (AArg × MC)
--- Arg {n} g i δi with ALNode←i g (i ≻ δi)
--- ... | Ln (Lnr s) v = just (mkArg s (premises s) (just (ALNode←i g i)) , v)
---   where
---   extr : Role → Sucs (n - i - suc δi) → Maybe ALNode
---   extr r [] = nothing
---   extr r ((r1 , δδi) ∷ xs) with r =ᵇ r1
---   ... | true  = just (ALNodev←i (g [ i ]) ((suc δi) ≻ δδi))
---   ... | false = extr r xs
-
---   premises' : ∀ {m} → Vec Role m → Vec (Maybe ALNode) m
---   premises' []v = []v
---   premises' (r ∷v rs) = extr r (sucs←δi g i δi) ∷v premises' rs
-
---   premises : (s : RA-Scheme) → Vec (Maybe ALNode) (RA-Scheme.ℕprem s)
---   premises (mkRA p c) = premises' p
--- ... | _ = nothing
-
-
--- the list of arguments (RA-nodes) of the i-th context
--- NArgs {ℕzero} _ _ = []
--- NArgs {n} g i = nargs (sucs←i g i)
---   where
---   -- list of RA-nodes from sucs
---   nargs : Sucs (n - i) → List (AArg × MC)
---   nargs [] = []
---   nargs (x ∷ xs) with Arg g i (proj₂ x)
---   ... | nothing  = nargs xs
---   ... | just arg = arg ∷ nargs xs
-
 -- the list of supports (supporting RA-nodes) of the i-th context
 NArgs+ : ∀ {n} → AGraph n → (i : Fin n) → Sucs (n - suc i)
 NArgs+ {n} g i = filterb (λ s → isSupport g i (proj₂ s)) (sucs←i g i)
@@ -383,58 +334,6 @@ fold↑ {n = ℕsuc n} f init = fold' f init (zero)
   ... | no  _ = f i (fold' f init (Fin.reduce≥ (suc i) (s≤s z≤n)))
 
 
---  calculating algebra values  --------------------------------------------
-
--- Deduction: from premises to conclusion
-
--- valRA : AArg → MC
--- valRA (mkArg _ prems concl) = valRA' prems concl
---   where
---   valRA' : ∀ {n} → Vec (Maybe ALNode) n → Maybe ALNode → MC
---   valRA' []v (just (Ln _ (just v))) = just v   -- ok
---   valRA' []v (just (Ln _ nothing))  = MC⊤      -- missed conclusion value
---   valRA' []v nothing                = nothing  -- missed conclusion itself
---   valRA' (nothing  ∷v _) _          = nothing  -- missed premise
---   valRA' ((just x) ∷v xs) c = LNode.value x ⨂ valRA' xs c
-
-
--- private
---   op : MC → MC → MC
---   op (just v1) (just v2) = just ((_⊕_ la) v1 v2)
---   op (just v1) nothing   = just v1
---   op nothing   (just v2) = just v2
---   op nothing   nothing   = nothing
-  
---   valargs : List (AArg × MC) → MC
---   valargs [] = MC⊥   -- impossible case, actually
---   valargs (x ∷ []) with valRA (proj₁ x)
---   ... | nothing = nothing
---   ... | just v  = (proj₂ x) ⨂ just v
---   valargs (x ∷ xs) with valRA (proj₁ x)
---   ... | nothing = valargs xs
---   ... | just v  = op ((proj₂ x) ⨂ just v) (valargs xs)
-
--- -- the value of the i-th node computed recursively
-
--- val {ℕzero} _ _ = nothing
--- val {ℕsuc n} g i with NArgs g i | val←i g i
--- ... | []   | v       = v  
--- ... | args | nothing = valargs args 
--- ... | args | v       = v ⨁ valargs args 
-
-
-
--- -- computing the values of the whole graph (recursively)
-
--- compute : ∀ {n} → AGraph n → AGraph n
--- compute {n} g = compute' {n} {_} {≤-reflexive refl} g g
---   where
---   compute' : ∀ {n k} → {k ℕ.≤ n} → AGraph n → AGraph k → AGraph k
---   compute' _ ∅ = ∅
---   compute' {ℕsuc n} {ℕsuc k} {p} g0 ((context (Ln nd _) sucs) & g) =
---     (context (Ln nd (val g0 (inject≤ (fromℕ (ℕsuc n ∸ ℕsuc k)) (s≤s (m∸n≤m n k))))) sucs)
---     & compute' {ℕsuc n} {k} {≤⇒pred≤ p} g0 g
-
 
 
 --   Conflicts  --------------------------------------------
@@ -501,46 +400,6 @@ foldConflicts {n} g i = List.foldr f MC⊥ (NConflicts g i)
 ¬foldConflicts : ∀ {n} → AGraph n → Fin n → MC
 ¬foldConflicts {n} g i = ⟪ ⊘ la ⟫ foldConflicts g i
 
--- value corrected by conflicts
--- val+conflicts : ∀ {n} → AGraph n → AGraph n → Fin n → MC
--- val+conflicts {n} g0 g i = val←i g i ⨂ ¬foldConflicts g i
-
--- iteration steps
-
--- the value of the next iteration
--- iterationVal : ∀ {n} → AGraph n → AGraph n → Fin n → MC
--- iterationVal g0 gin i = ⟨ val←i gin i , val+conflicts g0 gin i ⟩
-
-
-------------------------------------------------------------------------
--- valTree  : ATree → MC
--- valTrees : List (Role × ATree) → MC
-
--- deduction
--- foldPremises : MC → List (Role × ATree) → MC
--- foldPremises vconcl prems = List.foldr f vconcl prems
---   where
---   f : (Role × ATree) → MC → MC
---   f (_ , t) v = valTree t ⨂ v
-
--- -- fold incoming
--- foldIns : MC → List (Role × ATree) → MC
--- foldIns v0 [] = v0
--- foldIns v0 ((_ , (Ac.node (Ln (Lnr _) vconcl) prems)) ∷ rts) = (foldPremises vconcl prems) ⨁ (foldIns v0 rts)
--- foldIns _ _ = MC⊥   --  !!!  TODO
-
--- {-# TERMINATING #-}
--- valTree (Ac.node (Ln _ v) []) = v 
--- valTree (Ac.node (Ln (Lnc _) _) ((role "conflicting" , (Ac.node (Ln (Lnr _) _) _)) ∷ rts)) = valTrees rts
--- valTree (Ac.node (Ln (Lnc _) _) ((role "conflicted"  , (Ac.node (Ln (Lnr _) _) _)) ∷ rts)) = valTrees rts
--- valTree (Ac.node (Ln _ _) ((_ , (Ac.node (Ln (Lnr _) v) prems)) ∷ rts)) = (foldPremises v prems) ⨁ (valTrees rts)
--- valTree (Ac.node (Ln (Lnc _) v) (_ ∷ rts)) = v
--- valTree (Ac.node (Ln _ _) (_ ∷ rts)) = valTrees rts
-
--- valTrees [] = MC⊥
--- valTrees ((r , t) ∷ [])  = valTree t 
--- valTrees ((r , t) ∷ rts) = valTree t ⨁ valTrees rts
-
 
 zipTree3 : ATree → ATree → ATree → ATree3
 zipTree3 (Ac.node (Ln nd1 v1) rts1) (Ac.node (Ln nd2 v2) rts2) (Ac.node (Ln nd3 v3) rts3) 
@@ -583,46 +442,6 @@ valTree3 (Ac.node (Ln _ vroot@(just v0 , _ , _)) rts) = (just v0 ⨁ foldIns3 vr
 -- gprev currently is not used !
 valTree3←i : ∀ {n} → AGraph n → AGraph n → AGraph n → Fin n → MC
 valTree3←i g0 gprev g i = valTree3 (zipTree3 (toTree g0 i) (toTree gprev i) (toTree g i))
-
-
-----    non recursive   ---------
-
--- zipTree2 : ATree → ATree → ATree2 
--- zipTree2 (Ac.node (Ln nd1 v1) rts1) (Ac.node (Ln nd2 v2) rts2) =
---   Ac.node (Ln2 nd1 (v1 , v2)) (zip' rts1 rts2)
---   where
---   zip' : List (Role × ATree) → List (Role × ATree) → List (Role × ATree2)
---   zip' [] [] = []
---   zip' ((r1 , t1) ∷ rts1) ((r2 , t2) ∷ rts2) = ((r1 , zipTree2 t1 t2)) ∷ zip' rts1 rts2 
---   zip' _ _ = []
-
--- valTree2 : ATree2 → MC
-
--- -- deduction
--- foldPremises2 : MC × MC → MC × MC → List (Role × ATree2) → MC
--- foldPremises2 (nothing , _) (_ , varg) prems = List.foldr (λ _ v → v) varg prems
--- foldPremises2 (just v0 , _) (_ , varg) prems with List.foldr (λ _ v → v) varg prems
--- ... | just v  = just v0 ⨂ just v
--- ... | nothing = just v0
-
--- -- fold incoming
--- foldIns2 : MC × MC → List (Role × ATree2) → MC
--- foldIns2 vroot ins = List.foldr f MC⊥ ins
---   where
---   f : Role × ATree2 → MC → MC
---   f (role "conflicting" , (Ac.node (Ln2 (Lnr _) _) _)) v = v
---   f (role "conflicted"  , (Ac.node (Ln2 (Lnr _) _) _)) v = v
---   f (_ , (Ac.node (Ln2 (Lnr _) varg) prems)) v = v ⨁ (foldPremises2 vroot varg prems)
---   f (_ , (Ac.node _ _)) v = v
-
--- {-# TERMINATING #-}
--- valTree2 (Ac.node (Ln2 _ (v0 , _)) []) = v0
--- valTree2 (Ac.node (Ln2 _ vroot@(nothing , _)) rts) = foldIns2 vroot rts 
--- valTree2 (Ac.node (Ln2 _ vroot@(just v0 , _)) rts) = (just v0 ⨁ foldIns2 vroot rts) 
-
-
--- valTree2←i : ∀ {n} → AGraph n → AGraph n → Fin n → MC
--- valTree2←i g0 g i = valTree2 (zipTree2 (toTree g0 i) (toTree g i))
 
 
 
