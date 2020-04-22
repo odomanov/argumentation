@@ -206,9 +206,9 @@ main = run (putStrLn stringToPrint)
     +++ printG2 wh "G2 step 200" G2200 val←i
 
     +++ "\n\nContradiction degree:  step0 = "
-    +++ pprint w (val←i G20 (# 1) ⨂ val←i G20 (# 2))
+    +++ pprint w (val←i G20 (# 1) ⟪⨂⟫ val←i G20 (# 2))
     +++ " step100 = "
-    +++ pprint w (val←i G2100 (# 1) ⨂ val←i G2100 (# 2))
+    +++ pprint w (val←i G2100 (# 1) ⟪⨂⟫ val←i G2100 (# 2))
 
     +++ "\nCorrectness: "
     +++ "step0   = " +++ pprint w (Correctness G2 G20)
@@ -233,10 +233,20 @@ main = run (putStrLn stringToPrint)
     +++ printG7 wh "G7 step 200" G7200 val←i
     +++ printG7 wh "G7 step 1000" G71000 val←i
 
-    +++ "\n\nContradiction degree:  step0 = "
-    +++ pprint w (val←i G70 (# 1) ⨂ val←i G70 (# 2))
-    +++ " step100 = "
-    +++ pprint w (val←i G7100 (# 1) ⨂ val←i G7100 (# 2))
+    +++ "\n\nContradiction degree: step0   = "
+    +++ pprint w (val←i G70 (# 1) ⟪⨂⟫ val←i G70 (# 2))
+    +++ " step1   = "
+    +++ pprint w (val←i G71 (# 1) ⟪⨂⟫ val←i G71 (# 2))
+    +++ " step2   = "
+    +++ pprint w (val←i G72 (# 1) ⟪⨂⟫ val←i G72 (# 2))
+    +++ " step10  = "
+    +++ pprint w (val←i G710 (# 1) ⟪⨂⟫ val←i G710 (# 2))
+    +++ "\n                      step100 = "
+    +++ pprint w (val←i G7100 (# 1) ⟪⨂⟫ val←i G7100 (# 2))
+    +++ " step200 = "
+    +++ pprint w (val←i G7200 (# 1) ⟪⨂⟫ val←i G7200 (# 2))
+    +++ " step1000 = "
+    +++ pprint w (val←i G71000 (# 1) ⟪⨂⟫ val←i G71000 (# 2))
 
     +++ "\nCorrectness: "
     +++ "step0   = " +++ pprint w (Correctness G7 G70)
