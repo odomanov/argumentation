@@ -24,11 +24,11 @@ record IsLabelAlgebra {c ℓ₁ ℓ₂} {A : Set c}
                          (_⊗_ : Op₂ A)
                          (_⊕_ : Op₂ A)
                          -- (_⊖_ : Op₂ A)
-                         (⊘   : Op₁ A)
+                         (⊘   : Op₁ A)          -- negation
                          (_∧_ : Op₂ A)
                          (_∨_ : Op₂ A)
                          (mean : A → A → ℕ → A) -- <n> → <n+1>
-                         (delta : Op₂ A)
+                         (adiff : Op₂ A)
                          (⊤ : A)
                          (⊥ : A)
                          : Set (suc (c ⊔ ℓ₁ ⊔ ℓ₂)) where
@@ -80,11 +80,11 @@ record LabelAlgebra c ℓ₁ ℓ₂ : Set (suc (c ⊔ ℓ₁ ⊔ ℓ₂)) where
     _∧_     : Op₂ Carrier     -- The minimum operation.
     _∨_     : Op₂ Carrier     -- The maximum operation.
     mean    : Carrier → Carrier → ℕ → Carrier     -- The mean function
-    delta   : Op₂ Carrier     -- |a-b|
+    adiff   : Op₂ Carrier     -- |a-b|
     ⊤       : Carrier         -- The maximum.
     ⊥       : Carrier         -- The minimum.
     isLabelAlgebra : IsLabelAlgebra _≈_ _≤_ _⊗_ _⊕_ -- _⊖_
-                                    ⊘ _∧_ _∨_ mean delta ⊤ ⊥ 
+                                    ⊘ _∧_ _∨_ mean adiff ⊤ ⊥ 
     doc : Carrier → Doc
     
   open IsLabelAlgebra isLabelAlgebra public

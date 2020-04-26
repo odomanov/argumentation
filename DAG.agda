@@ -84,7 +84,7 @@ just x  ⨁ just y  = just (_⊕_ la x y)
 ⟪mean⟫ (just v)  nothing  _ = nothing
 ⟪mean⟫ (just v) (just va) n = just (mean la v va n)
 
-⟪delta⟫ = _⟪ delta la ⟫_
+⟪adiff⟫ = _⟪ adiff la ⟫_
 
 -- δi-th graph relative to i  
 _[_≻_] : ∀ {n} → AGraph (ℕsuc n)
@@ -448,7 +448,7 @@ valTree3←i g0 gprev g i = valTree3 (zipTree3 (toTree g0 i) (toTree gprev i) (t
 
 -- difference for i
 valδ : ∀ {n} → AGraph n → AGraph n → Fin n → MC
-valδ g0 g i = ⟪delta⟫ (val←i g i) $ valTree3←i g0 g0 g i ⨂ ⟪not⟫ (foldConflicts' g i)
+valδ g0 g i = ⟪adiff⟫ (val←i g i) $ valTree3←i g0 g0 g i ⨂ ⟪not⟫ (foldConflicts' g i)
   where
   foldConflicts' : ∀ {n} → AGraph n → Fin n → MC
   foldConflicts' {n} g i = List.foldr f MC⊥ (NConflicts g i)

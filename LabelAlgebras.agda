@@ -95,14 +95,14 @@ FUmean a acc n = record
   }
 
 postulate
-  0≤vdelta : ∀ a b → 0.0 [≤] (if value a [-] value b [≤] 0.0 then value b [-] value a else value a [-] value b) ≡ true
-  v≤1delta : ∀ a b → (if value a [-] value b [≤] 0.0 then value b [-] value a else value a [-] value b) [≤] 1.0 ≡ true
+  0≤vadiff : ∀ a b → 0.0 [≤] (if value a [-] value b [≤] 0.0 then value b [-] value a else value a [-] value b) ≡ true
+  v≤1adiff : ∀ a b → (if value a [-] value b [≤] 0.0 then value b [-] value a else value a [-] value b) [≤] 1.0 ≡ true
 
-FUdelta : FUnit → FUnit → FUnit
-FUdelta a b = record
+FUadiff : FUnit → FUnit → FUnit
+FUadiff a b = record
   { value = if value a [-] value b [≤] 0.0 then value b [-] value a else value a [-] value b
-  ; 0≤v = 0≤vdelta a b
-  ; v≤1 = v≤1delta a b
+  ; 0≤v = 0≤vadiff a b
+  ; v≤1 = v≤1adiff a b
   }
 
 min0≤v : ∀ x y → (0.0 [≤] (fmin (value x) (value y)) ≡ true)
@@ -218,7 +218,7 @@ Trust∨ a b = record
 postulate
   Trust-isLabelAlgebra : IsLabelAlgebra
     FU= FU≤ Trust⊗ Trust⊕ -- Trust⊖
-    Trust⊘ Trust∧ Trust∨ FUmean FUdelta FU1 FU0
+    Trust⊘ Trust∧ Trust∨ FUmean FUadiff FU1 FU0
 
 Trust : LabelAlgebra _ _ _
 Trust = record
@@ -232,7 +232,7 @@ Trust = record
   ; _∧_ = Trust∧
   ; _∨_ = Trust∨
   ; mean = FUmean
-  ; delta = FUdelta
+  ; adiff = FUadiff
   ; ⊤ = FU1
   ; ⊥ = FU0
   ; isLabelAlgebra = Trust-isLabelAlgebra
@@ -291,7 +291,7 @@ Pref∨ a b = record
 postulate
   Pref-isLabelAlgebra : IsLabelAlgebra
     FU= FU≤ Pref⊗ Pref⊕ -- Pref⊖
-    Pref⊘ Pref⊗ Pref∨ FUmean FUdelta FU1 FU0
+    Pref⊘ Pref⊗ Pref∨ FUmean FUadiff FU1 FU0
 
 Pref : LabelAlgebra _ _ _
 Pref = record
@@ -305,7 +305,7 @@ Pref = record
   ; _∧_ = Pref⊗
   ; _∨_ = Pref∨
   ; mean = FUmean
-  ; delta = FUdelta
+  ; adiff = FUadiff
   ; ⊤ = FU1
   ; ⊥ = FU0
   ; isLabelAlgebra = Pref-isLabelAlgebra
@@ -363,7 +363,7 @@ postulate
 postulate
   Łuk-isLabelAlgebra : IsLabelAlgebra
     FU= FU≤ Łuk⊗ Łuk⊕ -- Łuk⊖
-    Łuk⊘ Łuk∧ Łuk∨ FUmean FUdelta FU1 FU0
+    Łuk⊘ Łuk∧ Łuk∨ FUmean FUadiff FU1 FU0
 
 Łuk : LabelAlgebra _ _ _
 Łuk = record
@@ -377,7 +377,7 @@ postulate
   ; _∧_ = Łuk∧
   ; _∨_ = Łuk∨
   ; mean = FUmean
-  ; delta = FUdelta
+  ; adiff = FUadiff
   ; ⊤ = FU1
   ; ⊥ = FU0
   ; isLabelAlgebra = Łuk-isLabelAlgebra
@@ -416,7 +416,7 @@ Göd∨ = Göd⊕
 postulate
   Gödel-isLabelAlgebra : IsLabelAlgebra
     FU= FU≤ Göd⊗ Göd⊕ -- Göd⊖
-    Göd⊘ Göd∧ Göd∨ FUmean FUdelta FU1 FU0
+    Göd⊘ Göd∧ Göd∨ FUmean FUadiff FU1 FU0
 
 Gödel : LabelAlgebra _ _ _
 Gödel = record
@@ -430,7 +430,7 @@ Gödel = record
   ; _∧_ = Göd∧
   ; _∨_ = Göd∨
   ; mean = FUmean
-  ; delta = FUdelta
+  ; adiff = FUadiff
   ; ⊤ = FU1
   ; ⊥ = FU0
   ; isLabelAlgebra = Gödel-isLabelAlgebra
@@ -471,7 +471,7 @@ prod∨ = FUmax
 postulate
   Product-isLabelAlgebra : IsLabelAlgebra
     FU= FU≤ prod⊗ prod⊕ -- prod⊖
-    prod⊘ prod∧ prod∨ FUmean FUdelta FU1 FU0
+    prod⊘ prod∧ prod∨ FUmean FUadiff FU1 FU0
 
 Product : LabelAlgebra _ _ _
 Product = record
@@ -485,7 +485,7 @@ Product = record
   ; _∧_ = prod∧
   ; _∨_ = prod∨
   ; mean = FUmean
-  ; delta = FUdelta
+  ; adiff = FUadiff
   ; ⊤ = FU1
   ; ⊥ = FU0
   ; isLabelAlgebra = Product-isLabelAlgebra
