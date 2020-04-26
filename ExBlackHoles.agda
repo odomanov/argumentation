@@ -288,13 +288,13 @@ main = run (putStrLn stringToPrint)
     +++ printG G200 val←i
 
     +++ "\n\nContradiction degree:  step0 = "
-    +++ pprint w ((val←i G0 (# 3) ⟪⨂⟫ val←i G0 (# 9)) ⟪⨁⟫+ (val←i G0 (# 4) ⟪⨂⟫ val←i G0 (# 6)))
+    +++ pprint w ((val←i G0 (# 3) ⟪⨂⟫ val←i G0 (# 9)) ⟪⨁⟫⁺ (val←i G0 (# 4) ⟪⨂⟫ val←i G0 (# 6)))
     +++ " step1 = "
-    +++ pprint w ((val←i G1 (# 3) ⟪⨂⟫ val←i G1 (# 9)) ⟪⨁⟫+ (val←i G1 (# 4) ⟪⨂⟫ val←i G1 (# 6)))
+    +++ pprint w ((val←i G1 (# 3) ⟪⨂⟫ val←i G1 (# 9)) ⟪⨁⟫⁺ (val←i G1 (# 4) ⟪⨂⟫ val←i G1 (# 6)))
     +++ " step10 = "
-    +++ pprint w ((val←i G10 (# 3) ⟪⨂⟫ val←i G10 (# 9)) ⟪⨁⟫+ (val←i G10 (# 4) ⟪⨂⟫ val←i G10 (# 6)))
+    +++ pprint w ((val←i G10 (# 3) ⟪⨂⟫ val←i G10 (# 9)) ⟪⨁⟫⁺ (val←i G10 (# 4) ⟪⨂⟫ val←i G10 (# 6)))
     +++ " step200 = "
-    +++ pprint w ((val←i G200 (# 3) ⟪⨂⟫ val←i G200 (# 9)) ⟪⨁⟫+ (val←i G200 (# 4) ⟪⨂⟫ val←i G200 (# 6)))
+    +++ pprint w ((val←i G200 (# 3) ⟪⨂⟫ val←i G200 (# 9)) ⟪⨁⟫⁺ (val←i G200 (# 4) ⟪⨂⟫ val←i G200 (# 6)))
     
     +++ "\nCorrectness:"
     +++ " step0   = " +++ pprint w (Correctness G G0)

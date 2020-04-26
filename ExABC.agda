@@ -160,12 +160,12 @@ main = run (putStrLn stringToPrint)
 
     +++ "\n\nContradiction degree:  step0 = "
     +++ pprint w ((val←i G0 (# 3) ⟪⨂⟫ val←i G0 (# 4))
-      ⟪⨁⟫+ (val←i G0 (# 4) ⟪⨂⟫ val←i G0 (# 5))
-      ⟪⨁⟫+ (val←i G0 (# 5) ⟪⨂⟫ val←i G0 (# 3)))
+      ⟪⨁⟫⁺ (val←i G0 (# 4) ⟪⨂⟫ val←i G0 (# 5))
+      ⟪⨁⟫⁺ (val←i G0 (# 5) ⟪⨂⟫ val←i G0 (# 3)))
     +++ " step200 = "
     +++ pprint w ((val←i G200 (# 3) ⟪⨂⟫ val←i G200 (# 4))
-      ⟪⨁⟫+ (val←i G200 (# 4) ⟪⨂⟫ val←i G200 (# 5))
-      ⟪⨁⟫+ (val←i G200 (# 5) ⟪⨂⟫ val←i G200 (# 3)))
+      ⟪⨁⟫⁺ (val←i G200 (# 4) ⟪⨂⟫ val←i G200 (# 5))
+      ⟪⨁⟫⁺ (val←i G200 (# 5) ⟪⨂⟫ val←i G200 (# 3)))
 
     +++ "\nCorrectness: "
     +++ "  step0 = " +++ pprint w (Correctness G G0)
@@ -201,14 +201,14 @@ main = run (putStrLn stringToPrint)
 
     +++ "\n\nContradiction degree:  step0 = "
     +++ pprint w ((val←i G'0 (# 4) ⟪⨂⟫ val←i G'0 (# 5))
-      ⟪⨁⟫+ (val←i G'0 (# 5) ⟪⨂⟫ val←i G'0 (# 6))
-      ⟪⨁⟫+ (val←i G'0 (# 6) ⟪⨂⟫ val←i G'0 (# 4))
-      ⟪⨁⟫+ (val←i G'0 (# 4) ⟪⨂⟫ val←i G'0 (# 6)))
+      ⟪⨁⟫⁺ (val←i G'0 (# 5) ⟪⨂⟫ val←i G'0 (# 6))
+      ⟪⨁⟫⁺ (val←i G'0 (# 6) ⟪⨂⟫ val←i G'0 (# 4))
+      ⟪⨁⟫⁺ (val←i G'0 (# 4) ⟪⨂⟫ val←i G'0 (# 6)))
     +++ " step200 = "
     +++ pprint w ((val←i G'200 (# 4) ⟪⨂⟫ val←i G'200 (# 4))
-      ⟪⨁⟫+ (val←i G'200 (# 5) ⟪⨂⟫ val←i G'200 (# 6))
-      ⟪⨁⟫+ (val←i G'200 (# 6) ⟪⨂⟫ val←i G'200 (# 4))
-      ⟪⨁⟫+ (val←i G'200 (# 4) ⟪⨂⟫ val←i G'200 (# 6)))
+      ⟪⨁⟫⁺ (val←i G'200 (# 5) ⟪⨂⟫ val←i G'200 (# 6))
+      ⟪⨁⟫⁺ (val←i G'200 (# 6) ⟪⨂⟫ val←i G'200 (# 4))
+      ⟪⨁⟫⁺ (val←i G'200 (# 4) ⟪⨂⟫ val←i G'200 (# 6)))
 
     +++ "\nCorrectness: "
     +++ "  step0 = " +++ pprint w (Correctness G' G'0)

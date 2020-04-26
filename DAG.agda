@@ -50,6 +50,13 @@ _⟪_⟫_ : MC → ((Carrier la) → (Carrier la) → (Carrier la)) → MC → M
 just v1 ⟪ op ⟫ just v2 = just (op v1 v2)
 _ ⟪ _ ⟫ _ = nothing
 
+-- the "or" version of ⟪∙⟫
+_⟪_⟫+_ : MC → ((Carrier la) → (Carrier la) → (Carrier la)) → MC → MC
+just v1 ⟪ op ⟫+ just v2 = just (op v1 v2)
+nothing ⟪ op ⟫+ just v2 = just v2
+just v1 ⟪ op ⟫+ nothing = just v1
+nothing ⟪ op ⟫+ nothing = nothing
+
 -- same for a unary operation
 infixr 10 ⟪_⟫_
 
@@ -57,30 +64,18 @@ infixr 10 ⟪_⟫_
 ⟪ op ⟫ (just v) = just (op v)
 ⟪ _ ⟫  nothing  = nothing
 
-infixl 10 _⨂_ _⨁_
+infixl 10 _⟪⨂⟫_ _⟪⨁⟫⁺_
 
-_⨂_ : MC → MC → MC
-x ⨂ y = x ⟪ _⊗_ la ⟫ y 
+_⟪⨂⟫_ : MC → MC → MC
+x ⟪⨂⟫ y = x ⟪ _⊗_ la ⟫ y 
 
-_⨁_ : MC → MC → MC
-nothing ⨁ just y  = just y 
-just x  ⨁ nothing = just x 
-nothing ⨁ nothing = nothing 
-just x  ⨁ just y  = just (_⊕_ la x y)  
+_⟪⨁⟫⁺_ : MC → MC → MC
+x ⟪⨁⟫⁺ y = x ⟪ _⊕_ la ⟫+ y 
 
-⟪not⟫ = ⟪ ⊘ la ⟫_
-
-⟨_,_⟩ : MC → MC → MC
-⟨ x , y ⟩ = x ⟪ op ⟫ y
-  where
-  op : Carrier la → Carrier la → Carrier la
-  op a b = mean la a b 1
+⟪neg⟫ = ⟪ ⊘ la ⟫_
 
 ⟪mean⟫ : MC → MC → ℕ → MC
-⟪mean⟫ nothing   nothing  _ = nothing
-⟪mean⟫ nothing  (just va) _ = nothing
-⟪mean⟫ (just v)  nothing  _ = nothing
-⟪mean⟫ (just v) (just va) n = just (mean la v va n)
+⟪mean⟫ x y n = x ⟪ (λ x y → mean la x y n) ⟫ y
 
 ⟪adiff⟫ = _⟪ adiff la ⟫_
 
@@ -392,11 +387,11 @@ foldConflicts : ∀ {n} → AGraph n → Fin n → MC
 foldConflicts {n} g i = List.foldr f MC⊥ (NConflicts g i)
   where
   f : Fin n × Fin n → MC → MC
-  f (i1 , i2) v = v ⨁ (val←i g i1 ⨂ val←i g i2)
+  f (i1 , i2) v = v ⟪⨁⟫⁺ (⟪neg⟫ (val←i g i1 ⟪⨂⟫ val←i g i2))
 
 -- negation of foldConflicts
-¬foldConflicts : ∀ {n} → AGraph n → Fin n → MC
-¬foldConflicts {n} g i = ⟪ ⊘ la ⟫ foldConflicts g i
+-- ¬foldConflicts : ∀ {n} → AGraph n → Fin n → MC
+-- ¬foldConflicts {n} g i = ⟪ ⊘ la ⟫ foldConflicts g i
 
 
 zipTree3 : ATree → ATree → ATree → ATree3
@@ -413,13 +408,13 @@ valTree3 : ATree3 → MC
 
 private
   fff : (Role × ATree3) → MC → MC
-  fff (_ , t) v = valTree3 t ⨂ v
+  fff (_ , t) v = valTree3 t ⟪⨂⟫ v
 
 -- deduction
 foldPremises3 : MC × MC × MC → MC × MC × MC → List (Role × ATree3) → MC
 foldPremises3 (nothing , _ , _) (_ , _ , varg) prems = List.foldr fff varg prems
 foldPremises3 (just v0 , _ , _) (_ , _ , varg) prems with List.foldr fff varg prems
-... | just v  = just v0 ⨂ just v
+... | just v  = just v0 ⟪⨂⟫ just v
 ... | nothing = just v0
 
 -- fold incoming
@@ -429,13 +424,13 @@ foldIns3 vroot ins = List.foldr f MC⊥ ins
   f : Role × ATree3 → MC → MC
   f (role "conflicting" , (Ac.node (Ln (Lnr _) _) _)) v = v
   f (role "conflicted"  , (Ac.node (Ln (Lnr _) _) _)) v = v
-  f (_ , (Ac.node (Ln (Lnr _) varg) prems)) v = v ⨁ (foldPremises3 vroot varg prems)
+  f (_ , (Ac.node (Ln (Lnr _) varg) prems)) v = v ⟪⨁⟫⁺ (foldPremises3 vroot varg prems)
   f (_ , (Ac.node _ _)) v = v
 
 {-# TERMINATING #-}
 valTree3 (Ac.node (Ln _ (v0 , _ , _)) []) = v0
 valTree3 (Ac.node (Ln _ vroot@(nothing , _ , _)) rts) = foldIns3 vroot rts 
-valTree3 (Ac.node (Ln _ vroot@(just v0 , _ , _)) rts) = (just v0 ⨁ foldIns3 vroot rts) 
+valTree3 (Ac.node (Ln _ vroot@(just v0 , _ , _)) rts) = (just v0 ⟪⨁⟫⁺ foldIns3 vroot rts) 
 
 -- gprev currently is not used !
 valTree3←i : ∀ {n} → AGraph n → AGraph n → AGraph n → Fin n → MC
@@ -446,7 +441,7 @@ valTree3←i g0 gprev g i = valTree3 (zipTree3 (toTree g0 i) (toTree gprev i) (t
 
 -- difference for i
 valδ : ∀ {n} → AGraph n → AGraph n → Fin n → MC
-valδ g0 g i = ⟪adiff⟫ (val←i g i) $ valTree3←i g0 g0 g i ⨂ ⟪not⟫ (foldConflicts' g i)
+valδ g0 g i = ⟪adiff⟫ (val←i g i) $ valTree3←i g0 g0 g i ⟪⨂⟫ ⟪not⟫ (foldConflicts' g i)
   where
   foldConflicts' : ∀ {n} → AGraph n → Fin n → MC
   foldConflicts' {n} g i = List.foldr f MC⊥ (NConflicts g i)
@@ -489,7 +484,9 @@ private
     where
     newval : ℕ → MC
     newval k = valTree3←i g0 gprev g (inject≤ (fromℕ (n ∸ k)) (s≤s (m∸n≤m n k)))
-               ⨂ ¬foldConflicts gprev (inject≤ (fromℕ (n ∸ k)) (s≤s (m∸n≤m n k)))
+               ⟪⨁⟫⁺
+               -- ⟪⨂⟫
+               foldConflicts gprev (inject≤ (fromℕ (n ∸ k)) (s≤s (m∸n≤m n k)))
 
     f : ∀ {k} → AContext k → AGraph k → AGraph (ℕsuc k)
     f {k} (context (Ln nd v) sucs) g = context (Ln nd (newval k)) sucs & g
