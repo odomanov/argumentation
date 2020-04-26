@@ -53,6 +53,35 @@ fmin x y = if x [<] y then x else y
 fmax : Float → Float → Float
 fmax x y = if x [<] y then y else x 
 
+private
+  negg : Float → Float
+  negg 0.0 = 1.0
+  negg _ = 0.0
+
+postulate
+  0≤vgneg : ∀ a → 0.0 [≤] (negg a) ≡ true
+  v≤1gneg : ∀ a → (negg a) [≤] 1.0 ≡ true
+
+-- Gödel negation
+FUGneg : FUnit → FUnit
+FUGneg a = record
+  { value = negg (value a)
+  ; 0≤v = 0≤vgneg (value a)
+  ; v≤1 = v≤1gneg (value a)
+  }
+
+postulate
+  0≤v⊘ : ∀ x → 0.0 [≤] (value FU1) [-] value x ≡ true
+  v≤1⊘ : ∀ x → (value FU1) [-] value x [≤] 1.0 ≡ true
+
+-- Łukasiewicz negation
+FULneg : FUnit → FUnit
+FULneg a = record
+  { value = (value FU1) [-] (value a)
+  ; 0≤v = 0≤v⊘ a 
+  ; v≤1 = v≤1⊘ a 
+  }
+
 postulate
   0≤vmean : ∀ n x y → 0.0 [≤] ((fromℕ n) [*] value y [+] value x) [/] (fromℕ (suc n)) ≡ true
   v≤1mean : ∀ n x y → ((fromℕ n) [*] value y [+] value x) [/] (fromℕ (suc n)) [≤] 1.0 ≡ true
@@ -164,10 +193,6 @@ Trust⊕ a b = record
 --   ; 0≤v = 0≤v⊖ (value a) (value b)
 --   ; v≤1 = v≤1⊖ (value a) (value b)
 --   }
-
-postulate
-  0≤v⊘ : ∀ x → 0.0 [≤] (value FU1) [-] value x ≡ true
-  v≤1⊘ : ∀ x → (value FU1) [-] value x [≤] 1.0 ≡ true
 
 Trust⊘ : FUnit → FUnit
 Trust⊘ a = record
@@ -378,11 +403,12 @@ Göd⊕ a b = record
   }
 
 Göd⊘ : FUnit → FUnit
-Göd⊘ a = record
-  { value = (value FU1) [-] (value a)
-  ; 0≤v = 0≤v⊘ a 
-  ; v≤1 = v≤1⊘ a 
-  }
+Göd⊘ = FUGneg
+-- Göd⊘ a = record
+--   { value = (value FU1) [-] (value a)
+--   ; 0≤v = 0≤v⊘ a 
+--   ; v≤1 = v≤1⊘ a 
+--   }
 
 Göd∧ = Göd⊗
 Göd∨ = Göd⊕
@@ -436,11 +462,8 @@ prod⊕ a b = record
   }
 
 prod⊘ : FUnit → FUnit
-prod⊘ a = record
-  { value = (value FU1) [-] (value a)
-  ; 0≤v = 0≤v⊘ a 
-  ; v≤1 = v≤1⊘ a 
-  }
+prod⊘ = FULneg
+-- prod⊘ = FUGneg
 
 prod∧ = FUmin
 prod∨ = FUmax
