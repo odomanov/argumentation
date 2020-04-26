@@ -34,13 +34,11 @@ MC = Maybe (Carrier la)
 MC⊥ = just (LA⊥ la)
 MC⊤ = just (LA⊤ la)
 
-ANode    = Node         -- node
-ALNode   = LNode MC       -- labeled node
+ANode    = Node                  -- node
+ALNode   = LNode MC              -- labeled node
 AContext = Context ALNode Role   -- argumentation context
 AGraph   = Graph ALNode Role     -- argumentation graph     
 ATree    = Ac.Tree ALNode Role   -- argumentation tree
-ALNode2  = LNode (MC × MC)  
-ATree2   = Ac.Tree ALNode2 Role 
 ALNode3  = LNode (MC × MC × MC)  
 ATree3   = Ac.Tree ALNode3 Role 
 
@@ -49,7 +47,7 @@ Sucs n = List (Role × Fin n)
 
 -- applying a binary operation to the Maybe label (TODO: rewrite with >>=)
 _⟪_⟫_ : MC → ((Carrier la) → (Carrier la) → (Carrier la)) → MC → MC
-(just v1) ⟪ op ⟫ (just v2) = just (op v1 v2)
+just v1 ⟪ op ⟫ just v2 = just (op v1 v2)
 _ ⟪ _ ⟫ _ = nothing
 
 -- same for a unary operation
