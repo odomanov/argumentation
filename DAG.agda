@@ -51,11 +51,11 @@ just v1 ⟪ op ⟫ just v2 = just (op v1 v2)
 _ ⟪ _ ⟫ _ = nothing
 
 -- the "or" version of ⟪∙⟫
-_⟪_⟫+_ : MC → ((Carrier la) → (Carrier la) → (Carrier la)) → MC → MC
-just v1 ⟪ op ⟫+ just v2 = just (op v1 v2)
-nothing ⟪ op ⟫+ just v2 = just v2
-just v1 ⟪ op ⟫+ nothing = just v1
-nothing ⟪ op ⟫+ nothing = nothing
+_⟪_⟫⁺_ : MC → ((Carrier la) → (Carrier la) → (Carrier la)) → MC → MC
+just v1 ⟪ op ⟫⁺ just v2 = just (op v1 v2)
+nothing ⟪ op ⟫⁺ just v2 = just v2
+just v1 ⟪ op ⟫⁺ nothing = just v1
+nothing ⟪ op ⟫⁺ nothing = nothing
 
 -- same for a unary operation
 infixr 10 ⟪_⟫_
@@ -70,7 +70,7 @@ _⟪⨂⟫_ : MC → MC → MC
 x ⟪⨂⟫ y = x ⟪ _⊗_ la ⟫ y 
 
 _⟪⨁⟫⁺_ : MC → MC → MC
-x ⟪⨁⟫⁺ y = x ⟪ _⊕_ la ⟫+ y 
+x ⟪⨁⟫⁺ y = x ⟪ _⊕_ la ⟫⁺ y 
 
 ⟪neg⟫ = ⟪ ⊘ la ⟫_
 
@@ -383,8 +383,8 @@ replaceInGraph {n} g i v = foldr (λ k → AGraph k) f ∅ g
   ... | false = c & g
 
 -- the cumulative value of all conflicts of the i-th context
-foldConflicts : ∀ {n} → AGraph n → Fin n → MC
-foldConflicts {n} g i = List.foldr f MC⊥ (NConflicts g i)
+fold¬Conflicts : ∀ {n} → AGraph n → Fin n → MC
+fold¬Conflicts {n} g i = List.foldr f MC⊥ (NConflicts g i)
   where
   f : Fin n × Fin n → MC → MC
   f (i1 , i2) v = v ⟪⨁⟫⁺ (⟪neg⟫ (val←i g i1 ⟪⨂⟫ val←i g i2))
@@ -441,13 +441,10 @@ valTree3←i g0 gprev g i = valTree3 (zipTree3 (toTree g0 i) (toTree gprev i) (t
 
 -- difference for i
 valδ : ∀ {n} → AGraph n → AGraph n → Fin n → MC
-valδ g0 g i = ⟪adiff⟫ (val←i g i) $ valTree3←i g0 g0 g i ⟪⨂⟫ ⟪not⟫ (foldConflicts' g i)
-  where
-  foldConflicts' : ∀ {n} → AGraph n → Fin n → MC
-  foldConflicts' {n} g i = List.foldr f MC⊥ (NConflicts g i)
-    where
-    f : Fin n × Fin n → MC → MC
-    f (i1 , i2) v = v ⟪ _⊕_ la ⟫ (val←i g i1 ⨂ val←i g i2)
+valδ g0 g i = ⟪adiff⟫ (val←i g i) $ valTree3←i g0 g0 g i
+                      ⟪⨁⟫⁺
+                      -- ⟪⨂⟫
+                      (fold¬Conflicts g i)
 
 -- среднее от i до zero --- из Fin(n+1) --- max i = # n
 Mean′ : ∀ {a n} → (A : Set a) → Fin (ℕsuc n) → Set a
@@ -486,7 +483,7 @@ private
     newval k = valTree3←i g0 gprev g (inject≤ (fromℕ (n ∸ k)) (s≤s (m∸n≤m n k)))
                ⟪⨁⟫⁺
                -- ⟪⨂⟫
-               foldConflicts gprev (inject≤ (fromℕ (n ∸ k)) (s≤s (m∸n≤m n k)))
+               fold¬Conflicts gprev (inject≤ (fromℕ (n ∸ k)) (s≤s (m∸n≤m n k)))
 
     f : ∀ {k} → AContext k → AGraph k → AGraph (ℕsuc k)
     f {k} (context (Ln nd v) sucs) g = context (Ln nd (newval k)) sucs & g
