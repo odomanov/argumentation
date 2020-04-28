@@ -57,14 +57,14 @@ private
   textN n s = text s <> text (spaces (0 ⊔ (n ∸ S.length s)))
 
 docMC : MC → Doc
-docMC nothing  = textN 10 "NOTHING"
+docMC nothing  = textN 10 "NULL"
 docMC (just x) = textN 10 s
   where
   s = layout (renderPretty 1.0 8 ((doc la) x))
 
 
 docLabel : MC → Doc
-docLabel nothing = text "NOTHING"
+docLabel nothing = text "NULL"
 docLabel (just x) = (doc la) x 
 
 docNode : ALNode → Doc
