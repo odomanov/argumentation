@@ -256,6 +256,50 @@ printG g f = "\n  S1 = " +++ pprint w (f g (# 16))
           +++ " C2 = "  +++ pprint w (f g (# 1))
           +++ " C2' = "  +++ pprint w (f g (# 2))
 
+printContr : AGraph 17 → String
+printContr g = pprint w ((val←i g (# 3) ⟪⨂⟫ val←i g (# 9)) ⟪⨁⟫⁺ (val←i g (# 4) ⟪⨂⟫ val←i g (# 6)))
+
+printCSV : String → AGraph 17 → (AGraph 17 → Fin 17 → MC) → String
+printCSV s g f = "\n" +++ s
+          +++ "; " +++ pprint w (f g (# 16))                    -- S1,S3      
+          +++ "; "  +++ pprint w (f g (# 14))                   -- S2      
+          -- +++ "; "  +++ pprint w (f g (# 5))                    -- S3      
+          +++ "; "  +++ pprint w (f g (# 3))                    -- S4      
+          +++ "; "  +++ pprint w (f g (# 13))                   -- S5.S7      
+          +++ "; "  +++ pprint w (f g (# 8))                    -- S6      
+          -- +++ "; "  +++ pprint w (f g (# 11))                   -- S7      
+          +++ "; "  +++ pprint w (f g (# 6))                    -- S8      
+          +++ "; "  +++ pprint w (f g (# 9))                    -- S9      
+          +++ "; "  +++ pprint w (f g (# 15))                   -- A1      
+          +++ "; "  +++ pprint w (f g (# 4))                    -- A2      
+          +++ "; "  +++ pprint w (f g (# 7))                    -- A3      
+          +++ "; "  +++ pprint w (f g (# 10))                   -- A4      
+          +++ "; "  +++ pprint w (f g (# 0))                    -- C1      
+          +++ "; "  +++ pprint w (f g (# 1))                    -- C2      
+          +++ "; "  +++ pprint w (f g (# 2))                    -- C2'     
+          +++ "; "  +++ printContr g                            -- Contr   
+          +++ "; "  +++ pprint w (Correctness G g)              -- Corr    
+          
+printCSVh = "Step"
+          +++ "; S1,S3" 
+          +++ "; S2" 
+          -- +++ "; S3" 
+          +++ "; S4" 
+          +++ "; S5,S7" 
+          +++ "; S6" 
+          -- +++ "; S7" 
+          +++ "; S8" 
+          +++ "; S9" 
+          +++ "; A1" 
+          +++ "; A2" 
+          +++ "; A3" 
+          +++ "; A4" 
+          +++ "; C1" 
+          +++ "; C2" 
+          +++ "; C2'"
+          +++ "; Contr"
+          +++ "; Corr"
+
 main = run (putStrLn stringToPrint)
   where
   wh = 12
@@ -264,46 +308,56 @@ main = run (putStrLn stringToPrint)
     -- +++ printG G val←i
     -- +++ ppretty ws (docSection ws "computed w/o conflicts")
     -- +++ printG G (valTree3←i G G)
-    +++ ppretty ws (docSection ws "step 0")
-    +++ printG G0 val←i
-    +++ ppretty ws (docSection ws "step 1")
-    +++ printG G1 val←i
-    -- +++ ppretty ws (docSection ws "step 1 - confl")
-    -- +++ printG G1 foldConflicts
-    -- +++ ppretty ws (docSection ws "step 1 - val+confl")
-    -- +++ printG G1 (val+conflicts G)
-    +++ ppretty ws (docSection ws "step 2")
-    +++ printG G2 val←i
-    +++ ppretty ws (docSection ws "step 3")
-    +++ printG G3 val←i
-    +++ ppretty ws (docSection ws "step 4")
-    +++ printG G4 val←i
-    -- +++ ppretty ws (docSection ws "step 5")
-    -- +++ printG G5 val←i
-    +++ ppretty ws (docSection ws "step 10")
-    +++ printG G10 val←i
-    +++ ppretty ws (docSection ws "step 100")
-    +++ printG G100 val←i
-    +++ ppretty ws (docSection ws "step 200")
-    +++ printG G200 val←i
+    -- +++ ppretty ws (docSection ws "step 0")
+    -- +++ printG G0 val←i
+    -- +++ ppretty ws (docSection ws "step 1")
+    -- +++ printG G1 val←i
+    -- -- +++ ppretty ws (docSection ws "step 1 - confl")
+    -- -- +++ printG G1 foldConflicts
+    -- -- +++ ppretty ws (docSection ws "step 1 - val+confl")
+    -- -- +++ printG G1 (val+conflicts G)
+    -- +++ ppretty ws (docSection ws "step 2")
+    -- +++ printG G2 val←i
+    -- +++ ppretty ws (docSection ws "step 3")
+    -- +++ printG G3 val←i
+    -- +++ ppretty ws (docSection ws "step 4")
+    -- +++ printG G4 val←i
+    -- -- +++ ppretty ws (docSection ws "step 5")
+    -- -- +++ printG G5 val←i
+    -- +++ ppretty ws (docSection ws "step 10")
+    -- +++ printG G10 val←i
+    -- +++ ppretty ws (docSection ws "step 100")
+    -- +++ printG G100 val←i
+    -- +++ ppretty ws (docSection ws "step 200")
+    -- +++ printG G200 val←i
 
-    +++ "\n\nContradiction degree:  step0 = "
-    +++ pprint w ((val←i G0 (# 3) ⟪⨂⟫ val←i G0 (# 9)) ⟪⨁⟫⁺ (val←i G0 (# 4) ⟪⨂⟫ val←i G0 (# 6)))
-    +++ " step1 = "
-    +++ pprint w ((val←i G1 (# 3) ⟪⨂⟫ val←i G1 (# 9)) ⟪⨁⟫⁺ (val←i G1 (# 4) ⟪⨂⟫ val←i G1 (# 6)))
-    +++ " step10 = "
-    +++ pprint w ((val←i G10 (# 3) ⟪⨂⟫ val←i G10 (# 9)) ⟪⨁⟫⁺ (val←i G10 (# 4) ⟪⨂⟫ val←i G10 (# 6)))
-    +++ " step200 = "
-    +++ pprint w ((val←i G200 (# 3) ⟪⨂⟫ val←i G200 (# 9)) ⟪⨁⟫⁺ (val←i G200 (# 4) ⟪⨂⟫ val←i G200 (# 6)))
+    +++ printCSVh
+    +++ printCSV "0" G0 val←i
+    +++ printCSV "1" G1 val←i
+    +++ printCSV "2" G2 val←i
+    +++ printCSV "3" G3 val←i
+    +++ printCSV "4" G4 val←i
+    +++ printCSV "10" G10 val←i
+    +++ printCSV "100" G100 val←i
+    +++ printCSV "200" G200 val←i
     
-    +++ "\nCorrectness:"
-    +++ " step0   = " +++ pprint w (Correctness G G0)
-    +++ " step1   = " +++ pprint w (Correctness G G1)
-    +++ " step2   = " +++ pprint w (Correctness G G2)
-    +++ " step3   = " +++ pprint w (Correctness G G3)
-    +++ "\n            "
-    +++ " step10  = " +++ pprint w (Correctness G G10)
-    +++ " step100 = " +++ pprint w (Correctness G G100)
-    +++ " step200 = " +++ pprint w (Correctness G G200)
+    -- +++ "\n\nContradiction degree:  step0 = "
+    -- +++ pprint w ((val←i G0 (# 3) ⟪⨂⟫ val←i G0 (# 9)) ⟪⨁⟫⁺ (val←i G0 (# 4) ⟪⨂⟫ val←i G0 (# 6)))
+    -- +++ " step1 = "
+    -- +++ pprint w ((val←i G1 (# 3) ⟪⨂⟫ val←i G1 (# 9)) ⟪⨁⟫⁺ (val←i G1 (# 4) ⟪⨂⟫ val←i G1 (# 6)))
+    -- +++ " step10 = "
+    -- +++ pprint w ((val←i G10 (# 3) ⟪⨂⟫ val←i G10 (# 9)) ⟪⨁⟫⁺ (val←i G10 (# 4) ⟪⨂⟫ val←i G10 (# 6)))
+    -- +++ " step200 = "
+    -- +++ pprint w ((val←i G200 (# 3) ⟪⨂⟫ val←i G200 (# 9)) ⟪⨁⟫⁺ (val←i G200 (# 4) ⟪⨂⟫ val←i G200 (# 6)))
+    
+    -- +++ "\nCorrectness:"
+    -- +++ " step0   = " +++ pprint w (Correctness G G0)
+    -- +++ " step1   = " +++ pprint w (Correctness G G1)
+    -- +++ " step2   = " +++ pprint w (Correctness G G2)
+    -- +++ " step3   = " +++ pprint w (Correctness G G3)
+    -- +++ "\n            "
+    -- +++ " step10  = " +++ pprint w (Correctness G G10)
+    -- +++ " step100 = " +++ pprint w (Correctness G G100)
+    -- +++ " step200 = " +++ pprint w (Correctness G G200)
     
     -- +++ (pprint 110 G)
