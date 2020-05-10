@@ -140,7 +140,7 @@ A3 = SR-от-эксперта
 A4 = SR-от-эксперта
 C1 = SC
 C2 = SC
-C2' = SC
+C3 = SC
 
 G : AGraph _
 G =
@@ -150,7 +150,7 @@ G =
      node C2
        1.0 {refl} {refl}
        ((conflicting , # 7) ∷ (conflicted , # 1) ∷ []) &
-     node C2'
+     node C3
        1.0 {refl} {refl}
        ((conflicting , # 0) ∷ (conflicted , # 6) ∷ []) &
      node0 S4
@@ -254,7 +254,7 @@ printG g f = "\n  S1 = " +++ pprint w (f g (# 16))
           +++ " A4 = "  +++ pprint w (f g (# 10))
           +++ " C1 = "  +++ pprint w (f g (# 0))
           +++ " C2 = "  +++ pprint w (f g (# 1))
-          +++ " C2' = "  +++ pprint w (f g (# 2))
+          +++ " C3 = "  +++ pprint w (f g (# 2))
 
 printContr : AGraph 17 → String
 printContr g = pprint w ((val←i g (# 3) ⟪⨂⟫ val←i g (# 9)) ⟪⨁⟫⁺ (val←i g (# 4) ⟪⨂⟫ val←i g (# 6)))
@@ -276,7 +276,7 @@ printCSV s g f = "\n" +++ s
           +++ "; "  +++ pprint w (f g (# 10))                   -- A4      
           +++ "; "  +++ pprint w (f g (# 0))                    -- C1      
           +++ "; "  +++ pprint w (f g (# 1))                    -- C2      
-          +++ "; "  +++ pprint w (f g (# 2))                    -- C2'     
+          +++ "; "  +++ pprint w (f g (# 2))                    -- C3
           +++ "; "  +++ printContr g                            -- Contr   
           +++ "; "  +++ pprint w (Correctness G g)              -- Corr    
           
@@ -296,7 +296,7 @@ printCSVh = "Step"
           +++ "; A4" 
           +++ "; C1" 
           +++ "; C2" 
-          +++ "; C2'"
+          +++ "; C3"
           +++ "; Contr"
           +++ "; Corr"
 
