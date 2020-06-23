@@ -12,7 +12,7 @@ open import Data.Product using (_,_)
 open import Data.String as S renaming (_++_ to _+++_)
 open import Data.Vec as V using (Vec) renaming ([] to []v; _∷_ to _∷v_)
 
-open import ArgPrelude 
+open import ArgPrelude
 open import AIF
 open import LabelAlgebras
 open import ArgSchemes
@@ -176,7 +176,7 @@ main = run (putStrLn stringToPrint)
     +++ " step10 = " +++ pprint w (Correctness G G10)
     +++ "step100 = " +++ pprint w (Correctness G G100)
     +++ "step200 = " +++ pprint w (Correctness G G200)
-    
+
     -- +++ printABC 17 "foldConflicts:G "  G foldConflicts
     -- +++ printABC 17 "foldConflicts:G5"  G5 foldConflicts
     -- +++ printABC 17 "-foldConflicts:G5" G5 ¬foldConflicts
@@ -219,7 +219,7 @@ main = run (putStrLn stringToPrint)
     +++ " step10 = " +++ pprint w (Correctness G' G'10)
     +++ "step100 = " +++ pprint w (Correctness G' G'100)
     +++ "step200 = " +++ pprint w (Correctness G' G'200)
-    
+
     -- +++ printABC' 17 "foldConflicts:G' "  G' foldConflicts
     -- +++ printABC' 17 "foldConflicts:G'5"  G'5 foldConflicts
     -- +++ printABC' 17 "-foldConflicts:G'5" G'5 ¬foldConflicts
