@@ -145,53 +145,64 @@ C3 = SC
 G : AGraph _
 G =
      node C1
-       0.5 {refl} {refl}
+       1.0 {refl} {refl}     -- generel public
+       -- 1.0 {refl} {refl}     -- scientific audience
        ((conflicting , # 5) ∷ (conflicted , # 3) ∷ []) &
      node C2
-       1.0 {refl} {refl}
-       ((conflicting , # 7) ∷ (conflicted , # 1) ∷ []) &
+       0.5 {refl} {refl}     -- generel public
+       -- 1.0 {refl} {refl}     -- scientific audience
+       ((conflicting , # 1) ∷ (conflicted , # 7) ∷ []) &
      node C3
-       1.0 {refl} {refl}
-       ((conflicting , # 0) ∷ (conflicted , # 6) ∷ []) &
+       0.5 {refl} {refl}     -- generel public
+       -- 1.0 {refl} {refl}     -- scientific audience
+       ((conflicting , # 6) ∷ (conflicted , # 0) ∷ []) &
      node0 S4
        ((причинная-связь , # 0) ∷ []) &
      node A2
-       0.8 {refl} {refl}
+       0.8 {refl} {refl}     -- generel public
+       -- 0.8 {refl} {refl}     -- scientific audience
        ((событие1 , # 9) ∷ (событие2 , # 0) ∷ []) &
      node S3
-       0.9 {refl} {refl}
+       0.9 {refl} {refl}     -- generel public
+       -- 0.9 {refl} {refl}     -- scientific audience
        [] &
      node0 S8
        ((вывод , # 0) ∷ []) &
      node A3
-       1.0 {refl} {refl}
+       1.0 {refl} {refl}     -- generel public
+       -- 0.8 {refl} {refl}     -- scientific audience
        ((эксперт , # 5) ∷ (говорит , # 0) ∷ (область , # 4) ∷ []) &
      node S6
-       0.7 {refl} {refl}
+       0.7 {refl} {refl}     -- generel public
+       -- 1.0 {refl} {refl}     -- scientific audience
        [] &
      node0 S9
        ((вывод , # 0) ∷ []) &
      node A4
-       1.0 {refl} {refl}
+       1.0 {refl} {refl}     -- generel public
+       -- 0.8 {refl} {refl}     -- scientific audience
        ((эксперт , # 2) ∷ (говорит , # 0) ∷ (область , # 1) ∷ []) &
      node S7
-       0.8 {refl} {refl}
-       -- 1.0 {refl} {refl}
+       1.0 {refl} {refl}     -- generel public
+       -- 0.9 {refl} {refl}     -- scientific audience
        [] &
      node I-область-внеземная-физика
-       1.0 {refl} {refl}
+       1.0 {refl} {refl}     -- generel public
+       -- 1.0 {refl} {refl}     -- scientific audience
        [] &
      node S5
-       0.8 {refl} {refl}
-       -- 1.0 {refl} {refl}
+       1.0 {refl} {refl}     -- generel public
+       -- 0.8 {refl} {refl}     -- scientific audience
        [] &
      node0 S2
        ((вывод , # 0) ∷ []) &
      node A1
-       0.7 {refl} {refl}
+       1.0 {refl} {refl}     -- generel public
+       -- 0.5 {refl} {refl}     -- scientific audience
        ((все-признают , # 0) ∷ []) &
      node S1
-       0.9 {refl} {refl}
+       1.0 {refl} {refl}     -- generel public
+       -- 0.9 {refl} {refl}     -- scientific audience
        [] &
      ∅
 
@@ -263,13 +274,13 @@ printContr g = pprint w ((val←i g (# 3) ⟪⨂⟫ val←i g (# 9)) ⟪⨁⟫�
 
 printCSV : String → AGraph 17 → (AGraph 17 → Fin 17 → MC) → String
 printCSV s g f = "\n" +++ s
-          +++ "; " +++ pprint w (f g (# 16))                    -- S1,S3
+          +++ "; " +++ pprint w (f g (# 16))                    -- S1
           +++ "; "  +++ pprint w (f g (# 14))                   -- S2
-          -- +++ "; "  +++ pprint w (f g (# 5))                    -- S3
+          +++ "; "  +++ pprint w (f g (# 5))                    -- S3
           +++ "; "  +++ pprint w (f g (# 3))                    -- S4
-          +++ "; "  +++ pprint w (f g (# 13))                   -- S5.S7
+          +++ "; "  +++ pprint w (f g (# 13))                   -- S5
           +++ "; "  +++ pprint w (f g (# 8))                    -- S6
-          -- +++ "; "  +++ pprint w (f g (# 11))                   -- S7
+          +++ "; "  +++ pprint w (f g (# 11))                   -- S7
           +++ "; "  +++ pprint w (f g (# 6))                    -- S8
           +++ "; "  +++ pprint w (f g (# 9))                    -- S9
           +++ "; "  +++ pprint w (f g (# 15))                   -- A1
@@ -283,13 +294,13 @@ printCSV s g f = "\n" +++ s
           +++ "; "  +++ pprint w (Correctness G g)              -- Corr
 
 printCSVh = "Step"
-          +++ "; S1,S3"
+          +++ "; S1"
           +++ "; S2"
-          -- +++ "; S3"
+          +++ "; S3"
           +++ "; S4"
-          +++ "; S5,S7"
+          +++ "; S5"
           +++ "; S6"
-          -- +++ "; S7"
+          +++ "; S7"
           +++ "; S8"
           +++ "; S9"
           +++ "; A1"
@@ -306,60 +317,60 @@ main = run (putStrLn stringToPrint)
   where
   wh = 12
   stringToPrint = ""  --S.replicate ws '-'
-    +++ ppretty ws (docSection ws "original")
-    +++ printG G val←i
-    +++ ppretty ws (docSection ws "computed w/o conflicts")
-    +++ printG G (valTree3←i G G)
-    +++ ppretty ws (docSection ws "step 0")
-    +++ printG G0 val←i
-    +++ ppretty ws (docSection ws "step 1")
-    +++ printG G1 val←i
-    -- +++ ppretty ws (docSection ws "step 1 - confl")
-    -- +++ printG G1 foldConflicts
-    -- +++ ppretty ws (docSection ws "step 1 - val+confl")
-    -- +++ printG G1 (val+conflicts G)
-    +++ ppretty ws (docSection ws "step 2")
-    +++ printG G2 val←i
-    +++ ppretty ws (docSection ws "step 3")
-    +++ printG G3 val←i
-    +++ ppretty ws (docSection ws "step 4")
-    +++ printG G4 val←i
-    -- +++ ppretty ws (docSection ws "step 5")
-    -- +++ printG G5 val←i
-    +++ ppretty ws (docSection ws "step 10")
-    +++ printG G10 val←i
-    +++ ppretty ws (docSection ws "step 100")
-    +++ printG G100 val←i
-    +++ ppretty ws (docSection ws "step 200")
-    +++ printG G200 val←i
+    -- +++ ppretty ws (docSection ws "original")
+    -- +++ printG G val←i
+    -- +++ ppretty ws (docSection ws "computed w/o conflicts")
+    -- +++ printG G (valTree3←i G G)
+    -- +++ ppretty ws (docSection ws "step 0")
+    -- +++ printG G0 val←i
+    -- +++ ppretty ws (docSection ws "step 1")
+    -- +++ printG G1 val←i
+    -- -- +++ ppretty ws (docSection ws "step 1 - confl")
+    -- -- +++ printG G1 foldConflicts
+    -- -- +++ ppretty ws (docSection ws "step 1 - val+confl")
+    -- -- +++ printG G1 (val+conflicts G)
+    -- +++ ppretty ws (docSection ws "step 2")
+    -- +++ printG G2 val←i
+    -- +++ ppretty ws (docSection ws "step 3")
+    -- +++ printG G3 val←i
+    -- +++ ppretty ws (docSection ws "step 4")
+    -- +++ printG G4 val←i
+    -- -- +++ ppretty ws (docSection ws "step 5")
+    -- -- +++ printG G5 val←i
+    -- +++ ppretty ws (docSection ws "step 10")
+    -- +++ printG G10 val←i
+    -- +++ ppretty ws (docSection ws "step 100")
+    -- +++ printG G100 val←i
+    -- +++ ppretty ws (docSection ws "step 200")
+    -- +++ printG G200 val←i
 
-    -- +++ printCSVh
-    -- +++ printCSV "0" G0 val←i
-    -- +++ printCSV "1" G1 val←i
-    -- +++ printCSV "2" G2 val←i
-    -- +++ printCSV "3" G3 val←i
-    -- +++ printCSV "4" G4 val←i
-    -- +++ printCSV "10" G10 val←i
-    -- +++ printCSV "100" G100 val←i
-    -- +++ printCSV "200" G200 val←i
+    +++ printCSVh
+    +++ printCSV "0" G0 val←i
+    +++ printCSV "1" G1 val←i
+    +++ printCSV "2" G2 val←i
+    +++ printCSV "3" G3 val←i
+    +++ printCSV "4" G4 val←i
+    +++ printCSV "10" G10 val←i
+    +++ printCSV "100" G100 val←i
+    +++ printCSV "200" G200 val←i
 
-    +++ "\n\nContradiction degree:  step0 = "
-    +++ pprint w ((val←i G0 (# 3) ⟪⨂⟫ val←i G0 (# 9)) ⟪⨁⟫⁺ (val←i G0 (# 4) ⟪⨂⟫ val←i G0 (# 6)))
-    +++ " step1 = "
-    +++ pprint w ((val←i G1 (# 3) ⟪⨂⟫ val←i G1 (# 9)) ⟪⨁⟫⁺ (val←i G1 (# 4) ⟪⨂⟫ val←i G1 (# 6)))
-    +++ " step10 = "
-    +++ pprint w ((val←i G10 (# 3) ⟪⨂⟫ val←i G10 (# 9)) ⟪⨁⟫⁺ (val←i G10 (# 4) ⟪⨂⟫ val←i G10 (# 6)))
-    +++ " step200 = "
-    +++ pprint w ((val←i G200 (# 3) ⟪⨂⟫ val←i G200 (# 9)) ⟪⨁⟫⁺ (val←i G200 (# 4) ⟪⨂⟫ val←i G200 (# 6)))
+    -- +++ "\n\nContradiction degree:  step0 = "
+    -- +++ pprint w ((val←i G0 (# 3) ⟪⨂⟫ val←i G0 (# 9)) ⟪⨁⟫⁺ (val←i G0 (# 4) ⟪⨂⟫ val←i G0 (# 6)))
+    -- +++ " step1 = "
+    -- +++ pprint w ((val←i G1 (# 3) ⟪⨂⟫ val←i G1 (# 9)) ⟪⨁⟫⁺ (val←i G1 (# 4) ⟪⨂⟫ val←i G1 (# 6)))
+    -- +++ " step10 = "
+    -- +++ pprint w ((val←i G10 (# 3) ⟪⨂⟫ val←i G10 (# 9)) ⟪⨁⟫⁺ (val←i G10 (# 4) ⟪⨂⟫ val←i G10 (# 6)))
+    -- +++ " step200 = "
+    -- +++ pprint w ((val←i G200 (# 3) ⟪⨂⟫ val←i G200 (# 9)) ⟪⨁⟫⁺ (val←i G200 (# 4) ⟪⨂⟫ val←i G200 (# 6)))
 
-    +++ "\nCorrectness:"
-    +++ " step0   = " +++ pprint w (Correctness G G0)
-    +++ " step1   = " +++ pprint w (Correctness G G1)
-    +++ " step2   = " +++ pprint w (Correctness G G2)
-    +++ " step3   = " +++ pprint w (Correctness G G3)
-    +++ "\n            "
-    +++ " step10  = " +++ pprint w (Correctness G G10)
-    +++ " step100 = " +++ pprint w (Correctness G G100)
-    +++ " step200 = " +++ pprint w (Correctness G G200)
+    -- +++ "\nCorrectness:"
+    -- +++ " step0   = " +++ pprint w (Correctness G G0)
+    -- +++ " step1   = " +++ pprint w (Correctness G G1)
+    -- +++ " step2   = " +++ pprint w (Correctness G G2)
+    -- +++ " step3   = " +++ pprint w (Correctness G G3)
+    -- +++ "\n            "
+    -- +++ " step10  = " +++ pprint w (Correctness G G10)
+    -- +++ " step100 = " +++ pprint w (Correctness G G100)
+    -- +++ " step200 = " +++ pprint w (Correctness G G200)
 
     -- +++ (pprint 110 G)
