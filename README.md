@@ -1,2 +1,2 @@
 An Argumentation Project. 
-Tested with Agda 2.6.1, stdlib 1.3.
+Tested with Agda 2.6.1.2, stdlib 1.4.
