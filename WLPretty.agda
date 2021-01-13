@@ -14,7 +14,7 @@ open import Data.Maybe hiding (align)
 open import Data.Nat as ℕ
 open import Data.Nat.Show using (show)
 open import Data.Product
-open import Data.String as S renaming (_++_ to _+++_) hiding (braces; parens; _<+>_) 
+open import Data.String as S renaming (_++_ to _+++_) hiding (braces; parens; _<+>_; words) 
 open import Function using (_∘_; id)
 open import Level renaming (zero to lzero; suc to lsuc)
 open import Relation.Nullary.Decidable
