@@ -145,63 +145,63 @@ C3 = SC
 G : AGraph _
 G =
      node C1
-       1.0 {refl} {refl}     -- generel public
+       1.0 {refl} {refl}     -- general public
        -- 1.0 {refl} {refl}     -- scientific audience
        ((conflicting , # 5) ∷ (conflicted , # 3) ∷ []) &
      node C2
-       0.5 {refl} {refl}     -- generel public
+       0.5 {refl} {refl}     -- general public
        -- 1.0 {refl} {refl}     -- scientific audience
        ((conflicting , # 1) ∷ (conflicted , # 7) ∷ []) &
      node C3
-       0.5 {refl} {refl}     -- generel public
+       0.5 {refl} {refl}     -- general public
        -- 1.0 {refl} {refl}     -- scientific audience
        ((conflicting , # 6) ∷ (conflicted , # 0) ∷ []) &
      node0 S4
        ((причинная-связь , # 0) ∷ []) &
      node A2
-       0.8 {refl} {refl}     -- generel public
+       0.8 {refl} {refl}     -- general public
        -- 0.8 {refl} {refl}     -- scientific audience
        ((событие1 , # 9) ∷ (событие2 , # 0) ∷ []) &
      node S3
-       0.9 {refl} {refl}     -- generel public
+       0.9 {refl} {refl}     -- general public
        -- 0.9 {refl} {refl}     -- scientific audience
        [] &
      node0 S8
        ((вывод , # 0) ∷ []) &
      node A3
-       1.0 {refl} {refl}     -- generel public
+       1.0 {refl} {refl}     -- general public
        -- 0.8 {refl} {refl}     -- scientific audience
        ((эксперт , # 5) ∷ (говорит , # 0) ∷ (область , # 4) ∷ []) &
      node S6
-       0.7 {refl} {refl}     -- generel public
+       0.7 {refl} {refl}     -- general public
        -- 1.0 {refl} {refl}     -- scientific audience
        [] &
      node0 S9
        ((вывод , # 0) ∷ []) &
      node A4
-       1.0 {refl} {refl}     -- generel public
+       1.0 {refl} {refl}     -- general public
        -- 0.8 {refl} {refl}     -- scientific audience
        ((эксперт , # 2) ∷ (говорит , # 0) ∷ (область , # 1) ∷ []) &
      node S7
-       1.0 {refl} {refl}     -- generel public
+       1.0 {refl} {refl}     -- general public
        -- 0.9 {refl} {refl}     -- scientific audience
        [] &
      node I-область-внеземная-физика
-       1.0 {refl} {refl}     -- generel public
+       1.0 {refl} {refl}     -- general public
        -- 1.0 {refl} {refl}     -- scientific audience
        [] &
      node S5
-       1.0 {refl} {refl}     -- generel public
+       1.0 {refl} {refl}     -- general public
        -- 0.8 {refl} {refl}     -- scientific audience
        [] &
      node0 S2
        ((вывод , # 0) ∷ []) &
      node A1
-       1.0 {refl} {refl}     -- generel public
+       1.0 {refl} {refl}     -- general public
        -- 0.5 {refl} {refl}     -- scientific audience
        ((все-признают , # 0) ∷ []) &
      node S1
-       1.0 {refl} {refl}     -- generel public
+       1.0 {refl} {refl}     -- general public
        -- 0.9 {refl} {refl}     -- scientific audience
        [] &
      ∅
